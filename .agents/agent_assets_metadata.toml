@@ -18,3 +18,57 @@ id = "kxrPPzDTWeZnHdcMBTw7Z"
 uri = "file://artifacts/aivec/public/surgical-tools.png"
 type = "image"
 title = "Surgical tools editorial"
+
+[[generated]]
+id = "uV8lrauY4A-At18aBSzoM"
+uri = "file://artifacts/aivec/public/hero-anatomy.png"
+type = "image"
+title = "Vintage anatomical vascular illustration"
+
+[[generated]]
+id = "MknwZtpY78FgK6-JWNmu3"
+uri = "file://artifacts/aivec/public/tools-editorial.png"
+type = "image"
+title = "Endovascular instruments editorial photography"
+
+[[generated]]
+id = "i9xuAonJt2mqN2VdeuqRn"
+uri = "file://artifacts/aivec/public/or-atmosphere.png"
+type = "image"
+title = "Atmospheric operating room shot"
+
+[[generated]]
+id = "nTHc2OwQ6Cuj9Uk_OfmJE"
+uri = "file://artifacts/aivec/public/faculty-portrait.png"
+type = "image"
+title = "Serious surgeon portrait silhouette"
+
+[[generated]]
+id = "IDw22kKzuFAAXchjApy49"
+uri = "file://artifacts/aivec/public/aden-landscape.png"
+type = "image"
+title = "Aden Khormaksar coastline dusk"
+
+[[generated]]
+id = "uTsMCIUBE5DuiW0YirXQB"
+uri = "file://artifacts/aivec/public/texture-ultrasound.png"
+type = "image"
+title = "Abstract vascular angiography texture"
+
+[[generated]]
+id = "JwAvFzh2Wet9cVO_kmbIv"
+uri = "file://artifacts/aivec/public/venue-map.png"
+type = "image"
+title = "Stylized architectural map of Aden"
+
+[[generated]]
+id = "OXHz9gIR2Jh379EdYzopL"
+uri = "file://artifacts/aivec/public/stent-macro.png"
+type = "image"
+title = "Macro vascular stent photography"
+
+[[generated]]
+id = "KVZ2uSV2ZDhZ56fJK3ikM"
+uri = "file://artifacts/aivec/public/vein-abstract.png"
+type = "image"
+title = "Abstract crimson vascular structure"

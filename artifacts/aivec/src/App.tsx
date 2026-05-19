@@ -2,7 +2,7 @@ import { Switch, Route, Router as WouterRouter, Redirect, useLocation } from "wo
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { LanguageProvider, useLanguage } from "@/lib/i18n";
+import { LanguageProvider } from "@/lib/i18n";
 import { ClerkProvider } from "@clerk/react";
 import NotFound from "@/pages/not-found";
 
@@ -11,17 +11,9 @@ import { Footer } from "@/components/layout/Footer";
 import { AdminLayout } from "@/components/layout/AdminLayout";
 
 import { Home } from "@/pages/Home";
-import { About } from "@/pages/public/About";
-import { Events } from "@/pages/public/Events";
 import { EventDetail } from "@/pages/public/EventDetail";
-import { Vision } from "@/pages/public/Vision";
-import { Audience } from "@/pages/public/Audience";
-import { Sponsorship } from "@/pages/public/Sponsorship";
-import { News } from "@/pages/public/News";
 import { NewsDetail } from "@/pages/public/NewsDetail";
-import { Blog } from "@/pages/public/Blog";
 import { BlogDetail } from "@/pages/public/BlogDetail";
-import { Contact } from "@/pages/public/Contact";
 import { MyRegistrations } from "@/pages/portal/MyRegistrations";
 
 import { AdminDashboard } from "@/pages/admin/AdminDashboard";
@@ -71,20 +63,16 @@ function LanguageRouter() {
       <Navbar />
       <main className="flex-1">
         <Switch>
+          {/* The Single Page Landing */}
           <Route path="/:lang" component={Home} />
-          <Route path="/:lang/about" component={About} />
-          <Route path="/:lang/events" component={Events} />
+          
+          {/* Detail pages and portals */}
           <Route path="/:lang/events/:slug" component={EventDetail} />
-          <Route path="/:lang/vision" component={Vision} />
-          <Route path="/:lang/audience" component={Audience} />
-          <Route path="/:lang/sponsorship" component={Sponsorship} />
-          <Route path="/:lang/news" component={News} />
           <Route path="/:lang/news/:slug" component={NewsDetail} />
-          <Route path="/:lang/blog" component={Blog} />
           <Route path="/:lang/blog/:slug" component={BlogDetail} />
-          <Route path="/:lang/contact" component={Contact} />
           <Route path="/:lang/me/registrations" component={MyRegistrations} />
           
+          {/* Admin routes */}
           <Route path="/:lang/admin/*" component={AdminRouter} />
           
           <Route component={NotFound} />
@@ -114,7 +102,7 @@ function App() {
   return (
     <ClerkProvider publishableKey={PUBLISHABLE_KEY} appearance={{
       variables: {
-        colorPrimary: "hsl(215 60% 25%)",
+        colorPrimary: "hsl(355 65% 25%)",
       }
     }}>
       <QueryClientProvider client={queryClient}>

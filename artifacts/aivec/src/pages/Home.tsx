@@ -1,144 +1,498 @@
 import { useLanguage } from "@/lib/i18n";
-import { useGetSiteSettings, useGetPage, useListEvents, useListSponsors, useListNews } from "@workspace/api-client-react";
-import { Button } from "@/components/ui/button";
-import { Link } from "wouter";
-import { Calendar, MapPin, ArrowRight, ArrowLeft } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Link, useLocation } from "wouter";
+import { 
+  useGetSiteSettings, 
+  useListEvents, 
+  useListNews, 
+  useListSponsors, 
+  useGetPage,
+  getGetPageQueryKey,
+  getGetSiteSettingsQueryKey,
+  getListEventsQueryKey,
+  getListNewsQueryKey,
+  getListSponsorsQueryKey
+} from "@workspace/api-client-react";
+import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
 import { format } from "date-fns";
+import { ArrowRight, ArrowLeft, Calendar, MapPin, ArrowUpRight, Phone, Mail } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 
 export function Home() {
   const { lang, t } = useLanguage();
-  const { data: settings } = useGetSiteSettings();
-  const { data: aboutPage } = useGetPage("about");
-  const { data: events } = useListEvents({ status: 'open' });
-  const { data: news } = useListNews({ published: true });
-  const { data: sponsors } = useListSponsors();
+  const Arrow = lang === 'ar' ? ArrowLeft : ArrowRight;
+  const isRtl = lang === 'ar';
+  const [, setLocation] = useLocation();
 
-  const ArrowIcon = lang === 'ar' ? ArrowLeft : ArrowRight;
+  const { data: settings } = useGetSiteSettings({ query: { queryKey: getGetSiteSettingsQueryKey() } as never });
+  const { data: events } = useListEvents(undefined, { query: { queryKey: getListEventsQueryKey() } as never });
+  const { data: news } = useListNews(undefined, { query: { queryKey: getListNewsQueryKey() } as never });
+  const { data: sponsors } = useListSponsors({ query: { queryKey: getListSponsorsQueryKey() } as never });
+  
+  const { data: pageAbout } = useGetPage('about', { query: { queryKey: getGetPageQueryKey('about') } as never });
+  const { data: pageVision } = useGetPage('vision', { query: { queryKey: getGetPageQueryKey('vision') } as never });
+  const { data: pageAudience } = useGetPage('audience', { query: { queryKey: getGetPageQueryKey('audience') } as never });
+  const { data: pageSponsorship } = useGetPage('sponsorship', { query: { queryKey: getGetPageQueryKey('sponsorship') } as never });
+
+  // Parallax logic
+  const containerRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ["start start", "end start"]
+  });
+  
+  const yHero = useTransform(scrollYProgress, [0, 1], ["0%", "50%"]);
+  const opacityHero = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
+
+  // Handle anchor links
+  useEffect(() => {
+    const hash = window.location.hash;
+    if (hash) {
+      setTimeout(() => {
+        const element = document.querySelector(hash);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth' });
+        }
+      }, 100);
+    }
+  }, []);
+
+  const openEvents = events?.filter(e => e.status === 'open' || e.status === 'coming_soon') || [];
 
   return (
-    <div className="flex flex-col min-h-screen">
-      {/* Hero Section */}
-      <section className="relative h-[85vh] flex items-center justify-center overflow-hidden bg-background">
-        <div className="absolute inset-0 bg-primary/5 z-0" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-primary/10 via-background to-background z-0" />
-        
-        <div className="container relative z-10 px-4 flex flex-col items-center text-center">
-          <div className="inline-flex items-center rounded-full border border-accent/30 px-3 py-1 text-sm font-medium bg-accent/10 text-accent-foreground mb-8">
-            {t("2nd Edition", "النسخة الثانية")}
-          </div>
-          
-          <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold font-serif max-w-4xl tracking-tight text-primary mb-6 leading-tight">
-            {t(settings?.siteTitleEn || "Aden International Vascular & Endovascular Conference", settings?.siteTitleAr || "مؤتمر عدن الدولي للأوعية الدموية")}
-          </h1>
-          
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-6 text-muted-foreground mb-12 text-lg font-medium">
-            <div className="flex items-center gap-2 bg-card/50 backdrop-blur-sm px-4 py-2 rounded-lg border shadow-sm">
-              <Calendar className="w-5 h-5 text-accent" />
-              <span>{t(settings?.conferenceDatesEn || "December 1–3, 2026", settings?.conferenceDatesAr || "١-٣ ديسمبر ٢٠٢٦")}</span>
-            </div>
-            <div className="flex items-center gap-2 bg-card/50 backdrop-blur-sm px-4 py-2 rounded-lg border shadow-sm">
-              <MapPin className="w-5 h-5 text-accent" />
-              <span>{t(settings?.venueNameEn || "Saba Grand Hall", settings?.venueNameAr || "قاعة سبأ الكبرى")}</span>
-            </div>
-          </div>
+    <div className="bg-background text-foreground selection:bg-primary selection:text-primary-foreground" ref={containerRef}>
+      
+      {/* HERO SECTION - ASYMMETRIC */}
+      <section id="home" className="relative min-h-[100dvh] pt-28 pb-16 overflow-hidden flex flex-col justify-center">
+        <div className="container mx-auto px-6 md:px-12 relative z-10 flex-1 flex flex-col justify-center">
+          <div className="grid lg:grid-cols-12 gap-8 lg:gap-12 items-center h-full">
+            
+            {/* Typographic Masthead */}
+            <div className="lg:col-span-7 flex flex-col justify-center order-2 lg:order-1 pt-12 lg:pt-0">
+              <motion.div
+                initial={{ opacity: 0, y: 40 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+              >
+                <div className="flex items-center gap-4 mb-8">
+                  <div className="h-px bg-primary w-12" />
+                  <span className="text-xs uppercase tracking-[0.2em] font-bold text-primary">
+                    {settings ? t(settings.conferenceOrdinalEn, settings.conferenceOrdinalAr) : "2nd"} {t("Edition", "النسخة")}
+                  </span>
+                </div>
+                
+                <h1 className="text-[12vw] sm:text-[8vw] lg:text-[7.5rem] leading-[0.85] font-serif font-bold text-foreground mb-8 tracking-tighter">
+                  {t("Aden Intl.", "مؤتمر عدن")}<br />
+                  <span className="text-primary italic font-light ml-[10%] rtl:ml-0 rtl:mr-[10%] inline-block">
+                    {t("Vascular", "الدولي")}
+                  </span><br />
+                  {t("Conference", "للأوعية الدموية")}
+                </h1>
 
-          <div className="flex flex-col sm:flex-row items-center gap-4">
-            <Link href={`/${lang}/events`}>
-              <Button size="lg" className="h-14 px-8 text-base shadow-lg">
-                {t("Register Now", "سجل الآن")}
-              </Button>
-            </Link>
-            <Link href={`/${lang}/about`}>
-              <Button size="lg" variant="outline" className="h-14 px-8 text-base bg-background/50 backdrop-blur border-primary/20 hover:bg-primary/5">
-                {t("About Conference", "عن المؤتمر")}
-              </Button>
-            </Link>
+                <div className="grid sm:grid-cols-2 gap-8 mt-16 max-w-2xl border-t border-border/50 pt-8">
+                  <div>
+                    <p className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold mb-2">
+                      {t("Date & Time", "الزمان")}
+                    </p>
+                    <p className="text-lg font-serif">
+                      {settings ? t(settings.conferenceDatesEn, settings.conferenceDatesAr) : "Dec 1–3, 2026"}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold mb-2">
+                      {t("Location", "المكان")}
+                    </p>
+                    <p className="text-lg font-serif">
+                      {settings ? t(settings.venueNameEn, settings.venueNameAr) : "Saba Grand Hall, Aden"}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="mt-12 flex flex-wrap gap-6 items-center">
+                  <button 
+                    onClick={() => document.querySelector('#program')?.scrollIntoView({ behavior: 'smooth' })}
+                    className="group flex items-center justify-between px-8 py-5 bg-primary text-primary-foreground font-bold text-xs uppercase tracking-widest hover:bg-primary/90 transition-all border border-primary relative overflow-hidden w-full sm:w-auto"
+                  >
+                    <span className="relative z-10">{t("Explore Program", "استعرض البرنامج")}</span>
+                    <ArrowRight className={`w-4 h-4 ml-4 relative z-10 transition-transform group-hover:translate-x-1 ${isRtl ? 'rotate-180 ml-0 mr-4 group-hover:-translate-x-1' : ''}`} />
+                  </button>
+                  <button 
+                    onClick={() => document.querySelector('#contact')?.scrollIntoView({ behavior: 'smooth' })}
+                    className="group flex items-center justify-between px-8 py-5 bg-transparent text-foreground font-bold text-xs uppercase tracking-widest hover:bg-muted transition-all border border-border relative overflow-hidden w-full sm:w-auto"
+                  >
+                    <span className="relative z-10">{t("Contact Us", "تواصل معنا")}</span>
+                  </button>
+                </div>
+              </motion.div>
+            </div>
+
+            {/* Vertical Image Bleed */}
+            <div className="lg:col-span-5 h-[50vh] lg:h-[85vh] relative order-1 lg:order-2 w-full">
+              <motion.div 
+                className="absolute inset-0 z-0 bg-muted overflow-hidden border border-border shadow-2xl"
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
+              >
+                <motion.div style={{ y: yHero, scale: 1.1 }} className="w-full h-full">
+                  <img src="/hero-anatomy.png" alt="Anatomy" className="w-full h-full object-cover object-center mix-blend-multiply opacity-90 dark:opacity-70 dark:mix-blend-normal dark:filter dark:grayscale dark:contrast-150" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-background/40 to-transparent mix-blend-overlay"></div>
+                </motion.div>
+              </motion.div>
+            </div>
+            
           </div>
         </div>
       </section>
-      
-      {/* About Teaser */}
-      {aboutPage && (
-        <section className="py-24 bg-card">
-          <div className="container mx-auto px-4 max-w-4xl text-center">
-            <h2 className="text-3xl md:text-4xl font-serif text-primary mb-6">
-              {t(aboutPage.titleEn, aboutPage.titleAr)}
-            </h2>
-            <p className="text-lg text-muted-foreground leading-relaxed mb-8 line-clamp-4">
-              {t(aboutPage.bodyEn, aboutPage.bodyAr)}
-            </p>
-            <Link href={`/${lang}/about`} className="inline-flex items-center text-primary font-medium hover:underline gap-1">
-              {t("Read full story", "اقرأ المزيد")} <ArrowIcon className="w-4 h-4" />
-            </Link>
+
+      {/* HORIZONTAL STATS BANNER */}
+      <section className="border-y border-border/50 bg-card py-16 overflow-hidden">
+        <div className="container mx-auto px-6 md:px-12 flex flex-wrap justify-between items-center gap-12 font-serif text-center md:text-left rtl:md:text-right">
+          <div className="flex-1 min-w-[150px]">
+            <div className="text-6xl md:text-7xl font-light text-primary mb-2 font-mono tracking-tighter">02</div>
+            <div className="text-xs uppercase tracking-[0.2em] text-muted-foreground font-bold">{t("Editions", "النسخ")}</div>
+          </div>
+          <div className="flex-1 min-w-[150px]">
+            <div className="text-6xl md:text-7xl font-light text-primary mb-2 font-mono tracking-tighter">500<span className="text-4xl text-primary/60">+</span></div>
+            <div className="text-xs uppercase tracking-[0.2em] text-muted-foreground font-bold">{t("Delegates", "المشاركون")}</div>
+          </div>
+          <div className="flex-1 min-w-[150px]">
+            <div className="text-6xl md:text-7xl font-light text-primary mb-2 font-mono tracking-tighter">35</div>
+            <div className="text-xs uppercase tracking-[0.2em] text-muted-foreground font-bold">{t("Faculty", "المتحدثون")}</div>
+          </div>
+          <div className="flex-1 min-w-[150px]">
+            <div className="text-6xl md:text-7xl font-light text-primary mb-2 font-mono tracking-tighter">12</div>
+            <div className="text-xs uppercase tracking-[0.2em] text-muted-foreground font-bold">{t("CME Hours", "ساعات معتمدة")}</div>
+          </div>
+          <div className="flex-1 min-w-[150px]">
+            <div className="text-6xl md:text-7xl font-light text-primary mb-2 font-mono tracking-tighter">4</div>
+            <div className="text-xs uppercase tracking-[0.2em] text-muted-foreground font-bold">{t("Countries", "الدول")}</div>
+          </div>
+        </div>
+      </section>
+
+      {/* ABOUT - EDITORIAL SPREAD */}
+      {pageAbout && (
+        <section id="about" className="py-24 md:py-40 relative">
+          <div className="container mx-auto px-6 md:px-12">
+            <div className="grid lg:grid-cols-12 gap-16 lg:gap-24 items-start">
+              
+              <div className="lg:col-span-5 relative">
+                <div className="sticky top-32">
+                  <div className="aspect-[3/4] relative z-10 p-2 bg-card border border-border/50 shadow-xl overflow-hidden">
+                    <motion.img 
+                      initial={{ scale: 1.1 }}
+                      whileInView={{ scale: 1 }}
+                      transition={{ duration: 1.5 }}
+                      viewport={{ once: true }}
+                      src="/tools-editorial.png" alt="Editorial Tools" className="w-full h-full object-cover grayscale contrast-125" 
+                    />
+                  </div>
+                  <div className="absolute -bottom-12 -right-12 w-2/3 aspect-square bg-muted border border-border/50 p-2 z-20 hidden md:block shadow-2xl">
+                    <img src="/stent-macro.png" alt="Stent Macro" className="w-full h-full object-cover" />
+                  </div>
+                </div>
+              </div>
+
+              <div className="lg:col-span-7 pt-12 lg:pt-0">
+                <h3 className="text-accent font-bold uppercase tracking-[0.2em] text-sm mb-8 flex items-center gap-4">
+                  <span className="w-12 h-px bg-accent block"></span>
+                  {t("The Congress", "عن المؤتمر")}
+                </h3>
+                <h2 className="text-5xl md:text-6xl font-serif font-bold mb-10 leading-[1.1] text-foreground">
+                  {t(pageAbout.titleEn, pageAbout.titleAr)}
+                </h2>
+                
+                {pageAbout.subtitleEn && (
+                  <p className="text-2xl md:text-3xl text-primary font-serif italic mb-12 border-l-4 border-accent pl-8 rtl:pl-0 rtl:border-l-0 rtl:border-r-4 rtl:pr-8 py-2">
+                    {t(pageAbout.subtitleEn, pageAbout.subtitleAr)}
+                  </p>
+                )}
+                
+                <div className="prose prose-xl dark:prose-invert prose-p:text-muted-foreground max-w-none prose-headings:font-serif">
+                  {t(pageAbout.bodyEn, pageAbout.bodyAr)?.split('\n\n').map((p, i) => (
+                    <p key={i} className={i === 0 ? "first-letter:text-7xl first-letter:font-serif first-letter:text-primary first-letter:float-left first-letter:mr-4 rtl:first-letter:float-right rtl:first-letter:mr-0 rtl:first-letter:ml-4 first-letter:mt-2 first-letter:leading-none" : "leading-relaxed"}>
+                      {p}
+                    </p>
+                  ))}
+                </div>
+              </div>
+
+            </div>
           </div>
         </section>
       )}
 
-      {/* Featured Events */}
-      {events && events.length > 0 && (
-        <section className="py-24 bg-background">
-          <div className="container mx-auto px-4">
-            <div className="flex justify-between items-end mb-12">
+      {/* VISION & AUDIENCE - PARALLAX BACKGROUND */}
+      <section id="vision" className="py-32 md:py-48 bg-primary text-primary-foreground relative overflow-hidden">
+        <div className="absolute inset-0 opacity-20 mix-blend-overlay">
+          <img src="/texture-ultrasound.png" alt="Texture" className="w-full h-full object-cover" />
+        </div>
+        <div className="absolute inset-0 bg-gradient-to-b from-primary via-primary/90 to-primary"></div>
+        
+        <div className="container mx-auto px-6 md:px-12 relative z-10">
+          <div className="grid md:grid-cols-2 gap-20 lg:gap-32">
+            {pageVision && (
               <div>
-                <h2 className="text-3xl font-serif text-primary mb-2">{t("Upcoming Sessions", "الجلسات القادمة")}</h2>
-                <p className="text-muted-foreground">{t("Register for our highlighted workshops and lectures.", "سجل في ورش العمل والمحاضرات المميزة.")}</p>
+                <h3 className="text-accent font-bold uppercase tracking-[0.2em] text-sm mb-8 flex items-center gap-4">
+                  <span className="w-12 h-px bg-accent block"></span>
+                  {t("Our Vision", "رؤيتنا")}
+                </h3>
+                <h2 className="text-5xl font-serif font-bold mb-10 leading-tight text-white">
+                  {t(pageVision.titleEn, pageVision.titleAr)}
+                </h2>
+                <div className="prose prose-xl prose-invert max-w-none prose-p:text-white/80 prose-p:leading-relaxed">
+                  {t(pageVision.bodyEn, pageVision.bodyAr)}
+                </div>
               </div>
-              <Link href={`/${lang}/events`} className="hidden sm:inline-flex items-center text-primary font-medium hover:underline gap-1">
-                {t("View all", "عرض الكل")} <ArrowIcon className="w-4 h-4" />
-              </Link>
+            )}
+            {pageAudience && (
+              <div id="audience" className="md:pt-32">
+                <h3 className="text-accent font-bold uppercase tracking-[0.2em] text-sm mb-8 flex items-center gap-4">
+                  <span className="w-12 h-px bg-accent block"></span>
+                  {t("Who Should Attend", "الجمهور المستهدف")}
+                </h3>
+                <h2 className="text-5xl font-serif font-bold mb-10 leading-tight text-white">
+                  {t(pageAudience.titleEn, pageAudience.titleAr)}
+                </h2>
+                <div className="prose prose-xl prose-invert max-w-none prose-p:text-white/80 prose-p:leading-relaxed">
+                  {t(pageAudience.bodyEn, pageAudience.bodyAr)}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </section>
+
+      {/* PROGRAM - EDITORIAL TIMETABLE */}
+      <section id="program" className="py-24 md:py-40 bg-card">
+        <div className="container mx-auto px-6 md:px-12">
+          <div className="flex flex-col md:flex-row justify-between items-end mb-20 gap-8">
+            <div className="max-w-3xl">
+              <h3 className="text-accent font-bold uppercase tracking-[0.2em] text-sm mb-6 flex items-center gap-4">
+                <span className="w-12 h-px bg-accent block"></span>
+                {t("Scientific Program", "البرنامج العلمي")}
+              </h3>
+              <h2 className="text-5xl md:text-7xl font-serif font-bold leading-[0.9] tracking-tighter">
+                {t("Agenda & Sessions", "الجلسات والبرنامج")}
+              </h2>
+            </div>
+            <a href="#contact" className="text-sm font-bold uppercase tracking-widest text-primary hover:text-accent transition-colors flex items-center gap-2 pb-2">
+              {t("Inquire about sessions", "استفسر عن الجلسات")}
+              <ArrowRight className={`w-4 h-4 ${isRtl ? 'rotate-180' : ''}`} />
+            </a>
+          </div>
+
+          <div className="border-t-2 border-border">
+            {openEvents && openEvents.length > 0 ? (
+              openEvents.map((event, i) => (
+                <Link key={event.id} href={`/${lang}/events/${event.slug}`} className="group block border-b border-border/50 hover:bg-background transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary">
+                  <div className="grid md:grid-cols-12 gap-8 py-10 items-center px-4 md:px-8">
+                    <div className="md:col-span-2 text-sm font-mono text-muted-foreground uppercase tracking-widest flex flex-col gap-2 border-l-2 border-primary/20 pl-4 rtl:pl-0 rtl:border-l-0 rtl:border-r-2 rtl:pr-4">
+                      {event.startsAt && (
+                        <>
+                          <span className="font-bold text-primary">{format(new Date(event.startsAt), "MMM d")}</span>
+                          <span dir="ltr">{format(new Date(event.startsAt), "HH:mm")}</span>
+                        </>
+                      )}
+                    </div>
+                    <div className="md:col-span-8">
+                      <div className="flex gap-4 items-center mb-3">
+                        <span className={`text-[10px] font-bold uppercase tracking-widest px-2 py-1 bg-muted text-muted-foreground`}>
+                          {event.status.replace('_', ' ')}
+                        </span>
+                      </div>
+                      <h4 className="text-3xl font-serif font-bold mb-3 group-hover:text-primary transition-colors leading-tight">
+                        {t(event.titleEn, event.titleAr)}
+                      </h4>
+                      <p className="text-xl text-muted-foreground font-serif italic line-clamp-2">
+                        {t(event.summaryEn, event.summaryAr)}
+                      </p>
+                    </div>
+                    <div className="md:col-span-2 flex justify-end items-center">
+                      <span className="w-12 h-12 rounded-full border border-border flex items-center justify-center group-hover:bg-primary group-hover:text-primary-foreground group-hover:border-primary transition-all duration-300 transform group-hover:scale-110">
+                        <ArrowUpRight className={`w-5 h-5 ${isRtl ? '-scale-x-100' : ''}`} />
+                      </span>
+                    </div>
+                  </div>
+                </Link>
+              ))
+            ) : (
+              <div className="py-32 text-center border-b border-border/50">
+                <p className="text-2xl font-serif text-muted-foreground italic">{t("The scientific program is currently being finalized.", "جاري الانتهاء من إعداد البرنامج العلمي.")}</p>
+              </div>
+            )}
+          </div>
+        </div>
+      </section>
+
+      {/* FULL WIDTH IMAGE / PORTRAIT */}
+      <section className="h-[70vh] relative overflow-hidden">
+        <div className="absolute inset-0 z-0">
+          <motion.div style={{ y: useTransform(scrollYProgress, [0.5, 1], ["-20%", "20%"]) }} className="w-full h-[140%] -top-[20%] relative">
+            <img src="/faculty-portrait.png" alt="Faculty" className="w-full h-full object-cover object-top grayscale" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent"></div>
+          </motion.div>
+        </div>
+        <div className="container mx-auto px-6 md:px-12 relative z-10 h-full flex items-end pb-20">
+          <h2 className="text-4xl md:text-6xl lg:text-8xl font-serif font-bold text-white max-w-5xl leading-[0.9] tracking-tighter">
+            "Advancing vascular care through global collaboration."
+          </h2>
+        </div>
+      </section>
+
+      {/* NEWS SECTION */}
+      <section id="news" className="py-24 md:py-40 bg-background">
+        <div className="container mx-auto px-6 md:px-12">
+          <div className="flex flex-col md:flex-row justify-between items-end mb-20 gap-8 border-b-2 border-border pb-10">
+            <div>
+              <h3 className="text-accent font-bold uppercase tracking-[0.2em] text-sm mb-6 flex items-center gap-4">
+                <span className="w-12 h-px bg-accent block"></span>
+                {t("Latest Updates", "أحدث التحديثات")}
+              </h3>
+              <h2 className="text-5xl md:text-6xl font-serif font-bold leading-tight">
+                {t("Conference News", "أخبار المؤتمر")}
+              </h2>
+            </div>
+            <a href="#contact" className="text-sm font-bold uppercase tracking-widest text-primary hover:text-accent transition-colors flex items-center gap-2">
+              {t("Press inquiries", "استفسارات صحفية")}
+              <ArrowRight className={`w-4 h-4 ${isRtl ? 'rotate-180' : ''}`} />
+            </a>
+          </div>
+
+          <div className="grid md:grid-cols-12 gap-x-10 gap-y-16">
+            {news?.slice(0, 3).map((item, i) => {
+              const isLead = i === 0;
+              return (
+                <article key={item.id} className={`${isLead ? 'md:col-span-12 lg:col-span-7 lg:border-r lg:pr-10' : i === 1 ? 'md:col-span-6 lg:col-span-5' : 'md:col-span-6 lg:col-span-5 lg:col-start-8 lg:pt-10 lg:border-t lg:border-border/60'} border-border/60`}>
+                  <Link href={`/${lang}/news/${item.slug}`} className="group block h-full">
+                    {isLead && item.coverUrl ? (
+                      <div className="aspect-[16/10] mb-10 overflow-hidden bg-muted relative">
+                        <img src={item.coverUrl} alt="" className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105" />
+                      </div>
+                    ) : null}
+                    <div className="flex items-baseline gap-6 mb-6">
+                      <span className="font-mono text-[10px] tracking-[0.3em] text-accent font-bold uppercase">
+                        № {String(i + 1).padStart(2, '0')}
+                      </span>
+                      <span className="font-mono text-[10px] tracking-[0.25em] text-muted-foreground uppercase">
+                        {item.publishedAt ? format(new Date(item.publishedAt), "MMMM d, yyyy") : ""}
+                      </span>
+                    </div>
+                    <h4 className={`${isLead ? 'text-4xl md:text-5xl lg:text-6xl' : 'text-2xl md:text-3xl'} font-serif font-bold mb-5 leading-[1.05] tracking-tight group-hover:text-primary transition-colors`}>
+                      {t(item.titleEn, item.titleAr)}
+                    </h4>
+                    <p className={`text-muted-foreground ${isLead ? 'text-xl' : 'text-base'} font-serif italic leading-relaxed line-clamp-3 max-w-prose`}>
+                      {t(item.excerptEn, item.excerptAr)}
+                    </p>
+                    <div className="mt-8 inline-flex items-center gap-3 text-xs font-bold uppercase tracking-[0.25em] text-primary border-b border-primary/30 pb-1 group-hover:border-primary transition-colors">
+                      {t("Read article", "اقرأ المقال")}
+                      <Arrow className="w-3.5 h-3.5" />
+                    </div>
+                  </Link>
+                </article>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* SPONSORSHIP - MUSEUM WALL */}
+      <section id="sponsors" className="py-24 md:py-40 border-t border-border bg-card">
+        <div className="container mx-auto px-6 md:px-12 text-center">
+          <h3 className="text-accent font-bold uppercase tracking-[0.2em] text-sm mb-6 flex items-center justify-center gap-4">
+            <span className="w-12 h-px bg-accent block"></span>
+            {t("Industry Partners", "شركاء الصناعة")}
+            <span className="w-12 h-px bg-accent block"></span>
+          </h3>
+          <h2 className="text-5xl md:text-6xl font-serif font-bold mb-24 leading-tight max-w-3xl mx-auto">
+            {t("Supported by Leading Medical Innovations", "بدعم من رواد الابتكار الطبي")}
+          </h2>
+
+          <div className="max-w-5xl mx-auto">
+            {['platinum', 'gold', 'silver', 'supporter'].map(tier => {
+              const tierSponsors = sponsors?.filter(s => s.tier === tier) || [];
+              if (tierSponsors.length === 0) return null;
+              
+              return (
+                <div key={tier} className="mb-24 last:mb-0">
+                  <h4 className="text-sm font-bold uppercase tracking-[0.4em] text-primary mb-12 border-b border-border pb-6">
+                    {t(tier + " Sponsors", "رعاة " + tier)}
+                  </h4>
+                  <div className={`flex flex-wrap justify-center items-center gap-16 md:gap-24 ${tier === 'platinum' ? 'mb-8' : ''}`}>
+                    {tierSponsors.map(sponsor => (
+                      <a 
+                        key={sponsor.id} 
+                        href={sponsor.websiteUrl || '#'} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className={`grayscale hover:grayscale-0 transition-all duration-700 opacity-60 hover:opacity-100 ${
+                          tier === 'platinum' ? 'w-56 md:w-80' : 
+                          tier === 'gold' ? 'w-40 md:w-56' : 
+                          'w-28 md:w-40'
+                        }`}
+                      >
+                        {sponsor.logoUrl ? (
+                          <img src={sponsor.logoUrl} alt={t(sponsor.nameEn, sponsor.nameAr)} className="w-full h-auto object-contain mix-blend-multiply dark:mix-blend-normal" />
+                        ) : (
+                          <div className={`font-serif font-bold ${tier === 'platinum' ? 'text-4xl' : 'text-2xl'}`}>
+                            {t(sponsor.nameEn, sponsor.nameAr)}
+                          </div>
+                        )}
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* VENUE & CONTACT */}
+      <section id="venue" className="py-24 md:py-40 bg-background relative border-t border-border">
+        <div className="container mx-auto px-6 md:px-12">
+          <div id="contact" className="grid lg:grid-cols-2 gap-0 border border-border shadow-2xl bg-card">
+            
+            <div className="p-12 md:p-20 flex flex-col justify-center order-2 lg:order-1">
+              <h3 className="text-accent font-bold uppercase tracking-[0.2em] text-sm mb-8 flex items-center gap-4">
+                <span className="w-12 h-px bg-accent block"></span>
+                {t("Venue & Contact", "المكان والتواصل")}
+              </h3>
+              <h2 className="text-4xl md:text-5xl font-serif font-bold mb-10 leading-tight">
+                {settings ? t(settings.venueNameEn, settings.venueNameAr) : "Saba Grand Hall"}
+              </h2>
+              
+              <div className="space-y-8 mb-16 text-lg font-serif">
+                <div className="flex gap-6">
+                  <MapPin className="w-6 h-6 text-primary shrink-0 mt-1" />
+                  <p className="text-foreground leading-relaxed">{settings ? t(settings.venueDescEn, settings.venueDescAr) : "Khormaksar, Aden, Yemen"}</p>
+                </div>
+                <div className="flex items-center gap-6">
+                  <Phone className="w-6 h-6 text-primary shrink-0" />
+                  <p className="font-mono text-foreground tracking-wide" dir="ltr">{settings?.contactPhone || "+967 777 907 147"}</p>
+                </div>
+                <div className="flex items-center gap-6">
+                  <Mail className="w-6 h-6 text-primary shrink-0" />
+                  <p className="font-mono text-foreground tracking-wide">alameriendo@gmail.com</p>
+                </div>
+              </div>
+              
+              <div className="pt-10 border-t border-border/50">
+                <a href="#home" className="inline-flex items-center justify-center px-8 py-4 bg-foreground text-background font-bold text-xs uppercase tracking-widest hover:bg-primary hover:text-primary-foreground transition-colors">
+                  {t("Back to Top", "العودة للأعلى")}
+                  <ArrowRight className={`w-4 h-4 ml-4 ${isRtl ? 'rotate-180 ml-0 mr-4' : ''}`} />
+                </a>
+              </div>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {events.slice(0, 3).map((event) => (
-                <Card key={event.id} className="h-full hover:shadow-md transition-shadow">
-                  <CardHeader>
-                    <CardTitle className="text-xl font-serif line-clamp-2">
-                      {t(event.titleEn, event.titleAr)}
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
-                      {t(event.summaryEn, event.summaryAr)}
-                    </p>
-                    {event.startsAt && (
-                      <div className="flex items-center gap-2 text-sm font-medium mb-4">
-                        <Calendar className="w-4 h-4 text-primary" />
-                        <span>{format(new Date(event.startsAt), "PP")}</span>
-                      </div>
-                    )}
-                    <Link href={`/${lang}/events/${event.slug}`}>
-                      <Button variant="outline" className="w-full">{t("Register", "التسجيل")}</Button>
-                    </Link>
-                  </CardContent>
-                </Card>
-              ))}
+            <div className="relative min-h-[500px] lg:min-h-full bg-muted border-b lg:border-b-0 lg:border-l border-border order-1 lg:order-2">
+              <img src="/aden-landscape.png" alt="Aden Landscape" className="w-full h-full object-cover grayscale contrast-125 mix-blend-multiply opacity-80 dark:mix-blend-normal dark:opacity-60" />
             </div>
+            
           </div>
-        </section>
-      )}
+        </div>
+      </section>
 
-      {/* Sponsor Wall Teaser */}
-      {sponsors && sponsors.length > 0 && (
-        <section className="py-24 bg-muted/30 border-y">
-          <div className="container mx-auto px-4 text-center">
-            <h2 className="text-2xl font-serif text-primary mb-12 tracking-widest uppercase">
-              {t("Supported By", "بدعم من")}
-            </h2>
-            <div className="flex flex-wrap justify-center items-center gap-8 md:gap-16 opacity-70 grayscale">
-              {sponsors.slice(0, 5).map(sponsor => (
-                <div key={sponsor.id} className="flex items-center justify-center">
-                  {sponsor.logoUrl ? (
-                    <img src={sponsor.logoUrl} alt={t(sponsor.nameEn, sponsor.nameAr)} className="max-w-[120px] max-h-[60px] object-contain" />
-                  ) : (
-                    <span className="font-serif text-xl font-bold">{t(sponsor.nameEn, sponsor.nameAr)}</span>
-                  )}
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
     </div>
   );
 }

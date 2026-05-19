@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,400..800;1,9..40,400..800&family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300..800;1,9..40,300..800&family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&display=swap');
 @import "tailwindcss";
 @import "tw-animate-css";
 @plugin "@tailwindcss/typography";
@@ -64,125 +64,105 @@
 
 /* LIGHT MODE */
 :root {
-  --button-outline: rgba(0,0,0, .10);
-  --badge-outline: rgba(0,0,0, .05);
-  --opaque-button-border-intensity: -8;
-  --elevate-1: rgba(0,0,0, .03);
-  --elevate-2: rgba(0,0,0, .08);
+  /* Deep Ivory / Warm Bone paper base */
+  --background: 42 35% 94%;
+  --foreground: 350 25% 12%;
 
-  /* Deep Ivory / Warm Grey base */
-  --background: 40 30% 96%;
-  --foreground: 350 30% 15%;
+  --border: 350 15% 80%;
 
-  --border: 350 15% 85%;
+  --card: 42 40% 96%;
+  --card-foreground: 350 25% 12%;
+  --card-border: 350 15% 82%;
 
-  --card: 40 25% 94%;
-  --card-foreground: 350 30% 15%;
-  --card-border: 350 15% 85%;
+  --sidebar: 42 40% 96%;
+  --sidebar-foreground: 350 25% 12%;
+  --sidebar-border: 350 15% 82%;
+  --sidebar-primary: 355 65% 25%;
+  --sidebar-primary-foreground: 42 35% 94%;
+  --sidebar-accent: 350 15% 85%;
+  --sidebar-accent-foreground: 350 25% 12%;
+  --sidebar-ring: 355 65% 25%;
 
-  --sidebar: 40 30% 96%;
-  --sidebar-foreground: 350 30% 15%;
-  --sidebar-border: 350 15% 85%;
-  --sidebar-primary: 350 60% 30%;
-  --sidebar-primary-foreground: 40 30% 96%;
-  --sidebar-accent: 350 20% 90%;
-  --sidebar-accent-foreground: 350 30% 15%;
-  --sidebar-ring: 43 74% 49%;
+  --popover: 42 35% 94%;
+  --popover-foreground: 350 25% 12%;
+  --popover-border: 350 15% 80%;
 
-  --popover: 40 30% 96%;
-  --popover-foreground: 350 30% 15%;
-  --popover-border: 350 15% 85%;
+  /* Deep Arterial Oxblood */
+  --primary: 355 65% 25%;
+  --primary-foreground: 42 35% 94%;
 
-  /* Deep Arterial Red / Vascular Crimson */
-  --primary: 350 60% 30%;
-  --primary-foreground: 40 30% 96%;
+  /* Venous Burgundy */
+  --secondary: 345 40% 35%;
+  --secondary-foreground: 42 35% 94%;
 
-  /* Surgical Teal */
-  --secondary: 180 40% 20%;
-  --secondary-foreground: 40 30% 96%;
+  --muted: 350 10% 86%;
+  --muted-foreground: 350 15% 40%;
 
-  --muted: 350 15% 88%;
-  --muted-foreground: 350 20% 45%;
-
-  /* Gold Leaf */
-  --accent: 40 50% 55%;
-  --accent-foreground: 40 30% 96%;
+  /* Antique Gold Leaf */
+  --accent: 43 55% 45%;
+  --accent-foreground: 350 25% 12%;
 
   --destructive: 0 70% 40%;
   --destructive-foreground: 0 0% 100%;
 
   --input: 350 15% 80%;
-  --ring: 350 60% 30%;
+  --ring: 355 65% 25%;
 
   --app-font-sans: 'DM Sans', sans-serif;
   --app-font-serif: 'Fraunces', serif;
-  --app-font-mono: Menlo, monospace;
+  --app-font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
   --app-font-arabic: 'Cairo', sans-serif;
 
-  --radius: 0;
-
-  --shadow-2xs: 0px 2px 0px 0px rgba(0,0,0,0.02);
-  --shadow-xs: 0px 2px 0px 0px rgba(0,0,0,0.04);
-  --shadow-sm: 0px 2px 0px 0px rgba(0,0,0,0.05), 0px 1px 2px -1px rgba(0,0,0,0.05);
-  --shadow: 0px 2px 0px 0px rgba(0,0,0,0.05), 0px 1px 2px -1px rgba(0,0,0,0.05);
-  --shadow-md: 0px 2px 0px 0px rgba(0,0,0,0.05), 0px 2px 4px -1px rgba(0,0,0,0.05);
-  --shadow-lg: 0px 4px 12px 0px rgba(50, 10, 15, 0.08), 0px 4px 6px -1px rgba(50, 10, 15, 0.04);
-  --shadow-xl: 0px 8px 24px 0px rgba(50, 10, 15, 0.12), 0px 8px 10px -1px rgba(50, 10, 15, 0.08);
-  --shadow-2xl: 0px 12px 32px 0px rgba(50, 10, 15, 0.15);
+  --radius: 0px; /* Sharp, editorial edges */
 
   --tracking-normal: 0em;
   --spacing: 0.25rem;
 }
 
 .dark {
-  --button-outline: rgba(255,255,255, .10);
-  --badge-outline: rgba(255,255,255, .05);
-  --opaque-button-border-intensity: 9;
-  --elevate-1: rgba(255,255,255, .04);
-  --elevate-2: rgba(255,255,255, .09);
+  /* Deep Graphite / Almost Black */
+  --background: 350 10% 8%;
+  --foreground: 42 20% 90%;
 
-  /* Deep Graphite / Oxblood */
-  --background: 350 25% 10%;
-  --foreground: 40 20% 92%;
+  --border: 350 15% 20%;
 
-  --border: 350 20% 20%;
+  --card: 350 12% 10%;
+  --card-foreground: 42 20% 90%;
+  --card-border: 350 15% 20%;
 
-  --card: 350 25% 12%;
-  --card-foreground: 40 20% 92%;
-  --card-border: 350 20% 20%;
+  --sidebar: 350 12% 10%;
+  --sidebar-foreground: 42 20% 90%;
+  --sidebar-border: 350 15% 20%;
+  --sidebar-primary: 355 60% 40%;
+  --sidebar-primary-foreground: 42 20% 90%;
+  --sidebar-accent: 350 15% 18%;
+  --sidebar-accent-foreground: 42 20% 90%;
+  --sidebar-ring: 355 60% 40%;
 
-  --sidebar: 350 25% 10%;
-  --sidebar-foreground: 40 20% 92%;
-  --sidebar-border: 350 20% 20%;
-  --sidebar-primary: 350 50% 40%;
-  --sidebar-primary-foreground: 40 20% 92%;
-  --sidebar-accent: 350 25% 18%;
-  --sidebar-accent-foreground: 40 20% 92%;
-  --sidebar-ring: 40 50% 55%;
+  --popover: 350 12% 10%;
+  --popover-foreground: 42 20% 90%;
+  --popover-border: 350 15% 20%;
 
-  --popover: 350 25% 12%;
-  --popover-foreground: 40 20% 92%;
-  --popover-border: 350 20% 20%;
+  /* Arterial Oxblood but slightly brighter for dark mode */
+  --primary: 355 60% 40%;
+  --primary-foreground: 42 20% 90%;
 
-  /* Vascular Crimson */
-  --primary: 350 60% 45%;
-  --primary-foreground: 40 20% 92%;
+  /* Venous Burgundy */
+  --secondary: 345 35% 25%;
+  --secondary-foreground: 42 20% 90%;
 
-  /* Surgical Teal */
-  --secondary: 180 30% 30%;
-  --secondary-foreground: 40 20% 92%;
+  --muted: 350 15% 15%;
+  --muted-foreground: 350 10% 65%;
 
-  --muted: 350 20% 18%;
-  --muted-foreground: 350 15% 65%;
-
-  --accent: 40 50% 55%;
-  --accent-foreground: 350 25% 10%;
+  /* Antique Gold Leaf */
+  --accent: 43 50% 50%;
+  --accent-foreground: 350 10% 8%;
 
   --destructive: 0 60% 45%;
   --destructive-foreground: 0 0% 100%;
 
-  --input: 350 20% 25%;
-  --ring: 350 60% 45%;
+  --input: 350 15% 20%;
+  --ring: 355 60% 40%;
 }
 
 @layer base {
@@ -193,116 +173,31 @@
   body {
     @apply font-sans antialiased bg-background text-foreground;
   }
+  
+  html {
+    scroll-behavior: smooth;
+  }
 }
 
-/**
- * Using the elevate system.
- * Automatic contrast adjustment.
- *
- * <element className="hover-elevate" />
- * <element className="active-elevate-2" />
- *
- * // Using the tailwind utility when a data attribute is "on"
- * <element className="toggle-elevate data-[state=on]:toggle-elevated" />
- * // Or manually controlling the toggle state
- * <element className="toggle-elevate toggle-elevated" />
- *
- * Elevation systems have to handle many states.
- * - not-hovered, vs. hovered vs. active  (three mutually exclusive states)
- * - toggled or not
- * - focused or not (this is not handled with these utilities)
- *
- * Even without handling focused or not, this is six possible combinations that
- * need to be distinguished from eachother visually.
- */
-@layer utilities {
+/* Font feature settings for high quality typography */
+.font-serif {
+  font-feature-settings: "liga" 1, "dlig" 1;
+}
 
-  /* Hide ugly search cancel button in Chrome until we can style it properly */
-  input[type="search"]::-webkit-search-cancel-button {
-    @apply hidden;
-  }
+/* Cinematic scroll utilities */
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
 
-  /* Placeholder styling for contentEditable div */
-  [contenteditable][data-placeholder]:empty::before {
-    content: attr(data-placeholder);
-    color: hsl(var(--muted-foreground));
-    pointer-events: none;
-  }
-
-  /* .no-default-hover-elevate/no-default-active-elevate is an escape hatch so consumers of
-   * buttons/badges can remove the automatic brightness adjustment on interactions
-   * and program their own. */
-  .no-default-hover-elevate {}
-
-  .no-default-active-elevate {}
-
-
-  /**
-   * Toggleable backgrounds go behind the content. Hoverable/active goes on top.
-   * This way they can stack/compound. Both will overlap the parent's borders!
-   * So borders will be automatically adjusted both on toggle, and hover/active,
-   * and they will be compounded.
-   */
-  .toggle-elevate::before,
-  .toggle-elevate-2::before {
-    content: "";
-    pointer-events: none;
-    position: absolute;
-    inset: 0px;
-    /*border-radius: inherit;   match rounded corners */
-    border-radius: inherit;
-    z-index: -1;
-    /* sits behind content but above backdrop */
-  }
-
-  .toggle-elevate.toggle-elevated::before {
-    background-color: var(--elevate-2);
-  }
-
-  /* If there's a 1px border, adjust the inset so that it covers that parent's border */
-  .border.toggle-elevate::before {
-    inset: -1px;
-  }
-
-  /* Does not work on elements with overflow:hidden! */
-  .hover-elevate:not(.no-default-hover-elevate),
-  .active-elevate:not(.no-default-active-elevate),
-  .hover-elevate-2:not(.no-default-hover-elevate),
-  .active-elevate-2:not(.no-default-active-elevate) {
-    position: relative;
-    z-index: 0;
-  }
-
-  .hover-elevate:not(.no-default-hover-elevate)::after,
-  .active-elevate:not(.no-default-active-elevate)::after,
-  .hover-elevate-2:not(.no-default-hover-elevate)::after,
-  .active-elevate-2:not(.no-default-active-elevate)::after {
-    content: "";
-    pointer-events: none;
-    position: absolute;
-    inset: 0px;
-    /*border-radius: inherit;   match rounded corners */
-    border-radius: inherit;
-    z-index: 999;
-    /* sits in front of content */
-  }
-
-  .hover-elevate:hover:not(.no-default-hover-elevate)::after,
-  .active-elevate:active:not(.no-default-active-elevate)::after {
-    background-color: var(--elevate-1);
-  }
-
-  .hover-elevate-2:hover:not(.no-default-hover-elevate)::after,
-  .active-elevate-2:active:not(.no-default-active-elevate)::after {
-    background-color: var(--elevate-2);
-  }
-
-  /* If there's a 1px border, adjust the inset so that it covers that parent's border */
-  .border.hover-elevate:not(.no-hover-interaction-elevate)::after,
-  .border.active-elevate:not(.no-active-interaction-elevate)::after,
-  .border.hover-elevate-2:not(.no-hover-interaction-elevate)::after,
-  .border.active-elevate-2:not(.no-active-interaction-elevate)::after,
-  .border.hover-elevate:not(.no-hover-interaction-elevate)::after {
-    inset: -1px;
-  }
+/* Parallax and Image masks */
+.clip-path-reveal {
+  clip-path: inset(100% 0 0 0);
+  transition: clip-path 1.5s cubic-bezier(0.77, 0, 0.175, 1);
+}
+.clip-path-revealed {
+  clip-path: inset(0 0 0 0);
 }
