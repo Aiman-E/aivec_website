@@ -22,7 +22,7 @@ import {
 } from "lucide-react";
 
 function AdminLoginScreen() {
-  const { lang, t } = useLanguage();
+  const { lang, setLang, t } = useLanguage();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -41,6 +41,26 @@ function AdminLoginScreen() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-muted/30 p-6" dir={lang === "ar" ? "rtl" : "ltr"}>
       <div className="max-w-md w-full bg-card border border-border rounded-md p-8 shadow-sm">
+        <div className="flex justify-end mb-2">
+          <div className="inline-flex items-center rounded-full border bg-muted/50 p-0.5 text-xs">
+            <button
+              type="button"
+              onClick={() => setLang("en")}
+              className={`px-3 py-1 rounded-full transition-colors ${lang === "en" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"}`}
+              aria-pressed={lang === "en"}
+            >
+              EN
+            </button>
+            <button
+              type="button"
+              onClick={() => setLang("ar")}
+              className={`px-3 py-1 rounded-full transition-colors ${lang === "ar" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"}`}
+              aria-pressed={lang === "ar"}
+            >
+              ع
+            </button>
+          </div>
+        </div>
         <div className="text-center mb-6">
           <ShieldCheck className="w-10 h-10 mx-auto mb-3 text-primary" />
           <h1 className="text-2xl font-serif font-semibold mb-1">
@@ -103,7 +123,7 @@ function AdminLoginScreen() {
 }
 
 export function AdminLayout({ children }: { children: React.ReactNode }) {
-  const { lang, t } = useLanguage();
+  const { lang, setLang, t } = useLanguage();
   const [location] = useLocation();
   const { data: me, isLoading } = useAdminMe();
   const logout = useAdminLogout();
@@ -158,7 +178,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
   const sidebarContent = (
     <>
       <div className="p-6 pb-2 flex items-start justify-between gap-2">
-        <div>
+        <div className="min-w-0">
           <h2 className="text-lg font-serif font-semibold text-primary">{t("Admin Panel", "لوحة الإدارة")}</h2>
           <p className="text-xs text-muted-foreground mt-1 truncate">
             {me.displayName || me.username}
@@ -172,6 +192,26 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
         >
           <X className="w-5 h-5" />
         </button>
+      </div>
+      <div className="px-6 pb-2">
+        <div className="inline-flex items-center rounded-full border bg-muted/50 p-0.5 text-xs">
+          <button
+            type="button"
+            onClick={() => setLang("en")}
+            className={`px-3 py-1 rounded-full transition-colors ${lang === "en" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"}`}
+            aria-pressed={lang === "en"}
+          >
+            EN
+          </button>
+          <button
+            type="button"
+            onClick={() => setLang("ar")}
+            className={`px-3 py-1 rounded-full transition-colors ${lang === "ar" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"}`}
+            aria-pressed={lang === "ar"}
+          >
+            ع
+          </button>
+        </div>
       </div>
       <nav className="p-4 space-y-1 flex-1 overflow-y-auto">
         {navItems.map((item) => {
