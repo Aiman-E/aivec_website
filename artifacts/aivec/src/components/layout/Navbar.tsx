@@ -179,8 +179,31 @@ export function Navbar() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="lg:hidden fixed inset-0 z-[60] bg-background flex flex-col px-6 pt-28 pb-8 overflow-y-auto"
+            className="lg:hidden fixed inset-0 z-[60] bg-background flex flex-col px-6 pt-6 pb-8 overflow-y-auto"
           >
+            <div className="flex items-center justify-between mb-6">
+              <Link
+                href={`/${lang}`}
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center gap-3"
+              >
+                <div className="w-10 h-10 bg-primary flex items-center justify-center rounded-sm shadow-lg">
+                  <span className="text-primary-foreground font-serif font-bold text-xl">A</span>
+                </div>
+                <span className="font-serif font-bold text-base leading-none">
+                  {t("AIVEC 2026", "مؤتمر عدن")}
+                </span>
+              </Link>
+              <button
+                type="button"
+                aria-label={t("Close menu", "إغلاق القائمة")}
+                onClick={() => setMobileMenuOpen(false)}
+                className="p-2 -mr-2 text-foreground hover:text-accent transition-colors"
+              >
+                <X className="w-7 h-7" />
+              </button>
+            </div>
+
             <div className="flex flex-col gap-2 mt-2">
               {navLinks.map((link, i) => (
                 <motion.button
