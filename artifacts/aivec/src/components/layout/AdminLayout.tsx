@@ -93,8 +93,8 @@ function AdminLoginScreen() {
           </button>
         </form>
         <p className="mt-6 text-xs text-muted-foreground text-center">
-          <Link href={`/${lang}`}>
-            <a className="underline hover:text-foreground">{t("Back to homepage", "العودة إلى الصفحة الرئيسية")}</a>
+          <Link href={`/${lang}`} className="underline hover:text-foreground">
+            {t("Back to homepage", "العودة إلى الصفحة الرئيسية")}
           </Link>
         </p>
       </div>
@@ -180,15 +180,17 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
             : location.startsWith(item.href);
 
           return (
-            <Link key={item.href} href={item.href}>
-              <a className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors ${
+            <Link
+              key={item.href}
+              href={item.href}
+              className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors ${
                 isActive
                   ? "bg-primary/10 text-primary font-medium"
                   : "text-muted-foreground hover:bg-muted hover:text-foreground"
-              }`}>
-                <item.icon className="w-4 h-4 flex-shrink-0" />
-                <span className="truncate">{item.label}</span>
-              </a>
+              }`}
+            >
+              <item.icon className="w-4 h-4 flex-shrink-0" />
+              <span className="truncate">{item.label}</span>
             </Link>
           );
         })}
@@ -210,7 +212,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="lg:flex min-h-screen bg-muted/30" dir={lang === "ar" ? "rtl" : "ltr"}>
       {/* Mobile top bar */}
-      <div className="lg:hidden sticky top-16 z-30 flex items-center gap-3 bg-card border-b px-4 py-3">
+      <div className="lg:hidden sticky top-0 z-30 flex items-center gap-3 bg-card border-b px-4 py-3">
         <button
           type="button"
           onClick={() => setMobileNavOpen(true)}
@@ -228,7 +230,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
       </div>
 
       {/* Desktop sidebar */}
-      <aside className="hidden lg:flex w-64 bg-card border-r flex-shrink-0 sticky top-16 h-[calc(100vh-4rem)] flex-col">
+      <aside className="hidden lg:flex w-64 bg-card border-r flex-shrink-0 sticky top-0 h-screen flex-col">
         {sidebarContent}
       </aside>
 

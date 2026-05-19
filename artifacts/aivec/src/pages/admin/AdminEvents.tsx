@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Link } from "wouter";
+import { useLocation } from "wouter";
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
@@ -29,6 +29,7 @@ const eventSchema = z.object({
 
 export function AdminEvents() {
   const { lang, t } = useLanguage();
+  const [, setLocation] = useLocation();
   const { data: events, isLoading } = useListEvents();
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const createEvent = useCreateEvent();
@@ -143,12 +144,12 @@ export function AdminEvents() {
                   <Switch checked={event.featured} onCheckedChange={(v) => updateEvent.mutate({ id: event.id, data: { featured: v } }, { onSuccess: () => queryClient.invalidateQueries({ queryKey: getListEventsQueryKey() }) })} />
                 </TableCell>
                 <TableCell className="text-right space-x-2 rtl:space-x-reverse">
-                  <Link href={`/${lang}/admin/events/${event.id}/fields`}>
-                    <Button variant="outline" size="icon" title="Form Builder"><LayoutList className="w-4 h-4" /></Button>
-                  </Link>
-                  <Link href={`/${lang}/admin/events/${event.id}/registrations`}>
-                    <Button variant="outline" size="icon" title="Registrations"><Users className="w-4 h-4" /></Button>
-                  </Link>
+                  <Button variant="outline" size="icon" title="Form Builder" onClick={() => setLocation(`/${lang}/admin/events/${event.id}/fields`)}>
+                    <LayoutList className="w-4 h-4" />
+                  </Button>
+                  <Button variant="outline" size="icon" title="Registrations" onClick={() => setLocation(`/${lang}/admin/events/${event.id}/registrations`)}>
+                    <Users className="w-4 h-4" />
+                  </Button>
                   <Button variant="outline" size="icon" className="text-destructive hover:bg-destructive hover:text-white" onClick={() => handleDelete(event.id)}>
                     <Trash2 className="w-4 h-4" />
                   </Button>

@@ -1,11 +1,12 @@
 import { useLanguage } from "@/lib/i18n";
-import { Link } from "wouter";
+import { useLocation } from "wouter";
 import { Card, CardContent } from "@/components/ui/card";
 import { Edit } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export function AdminPages() {
   const { lang, t } = useLanguage();
+  const [, setLocation] = useLocation();
   
   const pages = [
     { key: "about", name: t("About", "عن المؤتمر") },
@@ -26,12 +27,10 @@ export function AdminPages() {
                 <h3 className="text-lg font-semibold">{page.name}</h3>
                 <p className="text-sm text-muted-foreground font-mono">{page.key}</p>
               </div>
-              <Link href={`/${lang}/admin/pages/${page.key}`}>
-                <Button variant="outline" size="sm" className="gap-2">
-                  <Edit className="w-4 h-4" />
-                  {t("Edit", "تعديل")}
-                </Button>
-              </Link>
+              <Button variant="outline" size="sm" className="gap-2" onClick={() => setLocation(`/${lang}/admin/pages/${page.key}`)}>
+                <Edit className="w-4 h-4" />
+                {t("Edit", "تعديل")}
+              </Button>
             </CardContent>
           </Card>
         ))}
