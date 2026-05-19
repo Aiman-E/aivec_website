@@ -162,13 +162,28 @@ export function Home() {
               </div>
 
               <div className="mt-10 lg:mt-12 flex flex-wrap gap-4 sm:gap-6 items-center">
-                <button
-                  onClick={() => document.querySelector('#program')?.scrollIntoView({ behavior: 'smooth' })}
-                  className="group flex items-center justify-between px-6 sm:px-8 py-4 sm:py-5 bg-primary text-primary-foreground font-bold text-xs uppercase tracking-widest hover:bg-primary/90 transition-all border border-primary relative overflow-hidden w-full sm:w-auto shadow-lg"
-                >
-                  <span className="relative z-10">{t("Explore Program", "استعرض البرنامج")}</span>
-                  <ArrowRight className={`w-4 h-4 ml-4 relative z-10 transition-transform group-hover:translate-x-1 ${isRtl ? 'rotate-180 ml-0 mr-4 group-hover:-translate-x-1' : ''}`} />
-                </button>
+                {settings?.heroCtaFormSlug ? (
+                  <Link
+                    href={`/${lang}/forms/${settings.heroCtaFormSlug}`}
+                    className="group flex items-center justify-between px-6 sm:px-8 py-4 sm:py-5 bg-primary text-primary-foreground font-bold text-xs uppercase tracking-widest hover:bg-primary/90 transition-all border border-primary relative overflow-hidden w-full sm:w-auto shadow-lg"
+                  >
+                    <span className="relative z-10">
+                      {t(
+                        settings.heroCtaLabelEn || "Join the Conference",
+                        settings.heroCtaLabelAr || "انضم إلى المؤتمر",
+                      )}
+                    </span>
+                    <ArrowRight className={`w-4 h-4 ml-4 relative z-10 transition-transform group-hover:translate-x-1 ${isRtl ? 'rotate-180 ml-0 mr-4 group-hover:-translate-x-1' : ''}`} />
+                  </Link>
+                ) : (
+                  <button
+                    onClick={() => document.querySelector('#program')?.scrollIntoView({ behavior: 'smooth' })}
+                    className="group flex items-center justify-between px-6 sm:px-8 py-4 sm:py-5 bg-primary text-primary-foreground font-bold text-xs uppercase tracking-widest hover:bg-primary/90 transition-all border border-primary relative overflow-hidden w-full sm:w-auto shadow-lg"
+                  >
+                    <span className="relative z-10">{t("Explore Program", "استعرض البرنامج")}</span>
+                    <ArrowRight className={`w-4 h-4 ml-4 relative z-10 transition-transform group-hover:translate-x-1 ${isRtl ? 'rotate-180 ml-0 mr-4 group-hover:-translate-x-1' : ''}`} />
+                  </button>
+                )}
                 <button
                   onClick={() => document.querySelector('#contact')?.scrollIntoView({ behavior: 'smooth' })}
                   className="group flex items-center justify-between px-6 sm:px-8 py-4 sm:py-5 bg-background/60 backdrop-blur-md text-foreground font-bold text-xs uppercase tracking-widest hover:bg-background transition-all border border-border relative overflow-hidden w-full sm:w-auto"

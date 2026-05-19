@@ -939,6 +939,9 @@ components:
         statFaculty: { type: string }
         statCmeHours: { type: string }
         statCountries: { type: string }
+        heroCtaFormSlug: { type: ["string", "null"] }
+        heroCtaLabelEn: { type: string }
+        heroCtaLabelAr: { type: string }
         updatedAt: { type: string, format: date-time }
 
     SiteSettingsUpdate:
@@ -975,6 +978,9 @@ components:
         statFaculty: { type: string }
         statCmeHours: { type: string }
         statCountries: { type: string }
+        heroCtaFormSlug: { type: ["string", "null"] }
+        heroCtaLabelEn: { type: string }
+        heroCtaLabelAr: { type: string }
 
     Page:
       type: object

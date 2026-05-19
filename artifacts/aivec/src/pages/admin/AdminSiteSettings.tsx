@@ -1,5 +1,5 @@
 import { useLanguage } from "@/lib/i18n";
-import { useGetSiteSettings, useUpdateSiteSettings } from "@workspace/api-client-react";
+import { useGetSiteSettings, useUpdateSiteSettings, useListForms } from "@workspace/api-client-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -48,6 +48,9 @@ const settingsSchema = z.object({
   statFaculty: z.string().optional(),
   statCmeHours: z.string().optional(),
   statCountries: z.string().optional(),
+  heroCtaFormSlug: z.string().optional(),
+  heroCtaLabelEn: z.string().optional(),
+  heroCtaLabelAr: z.string().optional(),
   logoUrl: z.string().optional(),
   faviconUrl: z.string().optional(),
   socialImageUrl: z.string().optional(),
@@ -86,6 +89,7 @@ export function AdminSiteSettings() {
   const { lang, t } = useLanguage();
   const { data: settings, isLoading } = useGetSiteSettings();
   const updateSettings = useUpdateSiteSettings();
+  const { data: formsList } = useListForms();
   const { toast } = useToast();
 
   const form = useForm<SettingsFormValues>({
@@ -111,6 +115,9 @@ export function AdminSiteSettings() {
       statFaculty: "35",
       statCmeHours: "12",
       statCountries: "4",
+      heroCtaFormSlug: "",
+      heroCtaLabelEn: "",
+      heroCtaLabelAr: "",
       logoUrl: "",
       faviconUrl: "",
       socialImageUrl: "",
@@ -168,6 +175,9 @@ export function AdminSiteSettings() {
         statFaculty: settings.statFaculty ?? "35",
         statCmeHours: settings.statCmeHours ?? "12",
         statCountries: settings.statCountries ?? "4",
+        heroCtaFormSlug: settings.heroCtaFormSlug ?? "",
+        heroCtaLabelEn: settings.heroCtaLabelEn ?? "",
+        heroCtaLabelAr: settings.heroCtaLabelAr ?? "",
         logoUrl: settings.logoUrl ?? "",
         faviconUrl: settings.faviconUrl ?? "",
         socialImageUrl: settings.socialImageUrl ?? "",
@@ -180,6 +190,7 @@ export function AdminSiteSettings() {
   function onSubmit(data: SettingsFormValues) {
     const payload = {
       ...data,
+      heroCtaFormSlug: data.heroCtaFormSlug?.trim() ? data.heroCtaFormSlug.trim() : null,
       contactEmails: data.contactEmails ? data.contactEmails.split(",").map(e => e.trim()).filter(Boolean) : [],
     };
     
@@ -216,6 +227,48 @@ export function AdminSiteSettings() {
                   )} />
                   <FormField control={form.control} name="conferenceNumber" render={({ field }) => (
                     <FormItem><FormLabel>Edition Number</FormLabel><FormControl><Input type="number" {...field} /></FormControl><FormMessage /></FormItem>
+                  )} />
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <h3 className="font-semibold text-lg border-b pb-2">{t("Hero CTA Button", "زر الدعوة الرئيسي")}</h3>
+                <p className="text-sm text-muted-foreground">
+                  {t(
+                    "Replaces the hero \"Explore Program\" button with a link to the selected form. Leave empty to keep the default.",
+                    "يستبدل زر \"استعرض البرنامج\" في الواجهة برابط إلى النموذج المحدد. اتركه فارغًا للإبقاء على الافتراضي."
+                  )}
+                </p>
+                <div className="grid md:grid-cols-3 gap-4">
+                  <FormField control={form.control} name="heroCtaFormSlug" render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t("Linked Form", "النموذج المرتبط")}</FormLabel>
+                      <Select
+                        value={field.value || "__none__"}
+                        onValueChange={(v) => field.onChange(v === "__none__" ? "" : v)}
+                      >
+                        <FormControl>
+                          <SelectTrigger><SelectValue placeholder={t("— None —", "— لا شيء —")} /></SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="__none__">{t("— None —", "— لا شيء —")}</SelectItem>
+                          {(formsList ?? [])
+                            .filter((f) => f.status === "open")
+                            .map((f) => (
+                              <SelectItem key={f.slug} value={f.slug}>
+                                {(lang === "ar" ? f.titleAr : f.titleEn) || f.slug}
+                              </SelectItem>
+                            ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )} />
+                  <FormField control={form.control} name="heroCtaLabelEn" render={({ field }) => (
+                    <FormItem><FormLabel>Button Label (EN)</FormLabel><FormControl><Input {...field} placeholder="Join the Conference" /></FormControl><FormMessage /></FormItem>
+                  )} />
+                  <FormField control={form.control} name="heroCtaLabelAr" render={({ field }) => (
+                    <FormItem><FormLabel>نص الزر (AR)</FormLabel><FormControl><Input {...field} dir="rtl" placeholder="انضم إلى المؤتمر" /></FormControl><FormMessage /></FormItem>
                   )} />
                 </div>
               </div>

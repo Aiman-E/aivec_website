@@ -1,6 +1,6 @@
 import { Router, type IRouter } from "express";
 import { eq } from "drizzle-orm";
-import { db, siteSettingsTable } from "@workspace/db";
+import { db, siteSettingsTable, formsTable } from "@workspace/db";
 import { UpdateSiteSettingsBody } from "@workspace/api-zod";
 import { requireAdminSession, logAdminActivity } from "../lib/adminAuth";
 
@@ -25,6 +25,27 @@ router.patch("/site-settings", requireAdminSession, async (req, res): Promise<vo
     return;
   }
   const current = await ensureSettings();
+  if (
+    "heroCtaFormSlug" in parsed.data &&
+    parsed.data.heroCtaFormSlug != null &&
+    parsed.data.heroCtaFormSlug.trim() !== ""
+  ) {
+    const slug = parsed.data.heroCtaFormSlug.trim();
+    const [form] = await db
+      .select({ status: formsTable.status })
+      .from(formsTable)
+      .where(eq(formsTable.slug, slug))
+      .limit(1);
+    if (!form) {
+      res.status(400).json({ error: `Form with slug "${slug}" does not exist` });
+      return;
+    }
+    if (form.status !== "open") {
+      res.status(400).json({ error: `Form "${slug}" is not open for submissions` });
+      return;
+    }
+    parsed.data.heroCtaFormSlug = slug;
+  }
   const [updated] = await db
     .update(siteSettingsTable)
     .set(parsed.data)

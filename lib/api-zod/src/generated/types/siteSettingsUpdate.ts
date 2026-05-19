@@ -41,4 +41,8 @@ export interface SiteSettingsUpdate {
   statFaculty?: string;
   statCmeHours?: string;
   statCountries?: string;
+  /** @nullable */
+  heroCtaFormSlug?: string | null;
+  heroCtaLabelEn?: string;
+  heroCtaLabelAr?: string;
 }

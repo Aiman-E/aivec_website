@@ -115,6 +115,10 @@ export interface SiteSettings {
   statFaculty?: string;
   statCmeHours?: string;
   statCountries?: string;
+  /** @nullable */
+  heroCtaFormSlug?: string | null;
+  heroCtaLabelEn?: string;
+  heroCtaLabelAr?: string;
   updatedAt?: string;
 }
 
@@ -153,6 +157,10 @@ export interface SiteSettingsUpdate {
   statFaculty?: string;
   statCmeHours?: string;
   statCountries?: string;
+  /** @nullable */
+  heroCtaFormSlug?: string | null;
+  heroCtaLabelEn?: string;
+  heroCtaLabelAr?: string;
 }
 
 export interface Page {

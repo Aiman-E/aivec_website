@@ -123,11 +123,11 @@ export function Navbar() {
                 <span className="text-primary-foreground font-serif font-bold text-2xl relative z-10">A</span>
               </div>
             )}
-            <div className="flex flex-col">
-              <span className="font-serif font-bold text-lg leading-none tracking-tight transition-colors text-foreground group-hover:text-accent">
+            <div className="flex flex-col min-w-0 max-w-[200px] sm:max-w-[260px] lg:max-w-[320px]">
+              <span className="font-serif font-bold text-base leading-tight tracking-tight transition-colors text-foreground group-hover:text-accent truncate" title={siteTitle}>
                 {siteTitle}
               </span>
-              <span className="text-[10px] uppercase tracking-widest font-medium mt-1 text-muted-foreground">
+              <span className="text-[10px] uppercase tracking-widest font-medium mt-1 text-muted-foreground truncate">
                 {t("Vascular Conference", "جراحة الأوعية الدموية")}
               </span>
             </div>

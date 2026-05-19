@@ -89,6 +89,9 @@ export const GetSiteSettingsResponse = zod.object({
   "statFaculty": zod.string().optional(),
   "statCmeHours": zod.string().optional(),
   "statCountries": zod.string().optional(),
+  "heroCtaFormSlug": zod.string().nullish(),
+  "heroCtaLabelEn": zod.string().optional(),
+  "heroCtaLabelAr": zod.string().optional(),
   "updatedAt": zod.coerce.date().optional()
 })
 
@@ -124,7 +127,10 @@ export const UpdateSiteSettingsBody = zod.object({
   "statDelegates": zod.string().optional(),
   "statFaculty": zod.string().optional(),
   "statCmeHours": zod.string().optional(),
-  "statCountries": zod.string().optional()
+  "statCountries": zod.string().optional(),
+  "heroCtaFormSlug": zod.string().nullish(),
+  "heroCtaLabelEn": zod.string().optional(),
+  "heroCtaLabelAr": zod.string().optional()
 })
 
 export const UpdateSiteSettingsResponse = zod.object({
@@ -160,6 +166,9 @@ export const UpdateSiteSettingsResponse = zod.object({
   "statFaculty": zod.string().optional(),
   "statCmeHours": zod.string().optional(),
   "statCountries": zod.string().optional(),
+  "heroCtaFormSlug": zod.string().nullish(),
+  "heroCtaLabelEn": zod.string().optional(),
+  "heroCtaLabelAr": zod.string().optional(),
   "updatedAt": zod.coerce.date().optional()
 })
 

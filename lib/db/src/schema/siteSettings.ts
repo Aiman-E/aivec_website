@@ -33,6 +33,9 @@ export const siteSettingsTable = pgTable("site_settings", {
   statFaculty: text("stat_faculty").notNull().default("35"),
   statCmeHours: text("stat_cme_hours").notNull().default("12"),
   statCountries: text("stat_countries").notNull().default("4"),
+  heroCtaFormSlug: text("hero_cta_form_slug"),
+  heroCtaLabelEn: text("hero_cta_label_en").notNull().default(""),
+  heroCtaLabelAr: text("hero_cta_label_ar").notNull().default(""),
   updatedAt: timestamp("updated_at", { withTimezone: true })
     .notNull()
     .defaultNow()
