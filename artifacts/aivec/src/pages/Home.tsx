@@ -525,7 +525,7 @@ export function Home() {
       {/* VENUE & CONTACT */}
       <section id="venue" className="py-16 md:py-32 lg:py-40 bg-background relative border-t border-border">
         <div className="container mx-auto px-6 md:px-12">
-          <div id="contact" className="grid lg:grid-cols-2 gap-0 border border-border shadow-2xl bg-card">
+          <div id="contact" className="grid lg:grid-cols-2 gap-0 border-2 border-foreground/15 shadow-2xl bg-card overflow-hidden">
             
             <div className="p-12 md:p-20 flex flex-col justify-center order-2 lg:order-1">
               <h3 className="text-accent font-bold uppercase tracking-[0.2em] text-sm mb-8 flex items-center gap-4">
@@ -559,9 +559,8 @@ export function Home() {
               </div>
             </div>
             
-            <div className="relative min-h-[320px] sm:min-h-[420px] lg:min-h-full bg-muted border-b lg:border-b-0 lg:border-l border-border order-1 lg:order-2 overflow-hidden">
+            <div className="relative min-h-[320px] sm:min-h-[420px] lg:min-h-full bg-muted border-b-2 lg:border-b-0 lg:border-l-2 border-foreground/15 order-1 lg:order-2 overflow-hidden">
               <img src="/aden-landscape.png" alt="Aden Landscape" className="absolute inset-0 w-full h-full object-cover grayscale contrast-110" />
-              <div className="absolute inset-0 bg-gradient-to-t from-background/40 via-transparent to-transparent pointer-events-none" />
             </div>
             
           </div>
