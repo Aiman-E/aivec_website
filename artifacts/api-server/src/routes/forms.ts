@@ -228,13 +228,38 @@ router.post("/forms/:slug/submit", async (req, res): Promise<void> => {
   for (const [k, v] of Object.entries(answers)) {
     if (allowedKeys.has(k)) filteredAnswers[k] = v;
   }
+
+  // Auto-derive submitter name/email from answers when not provided explicitly.
+  // 1) Email: any field of type "email" with a string value.
+  // 2) Name: any field whose key or label looks like a name field.
+  const NAME_HINT = /(^|[_\s-])(full[_\s-]?name|name|الاسم)([_\s-]|$)/i;
+  let derivedName: string | null = null;
+  let derivedEmail: string | null = null;
+  for (const f of fields) {
+    const v = filteredAnswers[f.fieldKey];
+    if (typeof v !== "string" || v.trim() === "") continue;
+    const val = v.trim();
+    if (!derivedEmail && f.fieldType === "email") {
+      derivedEmail = val;
+    }
+    if (
+      !derivedName &&
+      (f.fieldType === "short_text" || f.fieldType === "long_text") &&
+      (NAME_HINT.test(f.fieldKey) ||
+        NAME_HINT.test(f.labelEn ?? "") ||
+        NAME_HINT.test(f.labelAr ?? ""))
+    ) {
+      derivedName = val;
+    }
+  }
+
   const [row] = await db
     .insert(formSubmissionsTable)
     .values({
       formId: form.id,
       answers: filteredAnswers,
-      submitterName: parsed.data.submitterName ?? null,
-      submitterEmail: parsed.data.submitterEmail ?? null,
+      submitterName: parsed.data.submitterName ?? derivedName ?? null,
+      submitterEmail: parsed.data.submitterEmail ?? derivedEmail ?? null,
     })
     .returning();
   res.status(201).json(row);
