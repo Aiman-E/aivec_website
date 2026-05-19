@@ -111,23 +111,23 @@ export function Navbar() {
             : "border-border/20 py-6"
         }`}
       >
-        <div className="container mx-auto px-6 md:px-12 flex items-center justify-between">
-          <Link href={`/${lang}`} className="flex items-center gap-4 z-50 group">
+        <div className="container mx-auto px-6 md:px-12 flex items-center justify-between gap-3">
+          <Link href={`/${lang}`} className="flex items-center gap-3 lg:gap-4 z-50 group min-w-0 flex-1 lg:flex-initial">
             {logoSrc ? (
-              <div className="w-12 h-12 flex items-center justify-center rounded-sm overflow-hidden bg-background border border-border/40">
+              <div className="w-10 h-10 lg:w-12 lg:h-12 shrink-0 flex items-center justify-center rounded-sm overflow-hidden bg-background border border-border/40">
                 <img src={logoSrc} alt={siteTitle} className="w-full h-full object-contain" />
               </div>
             ) : (
-              <div className="w-12 h-12 bg-primary flex items-center justify-center rounded-sm overflow-hidden relative shadow-lg">
+              <div className="w-10 h-10 lg:w-12 lg:h-12 shrink-0 bg-primary flex items-center justify-center rounded-sm overflow-hidden relative shadow-lg">
                 <div className="absolute inset-0 bg-[url('/vein-abstract.png')] opacity-30 bg-cover bg-center"></div>
-                <span className="text-primary-foreground font-serif font-bold text-2xl relative z-10">A</span>
+                <span className="text-primary-foreground font-serif font-bold text-xl lg:text-2xl relative z-10">A</span>
               </div>
             )}
-            <div className="flex flex-col min-w-0 max-w-[200px] sm:max-w-[260px] lg:max-w-[320px]">
-              <span className="font-serif font-bold text-base leading-tight tracking-tight transition-colors text-foreground group-hover:text-accent truncate" title={siteTitle}>
+            <div className="flex flex-col min-w-0 flex-1 lg:flex-initial lg:max-w-[320px]">
+              <span className="font-serif font-bold text-sm lg:text-base leading-tight tracking-tight transition-colors text-foreground group-hover:text-accent truncate" title={siteTitle}>
                 {siteTitle}
               </span>
-              <span className="text-[10px] uppercase tracking-widest font-medium mt-1 text-muted-foreground truncate">
+              <span className="hidden sm:block text-[10px] uppercase tracking-widest font-medium mt-1 text-muted-foreground truncate">
                 {t("Vascular Conference", "جراحة الأوعية الدموية")}
               </span>
             </div>
@@ -173,7 +173,7 @@ export function Navbar() {
           </div>
 
           {/* Mobile: language toggle + hamburger */}
-          <div className="lg:hidden flex items-center gap-2">
+          <div className="lg:hidden flex items-center gap-2 shrink-0">
             <LangToggle />
             <button
               type="button"
