@@ -8,8 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
-import { Mail, Phone, MessageSquare } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
+import { motion } from "framer-motion";
 
 const contactSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -25,18 +24,11 @@ export function Contact() {
   const { lang, t } = useLanguage();
   const { data: settings } = useGetSiteSettings();
   const { toast } = useToast();
-  
   const createContact = useCreateContactSubmission();
 
   const form = useForm<ContactFormValues>({
     resolver: zodResolver(contactSchema),
-    defaultValues: {
-      name: "",
-      email: "",
-      phone: "",
-      subject: "",
-      message: "",
-    },
+    defaultValues: { name: "", email: "", phone: "", subject: "", message: "" },
   });
 
   function onSubmit(data: ContactFormValues) {
@@ -45,16 +37,16 @@ export function Contact() {
       {
         onSuccess: () => {
           toast({
-            title: t("Message sent", "تم إرسال الرسالة"),
-            description: t("We will get back to you shortly.", "سنقوم بالرد عليك قريباً."),
+            title: t("Inquiry Submitted", "تم إرسال الاستفسار"),
+            description: t("Our team will review your message and respond shortly.", "سيقوم فريقنا بمراجعة رسالتك والرد قريباً."),
           });
           form.reset();
         },
         onError: () => {
           toast({
             variant: "destructive",
-            title: t("Error", "خطأ"),
-            description: t("Failed to send message.", "فشل إرسال الرسالة."),
+            title: t("Submission Failed", "فشل الإرسال"),
+            description: t("There was an error sending your message. Please try again.", "حدث خطأ أثناء إرسال رسالتك. يرجى المحاولة مرة أخرى."),
           });
         }
       }
@@ -62,139 +54,190 @@ export function Contact() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-12 md:py-20">
-      <div className="max-w-4xl mx-auto mb-12 text-center">
-        <h1 className="text-4xl md:text-5xl font-serif text-primary mb-4">
-          {t("Contact Us", "اتصل بنا")}
-        </h1>
-        <p className="text-xl text-muted-foreground">
-          {t("Have questions about AIVEC 2026? We're here to help.", "هل لديك أسئلة حول مؤتمر عدن الدولي ٢٠٢٦؟ نحن هنا للمساعدة.")}
-        </p>
-      </div>
-
-      <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-        <div className="md:col-span-1 space-y-6">
-          <Card>
-            <CardContent className="p-6 flex items-start gap-4">
-              <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-                <Phone className="w-5 h-5 text-primary" />
-              </div>
-              <div>
-                <h3 className="font-semibold mb-1">{t("Phone", "الهاتف")}</h3>
-                <p className="text-muted-foreground text-sm" dir="ltr">{settings?.contactPhone || "+967 777 000 000"}</p>
-                {settings?.contactWhatsapp && (
-                  <p className="text-muted-foreground text-sm mt-1 flex items-center gap-1">
-                    <MessageSquare className="w-3 h-3" />
-                    <span dir="ltr">{settings.contactWhatsapp}</span>
-                  </p>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardContent className="p-6 flex items-start gap-4">
-              <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-                <Mail className="w-5 h-5 text-primary" />
-              </div>
-              <div>
-                <h3 className="font-semibold mb-1">{t("Email", "البريد الإلكتروني")}</h3>
-                {settings?.contactEmails ? (
-                  settings.contactEmails.map(email => (
-                    <p key={email} className="text-muted-foreground text-sm mb-1">{email}</p>
-                  ))
-                ) : (
-                  <p className="text-muted-foreground text-sm">info@aivec.org</p>
-                )}
-              </div>
-            </CardContent>
-          </Card>
+    <div className="flex flex-col min-h-screen bg-background text-foreground">
+      <section className="relative py-20 lg:py-32 border-b border-border/10 bg-card">
+        <div className="absolute inset-0 bg-[url('/hero-aden.png')] bg-cover bg-center opacity-5 pointer-events-none mix-blend-luminosity"></div>
+        <div className="container mx-auto px-4 md:px-8 relative z-10">
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+            className="max-w-4xl"
+          >
+            <div className="flex items-center gap-3 mb-6">
+              <span className="w-8 h-[2px] bg-primary"></span>
+              <span className="text-primary font-bold uppercase tracking-widest text-sm">
+                {t("Inquiries", "استفسارات")}
+              </span>
+            </div>
+            
+            <h1 className="text-4xl md:text-6xl font-serif font-bold text-foreground mb-6">
+              {t("Contact the Organizers", "التواصل مع المنظمين")}
+            </h1>
+            
+            <p className="text-xl text-muted-foreground font-serif italic">
+              {t("For academic inquiries, sponsorship opportunities, or registration support.", "للاستفسارات الأكاديمية أو فرص الرعاية أو دعم التسجيل.")}
+            </p>
+          </motion.div>
         </div>
+      </section>
 
-        <div className="md:col-span-2">
-          <Card>
-            <CardContent className="p-6 md:p-8">
-              <h2 className="text-2xl font-serif mb-6">{t("Send a Message", "إرسال رسالة")}</h2>
-              <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                  <div className="grid md:grid-cols-2 gap-4">
-                    <FormField
-                      control={form.control}
-                      name="name"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>{t("Name", "الاسم")}</FormLabel>
-                          <FormControl>
-                            <Input {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="email"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>{t("Email", "البريد الإلكتروني")}</FormLabel>
-                          <FormControl>
-                            <Input type="email" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-                  <div className="grid md:grid-cols-2 gap-4">
-                    <FormField
-                      control={form.control}
-                      name="phone"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>{t("Phone (Optional)", "الهاتف (اختياري)")}</FormLabel>
-                          <FormControl>
-                            <Input {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="subject"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>{t("Subject (Optional)", "الموضوع (اختياري)")}</FormLabel>
-                          <FormControl>
-                            <Input {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-                  <FormField
-                    control={form.control}
-                    name="message"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>{t("Message", "الرسالة")}</FormLabel>
-                        <FormControl>
-                          <Textarea rows={5} {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
+      <section className="py-16 lg:py-24">
+        <div className="container mx-auto px-4 md:px-8 max-w-6xl">
+          <div className="grid lg:grid-cols-12 gap-12 lg:gap-24">
+            
+            <motion.div 
+              className="lg:col-span-5"
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+            >
+              <h2 className="text-2xl font-serif font-bold mb-8 text-foreground">
+                {t("Direct Contact", "التواصل المباشر")}
+              </h2>
+              
+              <div className="space-y-10">
+                <div>
+                  <h3 className="text-sm font-bold uppercase tracking-widest text-muted-foreground mb-3">
+                    {t("Email", "البريد الإلكتروني")}
+                  </h3>
+                  <div className="space-y-2">
+                    {settings?.contactEmails ? (
+                      settings.contactEmails.map(email => (
+                        <p key={email} className="text-xl font-medium text-foreground font-sans">{email}</p>
+                      ))
+                    ) : (
+                      <>
+                        <p className="text-xl font-medium text-foreground font-sans">alameriendo@gmail.com</p>
+                        <p className="text-xl font-medium text-foreground font-sans">alameri_karim@yahoo.com</p>
+                      </>
                     )}
-                  />
-                  <Button type="submit" className="w-full md:w-auto" disabled={createContact.isPending}>
-                    {createContact.isPending ? t("Sending...", "جاري الإرسال...") : t("Send Message", "إرسال الرسالة")}
-                  </Button>
-                </form>
-              </Form>
-            </CardContent>
-          </Card>
+                  </div>
+                </div>
+                
+                <div className="h-px w-12 bg-border"></div>
+                
+                <div>
+                  <h3 className="text-sm font-bold uppercase tracking-widest text-muted-foreground mb-3">
+                    {t("Phone & WhatsApp", "الهاتف وواتساب")}
+                  </h3>
+                  <p className="text-xl font-medium text-foreground font-sans" dir="ltr">
+                    {settings?.contactPhone || "+967 777 907 147"}
+                  </p>
+                </div>
+
+                <div className="h-px w-12 bg-border"></div>
+
+                <div>
+                  <h3 className="text-sm font-bold uppercase tracking-widest text-muted-foreground mb-3">
+                    {t("Venue", "المكان")}
+                  </h3>
+                  <p className="text-lg text-foreground font-medium mb-1">
+                    {t(settings?.venueNameEn || "Saba Grand Hall", settings?.venueNameAr || "قاعة سبأ الكبرى")}
+                  </p>
+                  <p className="text-muted-foreground">
+                    {t("Khormaksar, Aden", "خورمكسر، عدن")}<br />
+                    {t("Republic of Yemen", "الجمهورية اليمنية")}
+                  </p>
+                </div>
+              </div>
+            </motion.div>
+            
+            <motion.div 
+              className="lg:col-span-7"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6, delay: 0.3 }}
+            >
+              <div className="bg-card border border-border p-8 md:p-12">
+                <h2 className="text-2xl font-serif font-bold mb-8 text-foreground">
+                  {t("Send an Inquiry", "إرسال استفسار")}
+                </h2>
+                
+                <Form {...form}>
+                  <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                    <div className="grid md:grid-cols-2 gap-6">
+                      <FormField
+                        control={form.control}
+                        name="name"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="font-semibold">{t("Full Name", "الاسم الكامل")}</FormLabel>
+                            <FormControl>
+                              <Input className="rounded-none bg-background focus-visible:ring-primary h-12" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="email"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="font-semibold">{t("Email Address", "البريد الإلكتروني")}</FormLabel>
+                            <FormControl>
+                              <Input type="email" className="rounded-none bg-background focus-visible:ring-primary h-12" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                    
+                    <div className="grid md:grid-cols-2 gap-6">
+                      <FormField
+                        control={form.control}
+                        name="phone"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="font-semibold">{t("Phone (Optional)", "الهاتف (اختياري)")}</FormLabel>
+                            <FormControl>
+                              <Input className="rounded-none bg-background focus-visible:ring-primary h-12" dir="ltr" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="subject"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="font-semibold">{t("Subject (Optional)", "الموضوع (اختياري)")}</FormLabel>
+                            <FormControl>
+                              <Input className="rounded-none bg-background focus-visible:ring-primary h-12" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                    
+                    <FormField
+                      control={form.control}
+                      name="message"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="font-semibold">{t("Message", "الرسالة")}</FormLabel>
+                          <FormControl>
+                            <Textarea className="rounded-none bg-background focus-visible:ring-primary min-h-[150px] resize-y" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <Button type="submit" size="lg" className="w-full rounded-none h-14 text-base font-bold mt-4" disabled={createContact.isPending}>
+                      {createContact.isPending ? t("Submitting...", "جاري الإرسال...") : t("Submit Inquiry", "إرسال الاستفسار")}
+                    </Button>
+                  </form>
+                </Form>
+              </div>
+            </motion.div>
+          </div>
         </div>
-      </div>
+      </section>
     </div>
   );
 }

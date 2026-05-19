@@ -1,0 +1,20 @@
+uploads = []
+outputs = []
+
+[[generated]]
+id = "nEzBUXYBDED23YTpedDYy"
+uri = "file://artifacts/aivec/public/hero-vascular.png"
+type = "image"
+title = "Vascular system anatomical abstraction"
+
+[[generated]]
+id = "noVfb1-8EvmPaD1LHg6I4"
+uri = "file://artifacts/aivec/public/hero-aden.png"
+type = "image"
+title = "Aden architecture scientific"
+
+[[generated]]
+id = "kxrPPzDTWeZnHdcMBTw7Z"
+uri = "file://artifacts/aivec/public/surgical-tools.png"
+type = "image"
+title = "Surgical tools editorial"
