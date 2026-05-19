@@ -229,10 +229,15 @@ export const EventFieldFieldType = {
   email: 'email',
   phone: 'phone',
   number: 'number',
+  date: 'date',
   dropdown: 'dropdown',
   radio: 'radio',
   checkbox: 'checkbox',
-  date: 'date',
+  yes_no: 'yes_no',
+  image_upload: 'image_upload',
+  file_upload: 'file_upload',
+  section_heading: 'section_heading',
+  description_text: 'description_text',
 } as const;
 
 export interface EventFieldOption {
@@ -349,10 +354,15 @@ export const EventFieldInputFieldType = {
   email: 'email',
   phone: 'phone',
   number: 'number',
+  date: 'date',
   dropdown: 'dropdown',
   radio: 'radio',
   checkbox: 'checkbox',
-  date: 'date',
+  yes_no: 'yes_no',
+  image_upload: 'image_upload',
+  file_upload: 'file_upload',
+  section_heading: 'section_heading',
+  description_text: 'description_text',
 } as const;
 
 export interface EventFieldInput {
@@ -420,6 +430,179 @@ export interface RegistrationUpdate {
   status?: RegistrationUpdateStatus;
   /** @nullable */
   notes?: string | null;
+}
+
+export type FormStatus = typeof FormStatus[keyof typeof FormStatus];
+
+
+export const FormStatus = {
+  draft: 'draft',
+  open: 'open',
+  closed: 'closed',
+} as const;
+
+export interface Form {
+  id: number;
+  slug: string;
+  titleEn: string;
+  titleAr: string;
+  descriptionEn?: string;
+  descriptionAr?: string;
+  /** @nullable */
+  logoUrl?: string | null;
+  submitLabelEn?: string;
+  submitLabelAr?: string;
+  successMessageEn?: string;
+  successMessageAr?: string;
+  status: FormStatus;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type FormFieldFieldType = typeof FormFieldFieldType[keyof typeof FormFieldFieldType];
+
+
+export const FormFieldFieldType = {
+  short_text: 'short_text',
+  long_text: 'long_text',
+  email: 'email',
+  phone: 'phone',
+  number: 'number',
+  date: 'date',
+  dropdown: 'dropdown',
+  radio: 'radio',
+  checkbox: 'checkbox',
+  yes_no: 'yes_no',
+  image_upload: 'image_upload',
+  file_upload: 'file_upload',
+  section_heading: 'section_heading',
+  description_text: 'description_text',
+} as const;
+
+export interface FormField {
+  id: number;
+  formId: number;
+  fieldKey: string;
+  fieldType: FormFieldFieldType;
+  labelEn?: string;
+  labelAr?: string;
+  helpEn?: string;
+  helpAr?: string;
+  placeholderEn?: string;
+  placeholderAr?: string;
+  required?: boolean;
+  order: number;
+  options?: EventFieldOption[];
+}
+
+export interface FormWithFields {
+  form: Form;
+  fields: FormField[];
+}
+
+export type FormInputStatus = typeof FormInputStatus[keyof typeof FormInputStatus];
+
+
+export const FormInputStatus = {
+  draft: 'draft',
+  open: 'open',
+  closed: 'closed',
+} as const;
+
+export interface FormInput {
+  slug: string;
+  titleEn: string;
+  titleAr: string;
+  descriptionEn?: string;
+  descriptionAr?: string;
+  /** @nullable */
+  logoUrl?: string | null;
+  submitLabelEn?: string;
+  submitLabelAr?: string;
+  successMessageEn?: string;
+  successMessageAr?: string;
+  status?: FormInputStatus;
+}
+
+export type FormUpdateStatus = typeof FormUpdateStatus[keyof typeof FormUpdateStatus];
+
+
+export const FormUpdateStatus = {
+  draft: 'draft',
+  open: 'open',
+  closed: 'closed',
+} as const;
+
+export interface FormUpdate {
+  slug?: string;
+  titleEn?: string;
+  titleAr?: string;
+  descriptionEn?: string;
+  descriptionAr?: string;
+  /** @nullable */
+  logoUrl?: string | null;
+  submitLabelEn?: string;
+  submitLabelAr?: string;
+  successMessageEn?: string;
+  successMessageAr?: string;
+  status?: FormUpdateStatus;
+}
+
+export type FormFieldInputFieldType = typeof FormFieldInputFieldType[keyof typeof FormFieldInputFieldType];
+
+
+export const FormFieldInputFieldType = {
+  short_text: 'short_text',
+  long_text: 'long_text',
+  email: 'email',
+  phone: 'phone',
+  number: 'number',
+  date: 'date',
+  dropdown: 'dropdown',
+  radio: 'radio',
+  checkbox: 'checkbox',
+  yes_no: 'yes_no',
+  image_upload: 'image_upload',
+  file_upload: 'file_upload',
+  section_heading: 'section_heading',
+  description_text: 'description_text',
+} as const;
+
+export interface FormFieldInput {
+  fieldKey: string;
+  fieldType: FormFieldInputFieldType;
+  labelEn: string;
+  labelAr: string;
+  helpEn?: string;
+  helpAr?: string;
+  placeholderEn?: string;
+  placeholderAr?: string;
+  required?: boolean;
+  order?: number;
+  options?: EventFieldOption[];
+}
+
+export interface FormFieldsInput {
+  fields: FormFieldInput[];
+}
+
+export interface FormSubmission {
+  id: number;
+  formId: number;
+  answers: unknown;
+  /** @nullable */
+  submitterName?: string | null;
+  /** @nullable */
+  submitterEmail?: string | null;
+  createdAt: string;
+}
+
+export interface FormSubmissionInput {
+  answers: unknown;
+  /** @nullable */
+  submitterName?: string | null;
+  /** @nullable */
+  submitterEmail?: string | null;
 }
 
 export interface NewsPost {
@@ -713,6 +896,18 @@ export const ListEventsStatus = {
   all: 'all',
   upcoming: 'upcoming',
   past: 'past',
+  open: 'open',
+} as const;
+
+export type ListFormsParams = {
+status?: ListFormsStatus;
+};
+
+export type ListFormsStatus = typeof ListFormsStatus[keyof typeof ListFormsStatus];
+
+
+export const ListFormsStatus = {
+  all: 'all',
   open: 'open',
 } as const;
 

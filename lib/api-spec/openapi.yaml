@@ -20,6 +20,7 @@ tags:
   - name: users
   - name: admin
   - name: storage
+  - name: forms
 
 paths:
   /storage/uploads/request-url:
@@ -317,6 +318,150 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Registration"
+
+  /forms:
+    get:
+      operationId: listForms
+      tags: [forms]
+      parameters:
+        - in: query
+          name: status
+          schema:
+            type: string
+            enum: [all, open]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Form"
+    post:
+      operationId: createForm
+      tags: [forms]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/FormInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Form"
+
+  /forms/{slug}:
+    get:
+      operationId: getForm
+      tags: [forms]
+      parameters:
+        - in: path
+          name: slug
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FormWithFields"
+
+  /forms/id/{id}:
+    patch:
+      operationId: updateForm
+      tags: [forms]
+      parameters:
+        - $ref: "#/components/parameters/IdParam"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/FormUpdate"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Form"
+    delete:
+      operationId: deleteForm
+      tags: [forms]
+      parameters:
+        - $ref: "#/components/parameters/IdParam"
+      responses:
+        "204":
+          description: Deleted
+
+  /forms/id/{id}/fields:
+    put:
+      operationId: setFormFields
+      tags: [forms]
+      parameters:
+        - $ref: "#/components/parameters/IdParam"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/FormFieldsInput"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/FormField"
+
+  /forms/{slug}/submit:
+    post:
+      operationId: submitForm
+      tags: [forms]
+      parameters:
+        - in: path
+          name: slug
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/FormSubmissionInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FormSubmission"
+
+  /forms/id/{id}/submissions:
+    get:
+      operationId: listFormSubmissions
+      tags: [forms]
+      parameters:
+        - $ref: "#/components/parameters/IdParam"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/FormSubmission"
 
   /news:
     get:
@@ -892,7 +1037,7 @@ components:
         fieldKey: { type: string }
         fieldType:
           type: string
-          enum: [short_text, long_text, email, phone, number, dropdown, radio, checkbox, date]
+          enum: [short_text, long_text, email, phone, number, date, dropdown, radio, checkbox, yes_no, image_upload, file_upload, section_heading, description_text]
         labelEn: { type: string }
         labelAr: { type: string }
         helpEn: { type: string }
@@ -973,7 +1118,7 @@ components:
         fieldKey: { type: string }
         fieldType:
           type: string
-          enum: [short_text, long_text, email, phone, number, dropdown, radio, checkbox, date]
+          enum: [short_text, long_text, email, phone, number, date, dropdown, radio, checkbox, yes_no, image_upload, file_upload, section_heading, description_text]
         labelEn: { type: string }
         labelAr: { type: string }
         helpEn: { type: string }
@@ -1020,6 +1165,132 @@ components:
       properties:
         status: { type: string, enum: [submitted, reviewed, accepted, rejected] }
         notes: { type: ["string", "null"] }
+
+    Form:
+      type: object
+      required: [id, slug, titleEn, titleAr, status, createdAt, updatedAt]
+      properties:
+        id: { type: integer }
+        slug: { type: string }
+        titleEn: { type: string }
+        titleAr: { type: string }
+        descriptionEn: { type: string }
+        descriptionAr: { type: string }
+        logoUrl: { type: ["string", "null"] }
+        submitLabelEn: { type: string }
+        submitLabelAr: { type: string }
+        successMessageEn: { type: string }
+        successMessageAr: { type: string }
+        status: { type: string, enum: [draft, open, closed] }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+
+    FormField:
+      type: object
+      required: [id, formId, fieldKey, fieldType, order]
+      properties:
+        id: { type: integer }
+        formId: { type: integer }
+        fieldKey: { type: string }
+        fieldType:
+          type: string
+          enum: [short_text, long_text, email, phone, number, date, dropdown, radio, checkbox, yes_no, image_upload, file_upload, section_heading, description_text]
+        labelEn: { type: string }
+        labelAr: { type: string }
+        helpEn: { type: string }
+        helpAr: { type: string }
+        placeholderEn: { type: string }
+        placeholderAr: { type: string }
+        required: { type: boolean }
+        order: { type: integer }
+        options: { type: array, items: { $ref: "#/components/schemas/EventFieldOption" } }
+
+    FormWithFields:
+      type: object
+      required: [form, fields]
+      properties:
+        form: { $ref: "#/components/schemas/Form" }
+        fields:
+          type: array
+          items:
+            $ref: "#/components/schemas/FormField"
+
+    FormInput:
+      type: object
+      required: [slug, titleEn, titleAr]
+      properties:
+        slug: { type: string }
+        titleEn: { type: string }
+        titleAr: { type: string }
+        descriptionEn: { type: string }
+        descriptionAr: { type: string }
+        logoUrl: { type: ["string", "null"] }
+        submitLabelEn: { type: string }
+        submitLabelAr: { type: string }
+        successMessageEn: { type: string }
+        successMessageAr: { type: string }
+        status: { type: string, enum: [draft, open, closed] }
+
+    FormUpdate:
+      type: object
+      properties:
+        slug: { type: string }
+        titleEn: { type: string }
+        titleAr: { type: string }
+        descriptionEn: { type: string }
+        descriptionAr: { type: string }
+        logoUrl: { type: ["string", "null"] }
+        submitLabelEn: { type: string }
+        submitLabelAr: { type: string }
+        successMessageEn: { type: string }
+        successMessageAr: { type: string }
+        status: { type: string, enum: [draft, open, closed] }
+
+    FormFieldInput:
+      type: object
+      required: [fieldKey, fieldType, labelEn, labelAr]
+      properties:
+        fieldKey: { type: string }
+        fieldType:
+          type: string
+          enum: [short_text, long_text, email, phone, number, date, dropdown, radio, checkbox, yes_no, image_upload, file_upload, section_heading, description_text]
+        labelEn: { type: string }
+        labelAr: { type: string }
+        helpEn: { type: string }
+        helpAr: { type: string }
+        placeholderEn: { type: string }
+        placeholderAr: { type: string }
+        required: { type: boolean }
+        order: { type: integer }
+        options: { type: array, items: { $ref: "#/components/schemas/EventFieldOption" } }
+
+    FormFieldsInput:
+      type: object
+      required: [fields]
+      properties:
+        fields:
+          type: array
+          items:
+            $ref: "#/components/schemas/FormFieldInput"
+
+    FormSubmission:
+      type: object
+      required: [id, formId, answers, createdAt]
+      properties:
+        id: { type: integer }
+        formId: { type: integer }
+        answers: {}
+        submitterName: { type: ["string", "null"] }
+        submitterEmail: { type: ["string", "null"] }
+        createdAt: { type: string, format: date-time }
+
+    FormSubmissionInput:
+      type: object
+      required: [answers]
+      properties:
+        answers: {}
+        submitterName: { type: ["string", "null"] }
+        submitterEmail: { type: ["string", "null"] }
 
     NewsPost:
       type: object

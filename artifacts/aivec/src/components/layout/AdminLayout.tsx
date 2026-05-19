@@ -19,6 +19,7 @@ import {
   UserCog,
   Menu,
   X,
+  ClipboardList,
 } from "lucide-react";
 import { useGetSiteSettings } from "@workspace/api-client-react";
 import { resolveImageUrl } from "@/components/admin/ImageUploadField";
@@ -162,6 +163,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
   const navItems = [
     { href: `/${lang}/admin`, icon: LayoutDashboard, label: t("Dashboard", "لوحة القيادة"), exact: true },
     { href: `/${lang}/admin/events`, icon: CalendarDays, label: t("Events", "الفعاليات") },
+    { href: `/${lang}/admin/forms`, icon: ClipboardList, label: t("Forms", "النماذج") },
     { href: `/${lang}/admin/pages`, icon: FileText, label: t("Pages", "الصفحات") },
     { href: `/${lang}/admin/news`, icon: Newspaper, label: t("News", "الأخبار") },
     { href: `/${lang}/admin/blog`, icon: PenTool, label: t("Blog", "المدونة") },

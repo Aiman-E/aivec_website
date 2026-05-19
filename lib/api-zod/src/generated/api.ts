@@ -294,7 +294,7 @@ export const GetEventResponse = zod.object({
   "id": zod.number(),
   "eventId": zod.number(),
   "fieldKey": zod.string(),
-  "fieldType": zod.enum(['short_text', 'long_text', 'email', 'phone', 'number', 'dropdown', 'radio', 'checkbox', 'date']),
+  "fieldType": zod.enum(['short_text', 'long_text', 'email', 'phone', 'number', 'date', 'dropdown', 'radio', 'checkbox', 'yes_no', 'image_upload', 'file_upload', 'section_heading', 'description_text']),
   "labelEn": zod.string().optional(),
   "labelAr": zod.string().optional(),
   "helpEn": zod.string().optional(),
@@ -374,7 +374,7 @@ export const SetEventFieldsParams = zod.object({
 export const SetEventFieldsBody = zod.object({
   "fields": zod.array(zod.object({
   "fieldKey": zod.string(),
-  "fieldType": zod.enum(['short_text', 'long_text', 'email', 'phone', 'number', 'dropdown', 'radio', 'checkbox', 'date']),
+  "fieldType": zod.enum(['short_text', 'long_text', 'email', 'phone', 'number', 'date', 'dropdown', 'radio', 'checkbox', 'yes_no', 'image_upload', 'file_upload', 'section_heading', 'description_text']),
   "labelEn": zod.string(),
   "labelAr": zod.string(),
   "helpEn": zod.string().optional(),
@@ -395,7 +395,7 @@ export const SetEventFieldsResponseItem = zod.object({
   "id": zod.number(),
   "eventId": zod.number(),
   "fieldKey": zod.string(),
-  "fieldType": zod.enum(['short_text', 'long_text', 'email', 'phone', 'number', 'dropdown', 'radio', 'checkbox', 'date']),
+  "fieldType": zod.enum(['short_text', 'long_text', 'email', 'phone', 'number', 'date', 'dropdown', 'radio', 'checkbox', 'yes_no', 'image_upload', 'file_upload', 'section_heading', 'description_text']),
   "labelEn": zod.string().optional(),
   "labelAr": zod.string().optional(),
   "helpEn": zod.string().optional(),
@@ -480,6 +480,200 @@ export const UpdateRegistrationResponse = zod.object({
   "answers": zod.unknown(),
   "createdAt": zod.coerce.date()
 })
+
+
+export const ListFormsQueryParams = zod.object({
+  "status": zod.enum(['all', 'open']).optional()
+})
+
+export const ListFormsResponseItem = zod.object({
+  "id": zod.number(),
+  "slug": zod.string(),
+  "titleEn": zod.string(),
+  "titleAr": zod.string(),
+  "descriptionEn": zod.string().optional(),
+  "descriptionAr": zod.string().optional(),
+  "logoUrl": zod.string().nullish(),
+  "submitLabelEn": zod.string().optional(),
+  "submitLabelAr": zod.string().optional(),
+  "successMessageEn": zod.string().optional(),
+  "successMessageAr": zod.string().optional(),
+  "status": zod.enum(['draft', 'open', 'closed']),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+})
+export const ListFormsResponse = zod.array(ListFormsResponseItem)
+
+
+export const CreateFormBody = zod.object({
+  "slug": zod.string(),
+  "titleEn": zod.string(),
+  "titleAr": zod.string(),
+  "descriptionEn": zod.string().optional(),
+  "descriptionAr": zod.string().optional(),
+  "logoUrl": zod.string().nullish(),
+  "submitLabelEn": zod.string().optional(),
+  "submitLabelAr": zod.string().optional(),
+  "successMessageEn": zod.string().optional(),
+  "successMessageAr": zod.string().optional(),
+  "status": zod.enum(['draft', 'open', 'closed']).optional()
+})
+
+
+export const GetFormParams = zod.object({
+  "slug": zod.coerce.string()
+})
+
+export const GetFormResponse = zod.object({
+  "form": zod.object({
+  "id": zod.number(),
+  "slug": zod.string(),
+  "titleEn": zod.string(),
+  "titleAr": zod.string(),
+  "descriptionEn": zod.string().optional(),
+  "descriptionAr": zod.string().optional(),
+  "logoUrl": zod.string().nullish(),
+  "submitLabelEn": zod.string().optional(),
+  "submitLabelAr": zod.string().optional(),
+  "successMessageEn": zod.string().optional(),
+  "successMessageAr": zod.string().optional(),
+  "status": zod.enum(['draft', 'open', 'closed']),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+}),
+  "fields": zod.array(zod.object({
+  "id": zod.number(),
+  "formId": zod.number(),
+  "fieldKey": zod.string(),
+  "fieldType": zod.enum(['short_text', 'long_text', 'email', 'phone', 'number', 'date', 'dropdown', 'radio', 'checkbox', 'yes_no', 'image_upload', 'file_upload', 'section_heading', 'description_text']),
+  "labelEn": zod.string().optional(),
+  "labelAr": zod.string().optional(),
+  "helpEn": zod.string().optional(),
+  "helpAr": zod.string().optional(),
+  "placeholderEn": zod.string().optional(),
+  "placeholderAr": zod.string().optional(),
+  "required": zod.boolean().optional(),
+  "order": zod.number(),
+  "options": zod.array(zod.object({
+  "value": zod.string(),
+  "labelEn": zod.string(),
+  "labelAr": zod.string()
+})).optional()
+}))
+})
+
+
+export const UpdateFormParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const UpdateFormBody = zod.object({
+  "slug": zod.string().optional(),
+  "titleEn": zod.string().optional(),
+  "titleAr": zod.string().optional(),
+  "descriptionEn": zod.string().optional(),
+  "descriptionAr": zod.string().optional(),
+  "logoUrl": zod.string().nullish(),
+  "submitLabelEn": zod.string().optional(),
+  "submitLabelAr": zod.string().optional(),
+  "successMessageEn": zod.string().optional(),
+  "successMessageAr": zod.string().optional(),
+  "status": zod.enum(['draft', 'open', 'closed']).optional()
+})
+
+export const UpdateFormResponse = zod.object({
+  "id": zod.number(),
+  "slug": zod.string(),
+  "titleEn": zod.string(),
+  "titleAr": zod.string(),
+  "descriptionEn": zod.string().optional(),
+  "descriptionAr": zod.string().optional(),
+  "logoUrl": zod.string().nullish(),
+  "submitLabelEn": zod.string().optional(),
+  "submitLabelAr": zod.string().optional(),
+  "successMessageEn": zod.string().optional(),
+  "successMessageAr": zod.string().optional(),
+  "status": zod.enum(['draft', 'open', 'closed']),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+})
+
+
+export const DeleteFormParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+
+export const SetFormFieldsParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const SetFormFieldsBody = zod.object({
+  "fields": zod.array(zod.object({
+  "fieldKey": zod.string(),
+  "fieldType": zod.enum(['short_text', 'long_text', 'email', 'phone', 'number', 'date', 'dropdown', 'radio', 'checkbox', 'yes_no', 'image_upload', 'file_upload', 'section_heading', 'description_text']),
+  "labelEn": zod.string(),
+  "labelAr": zod.string(),
+  "helpEn": zod.string().optional(),
+  "helpAr": zod.string().optional(),
+  "placeholderEn": zod.string().optional(),
+  "placeholderAr": zod.string().optional(),
+  "required": zod.boolean().optional(),
+  "order": zod.number().optional(),
+  "options": zod.array(zod.object({
+  "value": zod.string(),
+  "labelEn": zod.string(),
+  "labelAr": zod.string()
+})).optional()
+}))
+})
+
+export const SetFormFieldsResponseItem = zod.object({
+  "id": zod.number(),
+  "formId": zod.number(),
+  "fieldKey": zod.string(),
+  "fieldType": zod.enum(['short_text', 'long_text', 'email', 'phone', 'number', 'date', 'dropdown', 'radio', 'checkbox', 'yes_no', 'image_upload', 'file_upload', 'section_heading', 'description_text']),
+  "labelEn": zod.string().optional(),
+  "labelAr": zod.string().optional(),
+  "helpEn": zod.string().optional(),
+  "helpAr": zod.string().optional(),
+  "placeholderEn": zod.string().optional(),
+  "placeholderAr": zod.string().optional(),
+  "required": zod.boolean().optional(),
+  "order": zod.number(),
+  "options": zod.array(zod.object({
+  "value": zod.string(),
+  "labelEn": zod.string(),
+  "labelAr": zod.string()
+})).optional()
+})
+export const SetFormFieldsResponse = zod.array(SetFormFieldsResponseItem)
+
+
+export const SubmitFormParams = zod.object({
+  "slug": zod.coerce.string()
+})
+
+export const SubmitFormBody = zod.object({
+  "answers": zod.unknown(),
+  "submitterName": zod.string().nullish(),
+  "submitterEmail": zod.string().nullish()
+})
+
+
+export const ListFormSubmissionsParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const ListFormSubmissionsResponseItem = zod.object({
+  "id": zod.number(),
+  "formId": zod.number(),
+  "answers": zod.unknown(),
+  "submitterName": zod.string().nullish(),
+  "submitterEmail": zod.string().nullish(),
+  "createdAt": zod.coerce.date()
+})
+export const ListFormSubmissionsResponse = zod.array(ListFormSubmissionsResponseItem)
 
 
 export const ListNewsQueryParams = zod.object({

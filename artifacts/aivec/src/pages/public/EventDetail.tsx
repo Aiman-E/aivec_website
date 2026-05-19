@@ -4,20 +4,11 @@ import { useRoute } from "wouter";
 import { Skeleton } from "@/components/ui/skeleton";
 import { format } from "date-fns";
 import { Calendar, MapPin, ArrowRight, ArrowLeft, Clock } from "lucide-react";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { SignInButton, useUser } from "@clerk/react";
-import { motion } from "framer-motion";
 import { resolveImageUrl } from "@/components/admin/ImageUploadField";
+import { FormRenderer } from "@/components/public/FormRenderer";
 
 export function EventDetail() {
   const { lang, t, tStatus } = useLanguage();
@@ -27,43 +18,9 @@ export function EventDetail() {
   const slug = params?.slug || "";
   const { toast } = useToast();
   const { isSignedIn } = useUser();
-  const isRtl = lang === 'ar';
 
   const { data: eventData, isLoading } = useGetEvent(slug, { query: { enabled: !!slug, queryKey: getGetEventQueryKey(slug) } as never });
   const registerForEvent = useRegisterForEvent();
-
-  const formSchema = z.record(z.any());
-  const form = useForm({
-    resolver: zodResolver(formSchema),
-    defaultValues: {}
-  });
-
-  // Build per-field validation rules so email/phone/number actually validate
-  // instead of accepting anything. Required-field messages are localized.
-  const buildFieldRules = (field: { fieldType: string; required?: boolean | null }) => {
-    const rules: Record<string, unknown> = {
-      required: field.required
-        ? t("This field is required", "هذا الحقل مطلوب")
-        : false,
-    };
-    if (field.fieldType === "email") {
-      rules.pattern = {
-        value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-        message: t("Please enter a valid email address", "يرجى إدخال بريد إلكتروني صالح"),
-      };
-    } else if (field.fieldType === "phone") {
-      rules.pattern = {
-        value: /^[+\d][\d\s\-()]{5,}$/,
-        message: t("Please enter a valid phone number", "يرجى إدخال رقم هاتف صالح"),
-      };
-    } else if (field.fieldType === "number") {
-      rules.pattern = {
-        value: /^-?\d+(\.\d+)?$/,
-        message: t("Please enter a number", "يرجى إدخال رقم"),
-      };
-    }
-    return rules;
-  };
 
   if (isLoading) {
     return (
@@ -106,7 +63,7 @@ export function EventDetail() {
   const Arrow = lang === 'ar' ? ArrowRight : ArrowLeft;
   const isRegistrationOpen = event.status === 'open';
 
-  function onSubmit(answers: any) {
+  function onSubmit(answers: Record<string, unknown>) {
     registerForEvent.mutate(
       { id: event.id, data: { answers } } as never,
       {
@@ -243,95 +200,13 @@ export function EventDetail() {
                       </SignInButton>
                     </div>
                   ) : (
-                    <Form {...form}>
-                      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-                        {fields.map((field) => (
-                          <FormField
-                            key={field.fieldKey}
-                            control={form.control}
-                            name={field.fieldKey as never}
-                            rules={buildFieldRules(field)}
-                            render={({ field: formField }) => (
-                              <FormItem>
-                                <FormLabel className="font-bold text-xs uppercase tracking-widest text-muted-foreground flex items-center gap-2">
-                                  {t(field.labelEn, field.labelAr)}
-                                  {field.required && <span className="text-primary">*</span>}
-                                </FormLabel>
-                                <FormControl>
-                                  {field.fieldType === 'short_text' || field.fieldType === 'email' || field.fieldType === 'phone' || field.fieldType === 'number' ? (
-                                    <Input 
-                                      type={field.fieldType === 'email' ? 'email' : field.fieldType === 'number' ? 'number' : 'text'} 
-                                      placeholder={t(field.placeholderEn, field.placeholderAr)} 
-                                      className="rounded-none bg-background focus-visible:ring-primary border-border h-12"
-                                      {...formField} 
-                                    />
-                                  ) : field.fieldType === 'long_text' ? (
-                                    <Textarea 
-                                      placeholder={t(field.placeholderEn, field.placeholderAr)} 
-                                      className="rounded-none bg-background focus-visible:ring-primary border-border min-h-[120px]"
-                                      {...formField} 
-                                    />
-                                  ) : field.fieldType === 'dropdown' && field.options ? (
-                                    <Select onValueChange={formField.onChange} defaultValue={formField.value}>
-                                      <FormControl>
-                                        <SelectTrigger className="rounded-none bg-background focus:ring-primary border-border h-12">
-                                          <SelectValue placeholder={t(field.placeholderEn, field.placeholderAr)} />
-                                        </SelectTrigger>
-                                      </FormControl>
-                                      <SelectContent className="rounded-none">
-                                        {field.options.map(opt => (
-                                          <SelectItem key={opt.value} value={opt.value} className="rounded-none">
-                                            {t(opt.labelEn, opt.labelAr)}
-                                          </SelectItem>
-                                        ))}
-                                      </SelectContent>
-                                    </Select>
-                                  ) : field.fieldType === 'radio' && field.options ? (
-                                    <RadioGroup onValueChange={formField.onChange} defaultValue={formField.value} className="flex flex-col space-y-3 mt-4">
-                                      {field.options.map(opt => (
-                                        <FormItem key={opt.value} className="flex items-center space-x-3 space-x-reverse space-y-0">
-                                          <FormControl>
-                                            <RadioGroupItem value={opt.value} className="border-border text-primary" />
-                                          </FormControl>
-                                          <FormLabel className="font-serif text-foreground cursor-pointer text-base">
-                                            {t(opt.labelEn, opt.labelAr)}
-                                          </FormLabel>
-                                        </FormItem>
-                                      ))}
-                                    </RadioGroup>
-                                  ) : field.fieldType === 'checkbox' ? (
-                                    <div className="flex items-start space-x-3 space-x-reverse mt-4">
-                                      <FormControl>
-                                        <Checkbox 
-                                          checked={formField.value} 
-                                          onCheckedChange={formField.onChange} 
-                                          className="mt-1 border-border data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground"
-                                        />
-                                      </FormControl>
-                                      <FormDescription className="mt-0 text-base font-serif text-foreground leading-relaxed">
-                                        {t(field.placeholderEn, field.placeholderAr)}
-                                      </FormDescription>
-                                    </div>
-                                  ) : (
-                                    <Input className="rounded-none h-12" {...formField} />
-                                  )}
-                                </FormControl>
-                                {field.helpEn && <p className="text-xs text-muted-foreground mt-2 font-serif italic">{t(field.helpEn, field.helpAr)}</p>}
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-                        ))}
-                        <Button type="submit" size="lg" className="w-full rounded-none mt-12 h-14 font-bold text-xs uppercase tracking-widest bg-primary text-primary-foreground hover:bg-primary/90 group" disabled={registerForEvent.isPending}>
-                          {registerForEvent.isPending ? t("Processing...", "جاري المعالجة...") : (
-                            <span className="flex items-center gap-3">
-                              {t("Confirm Registration", "تأكيد التسجيل")}
-                              <ArrowRight className={`w-4 h-4 transition-transform group-hover:translate-x-1 ${isRtl ? 'rotate-180 group-hover:-translate-x-1' : ''}`} />
-                            </span>
-                          )}
-                        </Button>
-                      </form>
-                    </Form>
+                    <FormRenderer
+                      fields={fields}
+                      onSubmit={onSubmit}
+                      submitting={registerForEvent.isPending}
+                      submitLabel={t("Confirm Registration", "تأكيد التسجيل")}
+                      uploadBasePath="/api/storage/public"
+                    />
                   )}
                 </>
               )}

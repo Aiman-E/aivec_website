@@ -44,6 +44,89 @@ router.post("/storage/uploads/request-url", requireAdminSession, async (req: Req
 });
 
 /**
+ * POST /storage/public/uploads/request-url
+ *
+ * Public upload endpoint used by public form submissions (image/file fields).
+ * No admin auth. Enforces a 10MB size cap and a basic content-type allowlist
+ * to limit abuse.
+ */
+const PUBLIC_UPLOAD_MAX_BYTES = 10 * 1024 * 1024;
+const PUBLIC_UPLOAD_ALLOWED_PREFIXES = ["image/", "application/pdf"];
+const PUBLIC_UPLOAD_ALLOWED_EXACT = new Set([
+  "application/msword",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  "text/plain",
+]);
+
+// Simple in-memory sliding-window rate limiter (per IP).
+// Limits anonymous upload-URL minting to N requests per window to prevent
+// scripted abuse / storage cost DoS. Resets on process restart.
+const PUBLIC_UPLOAD_RL_WINDOW_MS = 60_000;
+const PUBLIC_UPLOAD_RL_MAX = 20;
+const publicUploadHits = new Map<string, number[]>();
+
+function checkPublicUploadRate(ip: string): boolean {
+  const now = Date.now();
+  const cutoff = now - PUBLIC_UPLOAD_RL_WINDOW_MS;
+  const arr = (publicUploadHits.get(ip) ?? []).filter((t) => t > cutoff);
+  if (arr.length >= PUBLIC_UPLOAD_RL_MAX) {
+    publicUploadHits.set(ip, arr);
+    return false;
+  }
+  arr.push(now);
+  publicUploadHits.set(ip, arr);
+  // Opportunistic cleanup
+  if (publicUploadHits.size > 5000) {
+    for (const [k, v] of publicUploadHits) {
+      const kept = v.filter((t) => t > cutoff);
+      if (kept.length === 0) publicUploadHits.delete(k);
+      else publicUploadHits.set(k, kept);
+    }
+  }
+  return true;
+}
+
+router.post("/storage/public/uploads/request-url", async (req: Request, res: Response) => {
+  const ip = (req.ip || req.socket.remoteAddress || "unknown").toString();
+  if (!checkPublicUploadRate(ip)) {
+    res.status(429).json({ error: "Too many upload requests. Please try again shortly." });
+    return;
+  }
+  const parsed = RequestUploadUrlBody.safeParse(req.body);
+  if (!parsed.success) {
+    res.status(400).json({ error: "Missing or invalid required fields" });
+    return;
+  }
+  const { name, size, contentType } = parsed.data;
+  if (typeof size === "number" && size > PUBLIC_UPLOAD_MAX_BYTES) {
+    res.status(413).json({ error: "File too large (max 10MB)" });
+    return;
+  }
+  const ct = (contentType || "").toLowerCase();
+  const allowed =
+    PUBLIC_UPLOAD_ALLOWED_EXACT.has(ct) ||
+    PUBLIC_UPLOAD_ALLOWED_PREFIXES.some((p) => ct.startsWith(p));
+  if (!allowed) {
+    res.status(415).json({ error: "Unsupported file type" });
+    return;
+  }
+  try {
+    const uploadURL = await objectStorageService.getObjectEntityUploadURL();
+    const objectPath = objectStorageService.normalizeObjectEntityPath(uploadURL);
+    res.json(
+      RequestUploadUrlResponse.parse({
+        uploadURL,
+        objectPath,
+        metadata: { name, size, contentType },
+      }),
+    );
+  } catch (error) {
+    req.log.error({ err: error }, "Error generating public upload URL");
+    res.status(500).json({ error: "Failed to generate upload URL" });
+  }
+});
+
+/**
  * GET /storage/public-objects/*
  *
  * Serve public assets from PUBLIC_OBJECT_SEARCH_PATHS.

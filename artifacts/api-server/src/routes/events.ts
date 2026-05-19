@@ -137,30 +137,34 @@ router.put("/events/id/:id/fields", requireAdminSession, async (req, res): Promi
     res.status(400).json({ error: parsed.error.message });
     return;
   }
-  await db.delete(eventFieldsTable).where(eq(eventFieldsTable.eventId, id));
-  if (parsed.data.fields.length === 0) {
-    res.json([]);
+  const [parent] = await db.select().from(eventsTable).where(eq(eventsTable.id, id));
+  if (!parent) {
+    res.status(404).json({ error: "Event not found" });
     return;
   }
-  const inserted = await db
-    .insert(eventFieldsTable)
-    .values(
-      parsed.data.fields.map((f, idx) => ({
-        eventId: id,
-        fieldKey: f.fieldKey,
-        fieldType: f.fieldType,
-        labelEn: f.labelEn,
-        labelAr: f.labelAr,
-        helpEn: f.helpEn ?? "",
-        helpAr: f.helpAr ?? "",
-        placeholderEn: f.placeholderEn ?? "",
-        placeholderAr: f.placeholderAr ?? "",
-        required: f.required ?? false,
-        order: f.order ?? idx,
-        options: f.options ?? null,
-      })),
-    )
-    .returning();
+  const inserted = await db.transaction(async (tx) => {
+    await tx.delete(eventFieldsTable).where(eq(eventFieldsTable.eventId, id));
+    if (parsed.data.fields.length === 0) return [];
+    return tx
+      .insert(eventFieldsTable)
+      .values(
+        parsed.data.fields.map((f, idx) => ({
+          eventId: id,
+          fieldKey: f.fieldKey,
+          fieldType: f.fieldType,
+          labelEn: f.labelEn,
+          labelAr: f.labelAr,
+          helpEn: f.helpEn ?? "",
+          helpAr: f.helpAr ?? "",
+          placeholderEn: f.placeholderEn ?? "",
+          placeholderAr: f.placeholderAr ?? "",
+          required: f.required ?? false,
+          order: f.order ?? idx,
+          options: f.options ?? null,
+        })),
+      )
+      .returning();
+  });
   await logAdminActivity(req, "event.fields.update", {
     targetType: "event",
     targetId: id,

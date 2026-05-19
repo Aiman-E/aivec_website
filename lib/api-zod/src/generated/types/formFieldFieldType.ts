@@ -6,10 +6,10 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export type EventFieldInputFieldType = typeof EventFieldInputFieldType[keyof typeof EventFieldInputFieldType];
+export type FormFieldFieldType = typeof FormFieldFieldType[keyof typeof FormFieldFieldType];
 
 
-export const EventFieldInputFieldType = {
+export const FormFieldFieldType = {
   short_text: 'short_text',
   long_text: 'long_text',
   email: 'email',

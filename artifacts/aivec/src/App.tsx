@@ -25,6 +25,10 @@ import { AdminPageEdit } from "@/pages/admin/AdminPageEdit";
 import { AdminEvents } from "@/pages/admin/AdminEvents";
 import { AdminEventFields } from "@/pages/admin/AdminEventFields";
 import { AdminEventRegistrations } from "@/pages/admin/AdminEventRegistrations";
+import { AdminForms } from "@/pages/admin/AdminForms";
+import { AdminFormFields } from "@/pages/admin/AdminFormFields";
+import { AdminFormSubmissions } from "@/pages/admin/AdminFormSubmissions";
+import { FormPage } from "@/pages/public/FormPage";
 import { AdminNews } from "@/pages/admin/AdminNews";
 import { AdminBlog } from "@/pages/admin/AdminBlog";
 import { AdminContact } from "@/pages/admin/AdminContact";
@@ -48,6 +52,9 @@ function AdminRouter() {
         <Route path="/:lang/admin/events" component={AdminEvents} />
         <Route path="/:lang/admin/events/:id/fields" component={AdminEventFields} />
         <Route path="/:lang/admin/events/:id/registrations" component={AdminEventRegistrations} />
+        <Route path="/:lang/admin/forms" component={AdminForms} />
+        <Route path="/:lang/admin/forms/:id/fields" component={AdminFormFields} />
+        <Route path="/:lang/admin/forms/:id/submissions" component={AdminFormSubmissions} />
         <Route path="/:lang/admin/news" component={AdminNews} />
         <Route path="/:lang/admin/blog" component={AdminBlog} />
         <Route path="/:lang/admin/contact" component={AdminContact} />
@@ -84,6 +91,7 @@ function LanguageRouter() {
           
           {/* Detail pages and portals */}
           <Route path="/:lang/events/:slug" component={EventDetail} />
+          <Route path="/:lang/forms/:slug" component={FormPage} />
           <Route path="/:lang/news/:slug" component={NewsDetail} />
           <Route path="/:lang/blog/:slug" component={BlogDetail} />
           <Route path="/:lang/me/registrations" component={MyRegistrations} />
