@@ -4,7 +4,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { motion } from "framer-motion";
 
 export function Sponsorship() {
-  const { lang, t } = useLanguage();
+  const { lang, t, tStatus } = useLanguage();
   const { data: page, isLoading: isLoadingPage } = useGetPage("sponsorship");
   const { data: sponsors, isLoading: isLoadingSponsors } = useListSponsors();
 
@@ -16,7 +16,11 @@ export function Sponsorship() {
     return acc;
   }, {} as Record<string, typeof sponsors>) || {};
 
-  const tierOrder = ["government", "platinum", "gold", "silver", "supporter"];
+  const KNOWN_TIERS = ["government", "platinum", "gold", "silver", "bronze", "supporter"];
+  // Render known tiers in priority order, then any unknown tiers from the DB
+  // so a newly added tier still surfaces instead of being silently dropped.
+  const extraTiers = Object.keys(groupedSponsors).filter(k => !KNOWN_TIERS.includes(k));
+  const tierOrder = [...KNOWN_TIERS, ...extraTiers];
 
   return (
     <div className="flex flex-col min-h-screen bg-background text-foreground">
@@ -81,7 +85,7 @@ export function Sponsorship() {
                     <div className="flex items-center justify-center gap-4 mb-12">
                       <div className="h-px bg-border flex-1 max-w-[100px]"></div>
                       <h2 className="text-2xl font-serif font-bold text-primary uppercase tracking-widest">
-                        {t(tier, tier)} {t("Sponsors", "الرعاة")}
+                        {tStatus(tier)} {t("Sponsors", "الرعاة")}
                       </h2>
                       <div className="h-px bg-border flex-1 max-w-[100px]"></div>
                     </div>

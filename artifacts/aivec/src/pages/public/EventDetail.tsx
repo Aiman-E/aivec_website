@@ -1,6 +1,6 @@
-import { useLanguage } from "@/lib/i18n";
+import { useLanguage, useNavigateToSection } from "@/lib/i18n";
 import { useGetEvent, useRegisterForEvent, getGetEventQueryKey } from "@workspace/api-client-react";
-import { useRoute, Link } from "wouter";
+import { useRoute } from "wouter";
 import { Skeleton } from "@/components/ui/skeleton";
 import { format } from "date-fns";
 import { Calendar, MapPin, ArrowRight, ArrowLeft, Clock } from "lucide-react";
@@ -19,7 +19,8 @@ import { SignInButton, useUser } from "@clerk/react";
 import { motion } from "framer-motion";
 
 export function EventDetail() {
-  const { lang, t } = useLanguage();
+  const { lang, t, tStatus } = useLanguage();
+  const goToSection = useNavigateToSection();
   const [, params] = useRoute("/:lang/events/:slug");
   const slug = params?.slug || "";
   const { toast } = useToast();
@@ -29,11 +30,38 @@ export function EventDetail() {
   const { data: eventData, isLoading } = useGetEvent(slug, { query: { enabled: !!slug, queryKey: getGetEventQueryKey(slug) } as never });
   const registerForEvent = useRegisterForEvent();
 
-  const formSchema = z.record(z.any()); 
+  const formSchema = z.record(z.any());
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {}
   });
+
+  // Build per-field validation rules so email/phone/number actually validate
+  // instead of accepting anything. Required-field messages are localized.
+  const buildFieldRules = (field: { fieldType: string; required?: boolean | null }) => {
+    const rules: Record<string, unknown> = {
+      required: field.required
+        ? t("This field is required", "هذا الحقل مطلوب")
+        : false,
+    };
+    if (field.fieldType === "email") {
+      rules.pattern = {
+        value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+        message: t("Please enter a valid email address", "يرجى إدخال بريد إلكتروني صالح"),
+      };
+    } else if (field.fieldType === "phone") {
+      rules.pattern = {
+        value: /^[+\d][\d\s\-()]{5,}$/,
+        message: t("Please enter a valid phone number", "يرجى إدخال رقم هاتف صالح"),
+      };
+    } else if (field.fieldType === "number") {
+      rules.pattern = {
+        value: /^-?\d+(\.\d+)?$/,
+        message: t("Please enter a number", "يرجى إدخال رقم"),
+      };
+    }
+    return rules;
+  };
 
   if (isLoading) {
     return (
@@ -60,9 +88,14 @@ export function EventDetail() {
     return (
       <div className="container mx-auto px-6 py-40 text-center min-h-[70vh] flex flex-col items-center justify-center">
         <h1 className="text-4xl font-serif text-muted-foreground mb-8">{t("Session not found.", "الجلسة غير موجودة.")}</h1>
-        <Link href={`/${lang}/#program`}>
-          <Button variant="outline" size="lg" className="rounded-none font-bold uppercase tracking-widest text-xs px-8 h-14">{t("Back to Program", "العودة للبرنامج")}</Button>
-        </Link>
+        <Button
+          variant="outline"
+          size="lg"
+          onClick={() => goToSection("#program")}
+          className="rounded-none font-bold uppercase tracking-widest text-xs px-8 h-14"
+        >
+          {t("Back to Program", "العودة للبرنامج")}
+        </Button>
       </div>
     );
   }
@@ -99,10 +132,14 @@ export function EventDetail() {
            <img src="/texture-ultrasound.png" alt="Texture" className="w-full h-full object-cover" />
         </div>
         <div className="container mx-auto px-6 md:px-12 max-w-6xl relative z-10">
-          <Link href={`/${lang}/#program`} className="inline-flex items-center text-xs font-bold text-muted-foreground hover:text-primary mb-12 transition-colors uppercase tracking-[0.2em]">
+          <button
+            type="button"
+            onClick={() => goToSection("#program")}
+            className="inline-flex items-center text-xs font-bold text-muted-foreground hover:text-primary mb-12 transition-colors uppercase tracking-[0.2em]"
+          >
             <Arrow className="w-4 h-4 mr-3 rtl:ml-3 rtl:mr-0" />
             {t("Back to Program", "العودة للبرنامج")}
-          </Link>
+          </button>
 
           <div className="max-w-4xl">
             <div className="flex flex-wrap gap-4 mb-8">
@@ -111,7 +148,7 @@ export function EventDetail() {
                 event.status === 'coming_soon' ? 'border-accent text-accent bg-accent/5' :
                 'border-border text-muted-foreground bg-muted'
               }`}>
-                {event.status.replace('_', ' ')}
+                {tStatus(event.status)}
               </span>
               {event.featured && (
                 <span className="inline-block text-[10px] font-bold uppercase tracking-[0.2em] px-4 py-1.5 border border-secondary text-secondary bg-secondary/5">
@@ -211,7 +248,7 @@ export function EventDetail() {
                             key={field.fieldKey}
                             control={form.control}
                             name={field.fieldKey as never}
-                            rules={{ required: field.required }}
+                            rules={buildFieldRules(field)}
                             render={({ field: formField }) => (
                               <FormItem>
                                 <FormLabel className="font-bold text-xs uppercase tracking-widest text-muted-foreground flex items-center gap-2">

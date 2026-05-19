@@ -1,4 +1,4 @@
-import { useLanguage } from "@/lib/i18n";
+import { useLanguage, useNavigateToSection } from "@/lib/i18n";
 import { useGetBlog, getGetBlogQueryKey } from "@workspace/api-client-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useRoute } from "wouter";
@@ -9,6 +9,7 @@ import { motion } from "framer-motion";
 
 export function BlogDetail() {
   const { lang, t } = useLanguage();
+  const goToSection = useNavigateToSection();
   const [, params] = useRoute("/:lang/blog/:slug");
   const slug = params?.slug || "";
   
@@ -38,9 +39,13 @@ export function BlogDetail() {
         <h1 className="text-4xl font-serif text-muted-foreground mb-8">
           {t("Article not found.", "المقال غير موجود.")}
         </h1>
-        <Link href={`/${lang}/#home`} className="text-primary font-bold hover:text-accent transition-colors uppercase tracking-[0.2em] text-xs">
+        <button
+          type="button"
+          onClick={() => goToSection("#home")}
+          className="text-primary font-bold hover:text-accent transition-colors uppercase tracking-[0.2em] text-xs"
+        >
           {t("Back to Home", "العودة للرئيسية")}
-        </Link>
+        </button>
       </div>
     );
   }
@@ -48,10 +53,14 @@ export function BlogDetail() {
   return (
     <div className="flex flex-col min-h-screen bg-background text-foreground pb-32 pt-28">
       <div className="container mx-auto px-6 md:px-12 max-w-4xl pt-16 pb-12">
-        <Link href={`/${lang}/#home`} className="inline-flex items-center text-xs font-bold text-muted-foreground hover:text-primary transition-colors uppercase tracking-[0.2em]">
+        <button
+          type="button"
+          onClick={() => goToSection("#home")}
+          className="inline-flex items-center text-xs font-bold text-muted-foreground hover:text-primary transition-colors uppercase tracking-[0.2em]"
+        >
           <Arrow className="w-4 h-4 mr-3 rtl:ml-3 rtl:mr-0" />
           {t("Back to Home", "العودة للرئيسية")}
-        </Link>
+        </button>
       </div>
       
       <article className="container mx-auto px-6 md:px-12 max-w-4xl">

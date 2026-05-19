@@ -6,7 +6,7 @@ import { format } from "date-fns";
 import { Badge } from "@/components/ui/badge";
 
 export function MyRegistrations() {
-  const { lang, t } = useLanguage();
+  const { lang, t, tStatus } = useLanguage();
   const { data: registrations, isLoading } = useListMyRegistrations();
 
   const getStatusColor = (status: string) => {
@@ -53,7 +53,7 @@ export function MyRegistrations() {
                   </div>
                 </div>
                 <Badge className={getStatusColor(reg.status)}>
-                  {t(reg.status, reg.status)}
+                  {tStatus(reg.status)}
                 </Badge>
               </CardHeader>
               <CardContent>

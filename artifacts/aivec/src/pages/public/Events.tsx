@@ -8,7 +8,7 @@ import { format } from "date-fns";
 import { motion } from "framer-motion";
 
 export function Events() {
-  const { lang, t } = useLanguage();
+  const { lang, t, tStatus } = useLanguage();
   const { data: events, isLoading } = useListEvents();
   const Arrow = lang === "ar" ? ArrowLeft : ArrowRight;
 
@@ -91,7 +91,7 @@ export function Events() {
                               event.status === 'coming_soon' ? 'bg-accent/10 text-accent' :
                               'bg-muted text-muted-foreground'
                             }`}>
-                              {event.status.replace('_', ' ')}
+                              {tStatus(event.status)}
                             </span>
                           </div>
                         </div>

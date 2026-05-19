@@ -78,7 +78,11 @@ export function Navbar() {
   const handleNavClick = (href: string) => {
     setMobileMenuOpen(false);
     if (location !== `/${lang}`) {
-      setLocation(`/${lang}${href}`);
+      // Queue the scroll target so Home can pick it up after it mounts and
+      // its sections render. Wouter strips hashes from setLocation, so we
+      // can't rely on window.location.hash alone.
+      sessionStorage.setItem("aivec_scroll_to", href);
+      setLocation(`/${lang}`);
     } else {
       // Wait one tick so menu close doesn't fight the scroll
       setTimeout(() => {

@@ -64,17 +64,25 @@ export function Home() {
   const yHero = useTransform(scrollYProgress, [0, 1], ["0%", "50%"]);
   const opacityHero = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
 
-  // Handle anchor links
+  // Handle anchor links — supports both window.location.hash and a target
+  // queued in sessionStorage by the navbar when jumping from another route.
+  // Polls briefly so async-loaded sections (events/news) have time to render.
   useEffect(() => {
-    const hash = window.location.hash;
-    if (hash) {
-      setTimeout(() => {
-        const element = document.querySelector(hash);
-        if (element) {
-          element.scrollIntoView({ behavior: 'smooth' });
-        }
-      }, 100);
-    }
+    const queued = sessionStorage.getItem("aivec_scroll_to");
+    const target = queued || window.location.hash;
+    if (!target) return;
+    sessionStorage.removeItem("aivec_scroll_to");
+    let attempts = 0;
+    const tryScroll = () => {
+      const element = document.querySelector(target);
+      if (element) {
+        element.scrollIntoView({ behavior: "smooth" });
+      } else if (attempts < 20) {
+        attempts += 1;
+        setTimeout(tryScroll, 150);
+      }
+    };
+    setTimeout(tryScroll, 100);
   }, []);
 
   const openEvents = events?.filter(e => e.status === 'open' || e.status === 'coming_soon') || [];
@@ -380,7 +388,10 @@ export function Home() {
         </div>
         <div className="container mx-auto px-6 md:px-12 relative z-10 h-full flex items-end pb-20">
           <h2 className="text-4xl md:text-6xl lg:text-8xl font-serif font-bold text-white max-w-5xl leading-[0.9] tracking-tighter">
-            "Advancing vascular care through global collaboration."
+            {t(
+              "“Advancing vascular care through global collaboration.”",
+              "«النهوض برعاية الأوعية الدموية عبر التعاون الدولي.»"
+            )}
           </h2>
         </div>
       </section>
