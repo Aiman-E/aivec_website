@@ -62,12 +62,12 @@ export function Home() {
     <div className="bg-background text-foreground selection:bg-primary selection:text-primary-foreground" ref={containerRef}>
       
       {/* HERO SECTION - ASYMMETRIC */}
-      <section id="home" className="relative min-h-[100dvh] pt-28 pb-16 overflow-hidden flex flex-col justify-center">
+      <section id="home" className="relative lg:min-h-[100dvh] pt-24 lg:pt-28 pb-16 overflow-hidden flex flex-col justify-center">
         <div className="container mx-auto px-6 md:px-12 relative z-10 flex-1 flex flex-col justify-center">
-          <div className="grid lg:grid-cols-12 gap-8 lg:gap-12 items-center h-full">
+          <div className="grid lg:grid-cols-12 gap-10 lg:gap-12 items-center h-full">
             
             {/* Typographic Masthead */}
-            <div className="lg:col-span-7 flex flex-col justify-center order-2 lg:order-1 pt-12 lg:pt-0">
+            <div className="lg:col-span-7 flex flex-col justify-center order-1 lg:order-1">
               <motion.div
                 initial={{ opacity: 0, y: 40 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -80,15 +80,15 @@ export function Home() {
                   </span>
                 </div>
                 
-                <h1 className="text-[12vw] sm:text-[8vw] lg:text-[7.5rem] leading-[0.85] font-serif font-bold text-foreground mb-8 tracking-tighter">
+                <h1 className="text-[15vw] sm:text-[10vw] lg:text-[7.5rem] leading-[0.85] font-serif font-bold text-foreground mb-8 tracking-tighter">
                   {t("Aden Intl.", "مؤتمر عدن")}<br />
-                  <span className="text-primary italic font-light ml-[10%] rtl:ml-0 rtl:mr-[10%] inline-block">
+                  <span className="text-primary italic font-light ml-[6%] sm:ml-[10%] rtl:ml-0 rtl:mr-[6%] sm:rtl:mr-[10%] inline-block">
                     {t("Vascular", "الدولي")}
                   </span><br />
                   {t("Conference", "للأوعية الدموية")}
                 </h1>
 
-                <div className="grid sm:grid-cols-2 gap-8 mt-16 max-w-2xl border-t border-border/50 pt-8">
+                <div className="grid sm:grid-cols-2 gap-6 sm:gap-8 mt-10 lg:mt-16 max-w-2xl border-t border-border/50 pt-8">
                   <div>
                     <p className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold mb-2">
                       {t("Date & Time", "الزمان")}
@@ -107,17 +107,17 @@ export function Home() {
                   </div>
                 </div>
 
-                <div className="mt-12 flex flex-wrap gap-6 items-center">
+                <div className="mt-10 lg:mt-12 flex flex-wrap gap-4 sm:gap-6 items-center">
                   <button 
                     onClick={() => document.querySelector('#program')?.scrollIntoView({ behavior: 'smooth' })}
-                    className="group flex items-center justify-between px-8 py-5 bg-primary text-primary-foreground font-bold text-xs uppercase tracking-widest hover:bg-primary/90 transition-all border border-primary relative overflow-hidden w-full sm:w-auto"
+                    className="group flex items-center justify-between px-6 sm:px-8 py-4 sm:py-5 bg-primary text-primary-foreground font-bold text-xs uppercase tracking-widest hover:bg-primary/90 transition-all border border-primary relative overflow-hidden w-full sm:w-auto"
                   >
                     <span className="relative z-10">{t("Explore Program", "استعرض البرنامج")}</span>
                     <ArrowRight className={`w-4 h-4 ml-4 relative z-10 transition-transform group-hover:translate-x-1 ${isRtl ? 'rotate-180 ml-0 mr-4 group-hover:-translate-x-1' : ''}`} />
                   </button>
                   <button 
                     onClick={() => document.querySelector('#contact')?.scrollIntoView({ behavior: 'smooth' })}
-                    className="group flex items-center justify-between px-8 py-5 bg-transparent text-foreground font-bold text-xs uppercase tracking-widest hover:bg-muted transition-all border border-border relative overflow-hidden w-full sm:w-auto"
+                    className="group flex items-center justify-between px-6 sm:px-8 py-4 sm:py-5 bg-transparent text-foreground font-bold text-xs uppercase tracking-widest hover:bg-muted transition-all border border-border relative overflow-hidden w-full sm:w-auto"
                   >
                     <span className="relative z-10">{t("Contact Us", "تواصل معنا")}</span>
                   </button>
@@ -126,7 +126,7 @@ export function Home() {
             </div>
 
             {/* Vertical Image Bleed */}
-            <div className="lg:col-span-5 h-[50vh] lg:h-[85vh] relative order-1 lg:order-2 w-full">
+            <div className="lg:col-span-5 h-[55vh] sm:h-[65vh] lg:h-[85vh] relative order-2 lg:order-2 w-full">
               <motion.div 
                 className="absolute inset-0 z-0 bg-muted overflow-hidden border border-border shadow-2xl"
                 initial={{ opacity: 0, scale: 0.95 }}
@@ -172,7 +172,7 @@ export function Home() {
 
       {/* ABOUT - EDITORIAL SPREAD */}
       {pageAbout && (
-        <section id="about" className="py-24 md:py-40 relative">
+        <section id="about" className="py-16 md:py-32 lg:py-40 relative">
           <div className="container mx-auto px-6 md:px-12">
             <div className="grid lg:grid-cols-12 gap-16 lg:gap-24 items-start">
               
@@ -223,21 +223,21 @@ export function Home() {
       )}
 
       {/* VISION & AUDIENCE - PARALLAX BACKGROUND */}
-      <section id="vision" className="py-32 md:py-48 bg-primary text-primary-foreground relative overflow-hidden">
+      <section id="vision" className="py-20 md:py-32 lg:py-48 bg-primary text-primary-foreground relative overflow-hidden">
         <div className="absolute inset-0 opacity-20 mix-blend-overlay">
           <img src="/texture-ultrasound.png" alt="Texture" className="w-full h-full object-cover" />
         </div>
         <div className="absolute inset-0 bg-gradient-to-b from-primary via-primary/90 to-primary"></div>
         
         <div className="container mx-auto px-6 md:px-12 relative z-10">
-          <div className="grid md:grid-cols-2 gap-20 lg:gap-32">
+          <div className="grid md:grid-cols-2 gap-16 md:gap-20 lg:gap-32">
             {pageVision && (
               <div>
                 <h3 className="text-accent font-bold uppercase tracking-[0.2em] text-sm mb-8 flex items-center gap-4">
                   <span className="w-12 h-px bg-accent block"></span>
                   {t("Our Vision", "رؤيتنا")}
                 </h3>
-                <h2 className="text-5xl font-serif font-bold mb-10 leading-tight text-white">
+                <h2 className="text-4xl md:text-5xl font-serif font-bold mb-8 md:mb-10 leading-tight text-white">
                   {t(pageVision.titleEn, pageVision.titleAr)}
                 </h2>
                 <div className="prose prose-xl prose-invert max-w-none prose-p:text-white/80 prose-p:leading-relaxed">
@@ -251,7 +251,7 @@ export function Home() {
                   <span className="w-12 h-px bg-accent block"></span>
                   {t("Who Should Attend", "الجمهور المستهدف")}
                 </h3>
-                <h2 className="text-5xl font-serif font-bold mb-10 leading-tight text-white">
+                <h2 className="text-4xl md:text-5xl font-serif font-bold mb-8 md:mb-10 leading-tight text-white">
                   {t(pageAudience.titleEn, pageAudience.titleAr)}
                 </h2>
                 <div className="prose prose-xl prose-invert max-w-none prose-p:text-white/80 prose-p:leading-relaxed">
@@ -264,7 +264,7 @@ export function Home() {
       </section>
 
       {/* PROGRAM - EDITORIAL TIMETABLE */}
-      <section id="program" className="py-24 md:py-40 bg-card">
+      <section id="program" className="py-16 md:py-32 lg:py-40 bg-card">
         <div className="container mx-auto px-6 md:px-12">
           <div className="flex flex-col md:flex-row justify-between items-end mb-20 gap-8">
             <div className="max-w-3xl">
@@ -341,7 +341,7 @@ export function Home() {
       </section>
 
       {/* NEWS SECTION */}
-      <section id="news" className="py-24 md:py-40 bg-background">
+      <section id="news" className="py-16 md:py-32 lg:py-40 bg-background">
         <div className="container mx-auto px-6 md:px-12">
           <div className="flex flex-col md:flex-row justify-between items-end mb-20 gap-8 border-b-2 border-border pb-10">
             <div>
@@ -397,7 +397,7 @@ export function Home() {
       </section>
 
       {/* SPONSORSHIP - MUSEUM WALL */}
-      <section id="sponsors" className="py-24 md:py-40 border-t border-border bg-card">
+      <section id="sponsors" className="py-16 md:py-32 lg:py-40 border-t border-border bg-card">
         <div className="container mx-auto px-6 md:px-12 text-center">
           <h3 className="text-accent font-bold uppercase tracking-[0.2em] text-sm mb-6 flex items-center justify-center gap-4">
             <span className="w-12 h-px bg-accent block"></span>
@@ -449,7 +449,7 @@ export function Home() {
       </section>
 
       {/* VENUE & CONTACT */}
-      <section id="venue" className="py-24 md:py-40 bg-background relative border-t border-border">
+      <section id="venue" className="py-16 md:py-32 lg:py-40 bg-background relative border-t border-border">
         <div className="container mx-auto px-6 md:px-12">
           <div id="contact" className="grid lg:grid-cols-2 gap-0 border border-border shadow-2xl bg-card">
             
