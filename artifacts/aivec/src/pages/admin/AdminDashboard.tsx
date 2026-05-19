@@ -2,6 +2,7 @@ import { useLanguage, useLocaleTag } from "@/lib/i18n";
 import { useGetAdminDashboard } from "@workspace/api-client-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Users, CalendarDays, Ticket, Newspaper, PenTool, MessageSquare } from "lucide-react";
+import { RecentActivities } from "@/components/admin/RecentActivities";
 
 export function AdminDashboard() {
   const { lang, t, tStatus } = useLanguage();
@@ -37,6 +38,10 @@ export function AdminDashboard() {
             </CardContent>
           </Card>
         ))}
+      </div>
+
+      <div className="mb-8">
+        <RecentActivities limit={15} />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">

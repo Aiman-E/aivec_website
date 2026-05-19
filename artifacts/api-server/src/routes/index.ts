@@ -11,6 +11,9 @@ import sponsorsRouter from "./sponsors";
 import heroImagesRouter from "./heroImages";
 import usersRouter from "./users";
 import adminRouter from "./admin";
+import adminAuthRouter from "./adminAuth";
+import adminAccountsRouter from "./adminAccounts";
+import adminActivitiesRouter from "./adminActivities";
 import storageRouter from "./storage";
 
 const router: IRouter = Router();
@@ -26,6 +29,9 @@ router.use(contactRouter);
 router.use(sponsorsRouter);
 router.use(heroImagesRouter);
 router.use(usersRouter);
+router.use(adminAuthRouter);
+router.use(adminAccountsRouter);
+router.use(adminActivitiesRouter);
 router.use(adminRouter);
 router.use(storageRouter);
 

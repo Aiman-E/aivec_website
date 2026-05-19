@@ -2,7 +2,7 @@ import { Router, type IRouter } from "express";
 import { eq } from "drizzle-orm";
 import { db, pagesTable } from "@workspace/db";
 import { UpdatePageBody } from "@workspace/api-zod";
-import { requireAdmin } from "../lib/auth";
+import { requireAdminSession, logAdminActivity } from "../lib/adminAuth";
 
 const router: IRouter = Router();
 
@@ -27,7 +27,7 @@ router.get("/pages/:key", async (req, res): Promise<void> => {
   res.json(page);
 });
 
-router.put("/pages/:key", requireAdmin, async (req, res): Promise<void> => {
+router.put("/pages/:key", requireAdminSession, async (req, res): Promise<void> => {
   const key = Array.isArray(req.params.key) ? req.params.key[0]! : req.params.key;
   const parsed = UpdatePageBody.safeParse(req.body);
   if (!parsed.success) {
@@ -41,6 +41,11 @@ router.put("/pages/:key", requireAdmin, async (req, res): Promise<void> => {
       .set(parsed.data)
       .where(eq(pagesTable.id, existing.id))
       .returning();
+    await logAdminActivity(req, "page.update", {
+      targetType: "page",
+      targetId: key,
+      summary: `Updated page "${key}"`,
+    });
     res.json(updated);
     return;
   }
@@ -48,6 +53,11 @@ router.put("/pages/:key", requireAdmin, async (req, res): Promise<void> => {
     .insert(pagesTable)
     .values({ key, ...parsed.data })
     .returning();
+  await logAdminActivity(req, "page.update", {
+    targetType: "page",
+    targetId: key,
+    summary: `Created page "${key}"`,
+  });
   res.json(created);
 });
 

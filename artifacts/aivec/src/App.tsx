@@ -30,6 +30,7 @@ import { AdminContact } from "@/pages/admin/AdminContact";
 import { AdminSponsors } from "@/pages/admin/AdminSponsors";
 import { AdminHeroImages } from "@/pages/admin/AdminHeroImages";
 import { AdminUsers } from "@/pages/admin/AdminUsers";
+import { AdminAccounts } from "@/pages/admin/AdminAccounts";
 
 const queryClient = new QueryClient();
 
@@ -52,6 +53,7 @@ function AdminRouter() {
         <Route path="/:lang/admin/sponsors" component={AdminSponsors} />
         <Route path="/:lang/admin/hero-images" component={AdminHeroImages} />
         <Route path="/:lang/admin/users" component={AdminUsers} />
+        <Route path="/:lang/admin/accounts" component={AdminAccounts} />
       </Switch>
     </AdminLayout>
   );

@@ -2,11 +2,11 @@ import { Router, type IRouter } from "express";
 import { eq, desc } from "drizzle-orm";
 import { db, contactSubmissionsTable } from "@workspace/db";
 import { CreateContactSubmissionBody } from "@workspace/api-zod";
-import { requireAdmin } from "../lib/auth";
+import { requireAdminSession, logAdminActivity } from "../lib/adminAuth";
 
 const router: IRouter = Router();
 
-router.get("/contact-submissions", requireAdmin, async (_req, res): Promise<void> => {
+router.get("/contact-submissions", requireAdminSession, async (_req, res): Promise<void> => {
   const rows = await db.select().from(contactSubmissionsTable).orderBy(desc(contactSubmissionsTable.createdAt));
   res.json(rows);
 });
@@ -30,7 +30,7 @@ router.post("/contact-submissions", async (req, res): Promise<void> => {
   res.status(201).json(row);
 });
 
-router.delete("/contact-submissions/:id", requireAdmin, async (req, res): Promise<void> => {
+router.delete("/contact-submissions/:id", requireAdminSession, async (req, res): Promise<void> => {
   const raw = Array.isArray(req.params.id) ? req.params.id[0]! : req.params.id;
   const id = parseInt(raw, 10);
   if (Number.isNaN(id)) {
@@ -38,6 +38,11 @@ router.delete("/contact-submissions/:id", requireAdmin, async (req, res): Promis
     return;
   }
   await db.delete(contactSubmissionsTable).where(eq(contactSubmissionsTable.id, id));
+  await logAdminActivity(req, "contact.delete", {
+    targetType: "contact",
+    targetId: id,
+    summary: `Deleted contact message #${id}`,
+  });
   res.sendStatus(204);
 });
 

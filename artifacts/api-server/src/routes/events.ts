@@ -14,7 +14,8 @@ import {
   RegisterForEventBody,
   UpdateRegistrationBody,
 } from "@workspace/api-zod";
-import { requireAuth, requireAdmin, optionalAuth } from "../lib/auth";
+import { requireAuth } from "../lib/auth";
+import { requireAdminSession, optionalAdminSession, logAdminActivity } from "../lib/adminAuth";
 
 const router: IRouter = Router();
 
@@ -25,9 +26,9 @@ function parseId(raw: string | string[] | undefined): number | null {
   return Number.isNaN(n) ? null : n;
 }
 
-router.get("/events", optionalAuth, async (req, res): Promise<void> => {
+router.get("/events", optionalAdminSession, async (req, res): Promise<void> => {
   const status = typeof req.query["status"] === "string" ? req.query["status"] : "all";
-  const isAdmin = req.localUser?.role === "admin";
+  const isAdmin = !!req.adminUser;
   const PUBLIC_STATUSES = ["open", "closed", "coming_soon"];
   const now = new Date();
   let rows;
@@ -46,19 +47,24 @@ router.get("/events", optionalAuth, async (req, res): Promise<void> => {
   res.json(rows);
 });
 
-router.post("/events", requireAdmin, async (req, res): Promise<void> => {
+router.post("/events", requireAdminSession, async (req, res): Promise<void> => {
   const parsed = CreateEventBody.safeParse(req.body);
   if (!parsed.success) {
     res.status(400).json({ error: parsed.error.message });
     return;
   }
   const [row] = await db.insert(eventsTable).values(parsed.data).returning();
+  await logAdminActivity(req, "event.create", {
+    targetType: "event",
+    targetId: row!.id,
+    summary: `Created event "${row!.titleEn}"`,
+  });
   res.status(201).json(row);
 });
 
-router.get("/events/:slug", optionalAuth, async (req, res): Promise<void> => {
+router.get("/events/:slug", optionalAdminSession, async (req, res): Promise<void> => {
   const slug = Array.isArray(req.params.slug) ? req.params.slug[0]! : req.params.slug;
-  const isAdmin = req.localUser?.role === "admin";
+  const isAdmin = !!req.adminUser;
   let [event] = await db.select().from(eventsTable).where(eq(eventsTable.slug, slug));
   if (!event && /^\d+$/.test(slug)) {
     [event] = await db.select().from(eventsTable).where(eq(eventsTable.id, parseInt(slug, 10)));
@@ -80,7 +86,7 @@ router.get("/events/:slug", optionalAuth, async (req, res): Promise<void> => {
   res.json({ event, fields });
 });
 
-router.patch("/events/id/:id", requireAdmin, async (req, res): Promise<void> => {
+router.patch("/events/id/:id", requireAdminSession, async (req, res): Promise<void> => {
   const id = parseId(req.params.id);
   if (id === null) {
     res.status(400).json({ error: "Invalid id" });
@@ -96,20 +102,31 @@ router.patch("/events/id/:id", requireAdmin, async (req, res): Promise<void> => 
     res.status(404).json({ error: "Event not found" });
     return;
   }
+  await logAdminActivity(req, "event.update", {
+    targetType: "event",
+    targetId: row.id,
+    summary: `Updated event "${row.titleEn}"`,
+  });
   res.json(row);
 });
 
-router.delete("/events/id/:id", requireAdmin, async (req, res): Promise<void> => {
+router.delete("/events/id/:id", requireAdminSession, async (req, res): Promise<void> => {
   const id = parseId(req.params.id);
   if (id === null) {
     res.status(400).json({ error: "Invalid id" });
     return;
   }
+  const [existing] = await db.select().from(eventsTable).where(eq(eventsTable.id, id));
   await db.delete(eventsTable).where(eq(eventsTable.id, id));
+  await logAdminActivity(req, "event.delete", {
+    targetType: "event",
+    targetId: id,
+    summary: existing ? `Deleted event "${existing.titleEn}"` : `Deleted event #${id}`,
+  });
   res.sendStatus(204);
 });
 
-router.put("/events/id/:id/fields", requireAdmin, async (req, res): Promise<void> => {
+router.put("/events/id/:id/fields", requireAdminSession, async (req, res): Promise<void> => {
   const id = parseId(req.params.id);
   if (id === null) {
     res.status(400).json({ error: "Invalid id" });
@@ -144,6 +161,12 @@ router.put("/events/id/:id/fields", requireAdmin, async (req, res): Promise<void
       })),
     )
     .returning();
+  await logAdminActivity(req, "event.fields.update", {
+    targetType: "event",
+    targetId: id,
+    summary: `Updated registration fields for event #${id}`,
+    details: { count: inserted.length },
+  });
   res.json(inserted);
 });
 
@@ -229,7 +252,7 @@ router.post("/events/id/:id/register", requireAuth, async (req, res): Promise<vo
   });
 });
 
-router.get("/events/id/:id/registrations", requireAdmin, async (req, res): Promise<void> => {
+router.get("/events/id/:id/registrations", requireAdminSession, async (req, res): Promise<void> => {
   const id = parseId(req.params.id);
   if (id === null) {
     res.status(400).json({ error: "Invalid id" });
@@ -273,7 +296,7 @@ router.get("/events/id/:id/registrations", requireAdmin, async (req, res): Promi
   );
 });
 
-router.patch("/registrations/:id", requireAdmin, async (req, res): Promise<void> => {
+router.patch("/registrations/:id", requireAdminSession, async (req, res): Promise<void> => {
   const id = parseId(req.params.id);
   if (id === null) {
     res.status(400).json({ error: "Invalid id" });
@@ -298,6 +321,11 @@ router.patch("/registrations/:id", requireAdmin, async (req, res): Promise<void>
   }
   const [user] = await db.select().from(usersTable).where(eq(usersTable.id, row.userId));
   const [event] = await db.select().from(eventsTable).where(eq(eventsTable.id, row.eventId));
+  await logAdminActivity(req, "registration.update", {
+    targetType: "registration",
+    targetId: row.id,
+    summary: `Updated registration #${row.id}${parsed.data.status ? ` → ${parsed.data.status}` : ""}`,
+  });
   res.json({
     ...row,
     userEmail: user?.email ?? null,

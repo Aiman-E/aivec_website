@@ -9,11 +9,11 @@ import {
   blogPostsTable,
   contactSubmissionsTable,
 } from "@workspace/db";
-import { requireAdmin } from "../lib/auth";
+import { requireAdminSession } from "../lib/adminAuth";
 
 const router: IRouter = Router();
 
-router.get("/admin/dashboard", requireAdmin, async (_req, res): Promise<void> => {
+router.get("/admin/dashboard", requireAdminSession, async (_req, res): Promise<void> => {
   const [usersCount] = await db.select({ c: sql<number>`count(*)::int` }).from(usersTable);
   const [eventsCount] = await db.select({ c: sql<number>`count(*)::int` }).from(eventsTable);
   const [openCount] = await db

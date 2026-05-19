@@ -2,7 +2,7 @@ import { Router, type IRouter } from "express";
 import { eq } from "drizzle-orm";
 import { db, siteSettingsTable } from "@workspace/db";
 import { UpdateSiteSettingsBody } from "@workspace/api-zod";
-import { requireAdmin } from "../lib/auth";
+import { requireAdminSession, logAdminActivity } from "../lib/adminAuth";
 
 const router: IRouter = Router();
 
@@ -18,7 +18,7 @@ router.get("/site-settings", async (_req, res): Promise<void> => {
   res.json(s);
 });
 
-router.patch("/site-settings", requireAdmin, async (req, res): Promise<void> => {
+router.patch("/site-settings", requireAdminSession, async (req, res): Promise<void> => {
   const parsed = UpdateSiteSettingsBody.safeParse(req.body);
   if (!parsed.success) {
     res.status(400).json({ error: parsed.error.message });
@@ -30,6 +30,11 @@ router.patch("/site-settings", requireAdmin, async (req, res): Promise<void> => 
     .set(parsed.data)
     .where(eq(siteSettingsTable.id, current.id))
     .returning();
+  await logAdminActivity(req, "site_settings.update", {
+    targetType: "site_settings",
+    summary: "Updated site settings",
+    details: { fields: Object.keys(parsed.data) },
+  });
   res.json(updated);
 });
 

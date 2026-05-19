@@ -32,6 +32,15 @@ _Populate as you build — non-obvious choices a reader couldn't infer from the 
 
 _Describe the high-level user-facing capabilities of this app once they exist._
 
+## Admin access
+
+- Admin panel: `/<lang>/admin` (e.g. `/en/admin`) — separate from public Clerk login.
+- Default seeded login on first run: **username `admin` / password `admin`** (change immediately via Admin → Admin Accounts).
+- Override the initial seed via env: `ADMIN_INITIAL_USERNAME`, `ADMIN_INITIAL_PASSWORD`.
+- In production (`NODE_ENV=production`), the seed will refuse to run unless `ADMIN_INITIAL_PASSWORD` is at least 12 characters.
+- Sessions are httpOnly cookies (`aivec_admin_session`), 7-day TTL.
+- Server invariants: cannot delete or disable your own account; at least one active admin must always remain.
+
 ## User preferences
 
 _Populate as you build — explicit user instructions worth remembering across sessions._

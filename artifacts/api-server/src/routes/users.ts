@@ -2,16 +2,16 @@ import { Router, type IRouter } from "express";
 import { eq, asc } from "drizzle-orm";
 import { db, usersTable } from "@workspace/db";
 import { UpdateUserRoleBody } from "@workspace/api-zod";
-import { requireAdmin } from "../lib/auth";
+import { requireAdminSession, logAdminActivity } from "../lib/adminAuth";
 
 const router: IRouter = Router();
 
-router.get("/users", requireAdmin, async (_req, res): Promise<void> => {
+router.get("/users", requireAdminSession, async (_req, res): Promise<void> => {
   const rows = await db.select().from(usersTable).orderBy(asc(usersTable.createdAt));
   res.json(rows);
 });
 
-router.patch("/users/:id/role", requireAdmin, async (req, res): Promise<void> => {
+router.patch("/users/:id/role", requireAdminSession, async (req, res): Promise<void> => {
   const raw = Array.isArray(req.params.id) ? req.params.id[0]! : req.params.id;
   const id = parseInt(raw, 10);
   if (Number.isNaN(id)) {
@@ -28,6 +28,11 @@ router.patch("/users/:id/role", requireAdmin, async (req, res): Promise<void> =>
     res.status(404).json({ error: "User not found" });
     return;
   }
+  await logAdminActivity(req, "user.role.update", {
+    targetType: "user",
+    targetId: row.id,
+    summary: `Set ${row.email} role to "${parsed.data.role}"`,
+  });
   res.json(row);
 });
 
