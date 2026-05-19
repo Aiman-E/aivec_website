@@ -76,6 +76,7 @@ function LanguageRouter() {
           <Route path="/:lang/me/registrations" component={MyRegistrations} />
           
           {/* Admin routes */}
+          <Route path="/:lang/admin" component={AdminRouter} />
           <Route path="/:lang/admin/*" component={AdminRouter} />
           
           <Route component={NotFound} />
