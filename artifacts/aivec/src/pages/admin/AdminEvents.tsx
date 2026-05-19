@@ -1,13 +1,13 @@
 import { useLanguage } from "@/lib/i18n";
 import { useListEvents, useCreateEvent, useUpdateEvent, useDeleteEvent, getListEventsQueryKey } from "@workspace/api-client-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useLocation } from "wouter";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -26,32 +26,56 @@ const eventSchema = z.object({
   featured: z.boolean().default(false),
   posterUrl: z.string().optional().default(""),
 });
+type EventFormValues = z.infer<typeof eventSchema>;
+const defaultValues: EventFormValues = { slug: "", titleEn: "", titleAr: "", status: "draft", featured: false, posterUrl: "" };
 
 export function AdminEvents() {
   const { lang, t } = useLanguage();
   const [, setLocation] = useLocation();
-  const { data: events, isLoading } = useListEvents();
-  const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const { data: events } = useListEvents();
+  const [dialogState, setDialogState] = useState<{ mode: "create" } | { mode: "edit"; id: number } | null>(null);
   const createEvent = useCreateEvent();
   const deleteEvent = useDeleteEvent();
   const updateEvent = useUpdateEvent();
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const form = useForm({
+  const form = useForm<EventFormValues>({
     resolver: zodResolver(eventSchema),
-    defaultValues: { slug: "", titleEn: "", titleAr: "", status: "draft" as any, featured: false, posterUrl: "" }
+    defaultValues,
   });
 
-  const onSubmit = (data: any) => {
-    createEvent.mutate({ data }, {
-      onSuccess: () => {
-        toast({ title: "Event created" });
-        setIsCreateOpen(false);
-        form.reset();
-        queryClient.invalidateQueries({ queryKey: getListEventsQueryKey() });
+  useEffect(() => {
+    if (dialogState?.mode === "edit") {
+      const item = events?.find(e => e.id === dialogState.id);
+      if (item) {
+        form.reset({
+          slug: item.slug,
+          titleEn: item.titleEn ?? "",
+          titleAr: item.titleAr ?? "",
+          status: (item.status as EventFormValues["status"]) ?? "draft",
+          featured: !!item.featured,
+          posterUrl: item.posterUrl ?? "",
+        });
       }
-    });
+    } else if (dialogState?.mode === "create") {
+      form.reset(defaultValues);
+    }
+  }, [dialogState, events, form]);
+
+  const onSubmit = (data: EventFormValues) => {
+    const invalidate = () => queryClient.invalidateQueries({ queryKey: getListEventsQueryKey() });
+    if (dialogState?.mode === "edit") {
+      updateEvent.mutate({ id: dialogState.id, data }, {
+        onSuccess: () => { toast({ title: t("Event updated", "تم تحديث الفعالية") }); setDialogState(null); invalidate(); },
+        onError: (err: any) => toast({ title: t("Update failed", "فشل التحديث"), description: err?.message ?? "", variant: "destructive" }),
+      });
+    } else {
+      createEvent.mutate({ data }, {
+        onSuccess: () => { toast({ title: t("Event created", "تم إنشاء الفعالية") }); setDialogState(null); invalidate(); },
+        onError: (err: any) => toast({ title: t("Create failed", "فشل الإنشاء"), description: err?.message ?? "", variant: "destructive" }),
+      });
+    }
   };
 
   const handleDelete = (id: number) => {
@@ -69,37 +93,43 @@ export function AdminEvents() {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-serif">{t("Events", "الفعاليات")}</h1>
-        <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
+        <Dialog open={dialogState !== null} onOpenChange={(open) => setDialogState(open ? { mode: "create" } : null)}>
           <DialogTrigger asChild>
             <Button>{t("Add Event", "إضافة فعالية")}</Button>
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>{t("Create Event", "إنشاء فعالية")}</DialogTitle>
+              <DialogTitle>{dialogState?.mode === "edit" ? t("Edit Event", "تعديل الفعالية") : t("Create Event", "إنشاء فعالية")}</DialogTitle>
             </DialogHeader>
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                <FormField control={form.control} name="slug" render={({field}) => <FormItem><FormLabel>Slug</FormLabel><FormControl><Input {...field} /></FormControl></FormItem>} />
-                <FormField control={form.control} name="titleEn" render={({field}) => <FormItem><FormLabel>Title (EN)</FormLabel><FormControl><Input {...field} /></FormControl></FormItem>} />
-                <FormField control={form.control} name="titleAr" render={({field}) => <FormItem><FormLabel>Title (AR)</FormLabel><FormControl><Input {...field} dir="rtl" /></FormControl></FormItem>} />
+                <FormField control={form.control} name="slug" render={({field}) => <FormItem><FormLabel>{t("Slug", "المعرّف")}</FormLabel><FormControl><Input {...field} dir="ltr" /></FormControl></FormItem>} />
+                <FormField control={form.control} name="titleEn" render={({field}) => <FormItem><FormLabel>{t("Title (EN)", "العنوان (الإنجليزية)")}</FormLabel><FormControl><Input {...field} /></FormControl></FormItem>} />
+                <FormField control={form.control} name="titleAr" render={({field}) => <FormItem><FormLabel>{t("Title (AR)", "العنوان (العربية)")}</FormLabel><FormControl><Input {...field} dir="rtl" /></FormControl></FormItem>} />
                 <FormField control={form.control} name="status" render={({field}) => (
                   <FormItem>
-                    <FormLabel>Status</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormLabel>{t("Status", "الحالة")}</FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl>
                       <SelectContent>
-                        <SelectItem value="draft">Draft</SelectItem>
-                        <SelectItem value="coming_soon">Coming Soon</SelectItem>
-                        <SelectItem value="open">Open</SelectItem>
-                        <SelectItem value="closed">Closed</SelectItem>
-                        <SelectItem value="past">Past</SelectItem>
+                        <SelectItem value="draft">{t("Draft", "مسودة")}</SelectItem>
+                        <SelectItem value="coming_soon">{t("Coming Soon", "قريباً")}</SelectItem>
+                        <SelectItem value="open">{t("Open", "متاح للتسجيل")}</SelectItem>
+                        <SelectItem value="closed">{t("Closed", "مغلق")}</SelectItem>
+                        <SelectItem value="past">{t("Past", "منتهي")}</SelectItem>
                       </SelectContent>
                     </Select>
                   </FormItem>
                 )} />
+                <FormField control={form.control} name="featured" render={({field}) => (
+                  <FormItem className="flex items-center justify-between rounded-md border p-3">
+                    <FormLabel className="!mt-0">{t("Featured", "مميزة")}</FormLabel>
+                    <FormControl><Switch checked={field.value} onCheckedChange={field.onChange} /></FormControl>
+                  </FormItem>
+                )} />
                 <FormField control={form.control} name="posterUrl" render={({field}) => (
                   <FormItem>
-                    <FormLabel>Poster (optional)</FormLabel>
+                    <FormLabel>{t("Poster (optional)", "ملصق (اختياري)")}</FormLabel>
                     <FormControl>
                       <ImageUploadField
                         value={field.value}
@@ -110,7 +140,7 @@ export function AdminEvents() {
                     </FormControl>
                   </FormItem>
                 )} />
-                <Button type="submit" className="w-full" disabled={createEvent.isPending}>Save</Button>
+                <Button type="submit" className="w-full" disabled={createEvent.isPending || updateEvent.isPending}>{t("Save", "حفظ")}</Button>
               </form>
             </Form>
           </DialogContent>
@@ -143,14 +173,17 @@ export function AdminEvents() {
                 <TableCell>
                   <Switch checked={event.featured} onCheckedChange={(v) => updateEvent.mutate({ id: event.id, data: { featured: v } }, { onSuccess: () => queryClient.invalidateQueries({ queryKey: getListEventsQueryKey() }) })} />
                 </TableCell>
-                <TableCell className="text-right space-x-2 rtl:space-x-reverse">
-                  <Button variant="outline" size="icon" title="Form Builder" onClick={() => setLocation(`/${lang}/admin/events/${event.id}/fields`)}>
+                <TableCell className="text-right space-x-2 rtl:space-x-reverse whitespace-nowrap">
+                  <Button variant="outline" size="icon" title={t("Edit", "تعديل")} onClick={() => setDialogState({ mode: "edit", id: event.id })}>
+                    <Pencil className="w-4 h-4" />
+                  </Button>
+                  <Button variant="outline" size="icon" title={t("Form Builder", "محرر النموذج")} onClick={() => setLocation(`/${lang}/admin/events/${event.id}/fields`)}>
                     <LayoutList className="w-4 h-4" />
                   </Button>
-                  <Button variant="outline" size="icon" title="Registrations" onClick={() => setLocation(`/${lang}/admin/events/${event.id}/registrations`)}>
+                  <Button variant="outline" size="icon" title={t("Registrations", "التسجيلات")} onClick={() => setLocation(`/${lang}/admin/events/${event.id}/registrations`)}>
                     <Users className="w-4 h-4" />
                   </Button>
-                  <Button variant="outline" size="icon" className="text-destructive hover:bg-destructive hover:text-white" onClick={() => handleDelete(event.id)}>
+                  <Button variant="outline" size="icon" className="text-destructive hover:bg-destructive hover:text-white" title={t("Delete", "حذف")} onClick={() => handleDelete(event.id)}>
                     <Trash2 className="w-4 h-4" />
                   </Button>
                 </TableCell>
