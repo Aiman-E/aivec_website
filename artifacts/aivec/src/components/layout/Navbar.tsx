@@ -39,9 +39,40 @@ export function Navbar() {
     { href: `#contact`, label: t("Contact", "اتصل بنا") },
   ];
 
-  const toggleLanguage = () => {
-    setLang(lang === "en" ? "ar" : "en");
-  };
+  const LangToggle = ({ className = "" }: { className?: string }) => (
+    <div
+      role="group"
+      aria-label="Language"
+      className={`relative inline-flex items-center h-9 rounded-full border border-border/70 bg-background/60 backdrop-blur-md p-1 select-none ${className}`}
+    >
+      <motion.span
+        layout
+        transition={{ type: "spring", stiffness: 500, damping: 40 }}
+        className="absolute top-1 bottom-1 w-[calc(50%-4px)] rounded-full bg-primary shadow-sm"
+        style={{ left: lang === "en" ? 4 : "calc(50% + 0px)" }}
+      />
+      <button
+        type="button"
+        onClick={() => setLang("en")}
+        aria-pressed={lang === "en"}
+        className={`relative z-10 px-3.5 h-7 text-[11px] font-bold uppercase tracking-[0.15em] transition-colors ${
+          lang === "en" ? "text-primary-foreground" : "text-muted-foreground hover:text-foreground"
+        }`}
+      >
+        EN
+      </button>
+      <button
+        type="button"
+        onClick={() => setLang("ar")}
+        aria-pressed={lang === "ar"}
+        className={`relative z-10 px-3.5 h-7 text-[13px] font-bold tracking-normal transition-colors font-arabic ${
+          lang === "ar" ? "text-primary-foreground" : "text-muted-foreground hover:text-foreground"
+        }`}
+      >
+        ع
+      </button>
+    </div>
+  );
 
   const handleNavClick = (href: string) => {
     setMobileMenuOpen(false);
@@ -85,7 +116,7 @@ export function Navbar() {
           </Link>
 
           {/* Desktop Nav */}
-          <div className="hidden lg:flex items-center gap-8">
+          <div className="hidden lg:flex items-center gap-6">
             <div className="flex items-center gap-6">
               {navLinks.map((link) => (
                 <button
@@ -99,15 +130,10 @@ export function Navbar() {
               ))}
             </div>
 
-            <div className="w-px h-5 mx-2 bg-border/60" />
+            <div className="w-px h-5 mx-1 bg-border/60" />
 
-            <div className="flex items-center gap-5">
-              <button
-                onClick={toggleLanguage}
-                className="text-xs font-bold hover:text-accent transition-colors uppercase tracking-widest text-foreground"
-              >
-                {lang === "en" ? "عربي" : "EN"}
-              </button>
+            <div className="flex items-center gap-4">
+              <LangToggle />
 
               {!isSignedIn ? (
                 <SignInButton mode="modal">
@@ -128,16 +154,19 @@ export function Navbar() {
             </div>
           </div>
 
-          {/* Mobile Toggle */}
-          <button
-            type="button"
-            aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
-            aria-expanded={mobileMenuOpen}
-            className="lg:hidden p-2 -mr-2 text-foreground z-[70] relative"
-            onClick={() => setMobileMenuOpen(o => !o)}
-          >
-            {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-          </button>
+          {/* Mobile: language toggle + hamburger */}
+          <div className="lg:hidden flex items-center gap-2">
+            <LangToggle />
+            <button
+              type="button"
+              aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
+              aria-expanded={mobileMenuOpen}
+              className="p-2 -mr-2 text-foreground z-[70] relative"
+              onClick={() => setMobileMenuOpen(o => !o)}
+            >
+              {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            </button>
+          </div>
         </div>
       </motion.nav>
 
@@ -167,13 +196,6 @@ export function Navbar() {
             </div>
 
             <div className="mt-auto pt-10 flex flex-col gap-3">
-              <button
-                onClick={() => { toggleLanguage(); setMobileMenuOpen(false); }}
-                className="w-full py-4 text-center border border-border font-bold text-sm tracking-widest uppercase hover:bg-muted transition-colors"
-              >
-                {lang === "en" ? "التصفح بالعربية" : "Switch to English"}
-              </button>
-
               {!isSignedIn ? (
                 <SignInButton mode="modal">
                   <Button size="lg" className="w-full rounded-none text-sm tracking-widest uppercase font-bold" onClick={() => setMobileMenuOpen(false)}>

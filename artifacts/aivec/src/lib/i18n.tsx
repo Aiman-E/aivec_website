@@ -15,7 +15,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   const [location, setLocation] = useLocation();
   const [lang, setLangState] = useState<Language>(() => {
     const saved = localStorage.getItem("aivec_lang");
-    return (saved === "ar" || saved === "en") ? saved : "en";
+    return (saved === "ar" || saved === "en") ? saved : "ar";
   });
 
   // Sync lang with URL

@@ -89,7 +89,7 @@ function RootRouter() {
   const [location] = useLocation();
 
   if (location === "/") {
-    const savedLang = localStorage.getItem("aivec_lang") || "en";
+    const savedLang = localStorage.getItem("aivec_lang") || "ar";
     return <Redirect to={`/${savedLang}`} />;
   }
 
