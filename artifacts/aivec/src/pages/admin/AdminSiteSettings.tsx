@@ -7,6 +7,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { useEffect } from "react";
 
@@ -24,7 +25,36 @@ const settingsSchema = z.object({
   contactEmails: z.string().optional(),
   footerNoteEn: z.string().optional(),
   footerNoteAr: z.string().optional(),
+  fontEn: z.string().optional(),
+  fontAr: z.string().optional(),
 });
+
+const EN_FONTS = [
+  "Fraunces",
+  "Playfair Display",
+  "Cormorant Garamond",
+  "EB Garamond",
+  "DM Serif Display",
+  "Libre Caslon Text",
+  "Lora",
+  "Crimson Pro",
+  "Inter",
+  "DM Sans",
+  "Manrope",
+];
+
+const AR_FONTS = [
+  "Cairo",
+  "Tajawal",
+  "IBM Plex Sans Arabic",
+  "Noto Naskh Arabic",
+  "Noto Kufi Arabic",
+  "Amiri",
+  "Reem Kufi",
+  "Markazi Text",
+  "El Messiri",
+  "Almarai",
+];
 
 type SettingsFormValues = z.infer<typeof settingsSchema>;
 
@@ -50,8 +80,30 @@ export function AdminSiteSettings() {
       contactEmails: "",
       footerNoteEn: "",
       footerNoteAr: "",
+      fontEn: "Fraunces",
+      fontAr: "Cairo",
     }
   });
+
+  const watchedFontEn = form.watch("fontEn");
+  const watchedFontAr = form.watch("fontAr");
+
+  useEffect(() => {
+    const families = [watchedFontEn, watchedFontAr].filter(Boolean) as string[];
+    if (families.length === 0) return;
+    const id = "aivec-admin-font-preview";
+    let link = document.getElementById(id) as HTMLLinkElement | null;
+    if (!link) {
+      link = document.createElement("link");
+      link.id = id;
+      link.rel = "stylesheet";
+      document.head.appendChild(link);
+    }
+    const params = families
+      .map((f) => `family=${encodeURIComponent(f.trim()).replace(/%20/g, "+")}:wght@400;600;700`)
+      .join("&");
+    link.href = `https://fonts.googleapis.com/css2?${params}&display=swap`;
+  }, [watchedFontEn, watchedFontAr]);
 
   useEffect(() => {
     if (settings) {
@@ -69,6 +121,8 @@ export function AdminSiteSettings() {
         contactEmails: settings.contactEmails?.join(", ") || "",
         footerNoteEn: settings.footerNoteEn || "",
         footerNoteAr: settings.footerNoteAr || "",
+        fontEn: settings.fontEn || "Fraunces",
+        fontAr: settings.fontAr || "Cairo",
       });
     }
   }, [settings, form]);
@@ -147,6 +201,68 @@ export function AdminSiteSettings() {
                   )} />
                   <FormField control={form.control} name="contactEmails" render={({ field }) => (
                     <FormItem className="md:col-span-2"><FormLabel>Emails (comma separated)</FormLabel><FormControl><Input {...field} dir="ltr" /></FormControl><FormMessage /></FormItem>
+                  )} />
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <h3 className="font-semibold text-lg border-b pb-2">{t("Typography", "الخطوط")}</h3>
+                <p className="text-sm text-muted-foreground">
+                  {t(
+                    "Choose the display font for each language. Changes apply site-wide after saving.",
+                    "اختر خط العرض لكل لغة. تُطبَّق التغييرات على الموقع بعد الحفظ."
+                  )}
+                </p>
+                <div className="grid md:grid-cols-2 gap-4">
+                  <FormField control={form.control} name="fontEn" render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>English Font</FormLabel>
+                      <Select onValueChange={field.onChange} value={field.value || "Fraunces"}>
+                        <FormControl>
+                          <SelectTrigger><SelectValue /></SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {EN_FONTS.map((f) => (
+                            <SelectItem key={f} value={f} style={{ fontFamily: `'${f}', serif` }}>
+                              {f}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <div
+                        className="mt-2 px-3 py-3 border bg-muted/30 text-2xl"
+                        style={{ fontFamily: `'${field.value || "Fraunces"}', serif` }}
+                      >
+                        AIVEC 2026 — Aden Vascular Conference
+                      </div>
+                      <FormMessage />
+                    </FormItem>
+                  )} />
+
+                  <FormField control={form.control} name="fontAr" render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>الخط العربي</FormLabel>
+                      <Select onValueChange={field.onChange} value={field.value || "Cairo"}>
+                        <FormControl>
+                          <SelectTrigger><SelectValue /></SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {AR_FONTS.map((f) => (
+                            <SelectItem key={f} value={f} style={{ fontFamily: `'${f}', sans-serif` }}>
+                              {f}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <div
+                        dir="rtl"
+                        className="mt-2 px-3 py-3 border bg-muted/30 text-2xl"
+                        style={{ fontFamily: `'${field.value || "Cairo"}', sans-serif` }}
+                      >
+                        مؤتمر عدن الدولي للأوعية الدموية
+                      </div>
+                      <FormMessage />
+                    </FormItem>
                   )} />
                 </div>
               </div>

@@ -738,6 +738,8 @@ components:
         logoUrl: { type: ["string", "null"] }
         faviconUrl: { type: ["string", "null"] }
         socialImageUrl: { type: ["string", "null"] }
+        fontEn: { type: string }
+        fontAr: { type: string }
         updatedAt: { type: string, format: date-time }
 
     SiteSettingsUpdate:
@@ -767,6 +769,8 @@ components:
         logoUrl: { type: ["string", "null"] }
         faviconUrl: { type: ["string", "null"] }
         socialImageUrl: { type: ["string", "null"] }
+        fontEn: { type: string }
+        fontAr: { type: string }
 
     Page:
       type: object

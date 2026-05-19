@@ -4,6 +4,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { LanguageProvider } from "@/lib/i18n";
 import { ClerkProvider } from "@clerk/react";
+import { FontLoader } from "@/components/FontLoader";
 import NotFound from "@/pages/not-found";
 
 import { Navbar } from "@/components/layout/Navbar";
@@ -111,6 +112,7 @@ function App() {
         <TooltipProvider>
           <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
             <LanguageProvider>
+              <FontLoader />
               <RootRouter />
             </LanguageProvider>
           </WouterRouter>

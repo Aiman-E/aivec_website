@@ -34,4 +34,6 @@ export interface SiteSettingsUpdate {
   faviconUrl?: string | null;
   /** @nullable */
   socialImageUrl?: string | null;
+  fontEn?: string;
+  fontAr?: string;
 }

@@ -52,6 +52,8 @@ export const GetSiteSettingsResponse = zod.object({
   "logoUrl": zod.string().nullish(),
   "faviconUrl": zod.string().nullish(),
   "socialImageUrl": zod.string().nullish(),
+  "fontEn": zod.string().optional(),
+  "fontAr": zod.string().optional(),
   "updatedAt": zod.coerce.date().optional()
 })
 
@@ -80,7 +82,9 @@ export const UpdateSiteSettingsBody = zod.object({
   "footerNoteAr": zod.string().optional(),
   "logoUrl": zod.string().nullish(),
   "faviconUrl": zod.string().nullish(),
-  "socialImageUrl": zod.string().nullish()
+  "socialImageUrl": zod.string().nullish(),
+  "fontEn": zod.string().optional(),
+  "fontAr": zod.string().optional()
 })
 
 export const UpdateSiteSettingsResponse = zod.object({
@@ -109,6 +113,8 @@ export const UpdateSiteSettingsResponse = zod.object({
   "logoUrl": zod.string().nullish(),
   "faviconUrl": zod.string().nullish(),
   "socialImageUrl": zod.string().nullish(),
+  "fontEn": zod.string().optional(),
+  "fontAr": zod.string().optional(),
   "updatedAt": zod.coerce.date().optional()
 })
 

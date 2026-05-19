@@ -93,6 +93,8 @@ export interface SiteSettings {
   faviconUrl?: string | null;
   /** @nullable */
   socialImageUrl?: string | null;
+  fontEn?: string;
+  fontAr?: string;
   updatedAt?: string;
 }
 
@@ -124,6 +126,8 @@ export interface SiteSettingsUpdate {
   faviconUrl?: string | null;
   /** @nullable */
   socialImageUrl?: string | null;
+  fontEn?: string;
+  fontAr?: string;
 }
 
 export interface Page {
