@@ -117,10 +117,10 @@ export function Navbar() {
               <img
                 src={logoSrc}
                 alt={siteTitle}
-                className="w-[50px] h-[50px] lg:w-[60px] lg:h-[60px] shrink-0 object-contain"
+                className="w-[63px] h-[63px] lg:w-[75px] lg:h-[75px] shrink-0 object-contain"
               />
             ) : (
-              <div className="w-[50px] h-[50px] lg:w-[60px] lg:h-[60px] shrink-0 bg-primary flex items-center justify-center rounded-sm overflow-hidden relative shadow-lg">
+              <div className="w-[63px] h-[63px] lg:w-[75px] lg:h-[75px] shrink-0 bg-primary flex items-center justify-center rounded-sm overflow-hidden relative shadow-lg">
                 <div className="absolute inset-0 bg-[url('/vein-abstract.png')] opacity-30 bg-cover bg-center"></div>
                 <span className="text-primary-foreground font-serif font-bold text-xl lg:text-2xl relative z-10">A</span>
               </div>
