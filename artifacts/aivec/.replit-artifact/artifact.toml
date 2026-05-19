@@ -1,0 +1,31 @@
+kind = "web"
+previewPath = "/"
+title = "AIVEC 2026"
+version = "1.0.0"
+id = "artifacts/aivec"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 22136
+
+[services.development]
+run = "pnpm --filter @workspace/aivec run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/aivec", "run", "build" ]
+publicDir = "artifacts/aivec/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "22136"
+BASE_PATH = "/"

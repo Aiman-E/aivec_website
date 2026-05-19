@@ -1,22 +1,30 @@
 openapi: 3.1.0
 info:
-  # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: AIVEC Conference API
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
-    description: Health operations
+  - name: auth
+  - name: settings
+  - name: pages
+  - name: events
+  - name: registrations
+  - name: news
+  - name: blog
+  - name: contact
+  - name: sponsors
+  - name: users
+  - name: admin
+
 paths:
   /healthz:
     get:
       operationId: healthCheck
       tags: [health]
-      summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
@@ -24,13 +32,1072 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /me:
+    get:
+      operationId: getMe
+      tags: [auth]
+      summary: Get the current authenticated user with role
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Me"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /site-settings:
+    get:
+      operationId: getSiteSettings
+      tags: [settings]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SiteSettings"
+    patch:
+      operationId: updateSiteSettings
+      tags: [settings]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SiteSettingsUpdate"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SiteSettings"
+
+  /pages/{key}:
+    get:
+      operationId: getPage
+      tags: [pages]
+      parameters:
+        - $ref: "#/components/parameters/PageKey"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Page"
+    put:
+      operationId: updatePage
+      tags: [pages]
+      parameters:
+        - $ref: "#/components/parameters/PageKey"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PageInput"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Page"
+
+  /events:
+    get:
+      operationId: listEvents
+      tags: [events]
+      parameters:
+        - in: query
+          name: status
+          schema:
+            type: string
+            enum: [all, upcoming, past, open]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Event"
+    post:
+      operationId: createEvent
+      tags: [events]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EventInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Event"
+
+  /events/{slug}:
+    get:
+      operationId: getEvent
+      tags: [events]
+      parameters:
+        - in: path
+          name: slug
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EventWithFields"
+
+  /events/id/{id}:
+    patch:
+      operationId: updateEvent
+      tags: [events]
+      parameters:
+        - $ref: "#/components/parameters/IdParam"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EventUpdate"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Event"
+    delete:
+      operationId: deleteEvent
+      tags: [events]
+      parameters:
+        - $ref: "#/components/parameters/IdParam"
+      responses:
+        "204":
+          description: Deleted
+
+  /events/id/{id}/fields:
+    put:
+      operationId: setEventFields
+      tags: [events]
+      parameters:
+        - $ref: "#/components/parameters/IdParam"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EventFieldsInput"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/EventField"
+
+  /events/id/{id}/register:
+    post:
+      operationId: registerForEvent
+      tags: [registrations]
+      parameters:
+        - $ref: "#/components/parameters/IdParam"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegistrationInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Registration"
+
+  /events/id/{id}/registrations:
+    get:
+      operationId: listEventRegistrations
+      tags: [registrations]
+      parameters:
+        - $ref: "#/components/parameters/IdParam"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Registration"
+
+  /me/registrations:
+    get:
+      operationId: listMyRegistrations
+      tags: [registrations]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Registration"
+
+  /registrations/{id}:
+    patch:
+      operationId: updateRegistration
+      tags: [registrations]
+      parameters:
+        - $ref: "#/components/parameters/IdParam"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegistrationUpdate"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Registration"
+
+  /news:
+    get:
+      operationId: listNews
+      tags: [news]
+      parameters:
+        - in: query
+          name: published
+          schema:
+            type: boolean
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/NewsPost"
+    post:
+      operationId: createNews
+      tags: [news]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NewsInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NewsPost"
+
+  /news/{slug}:
+    get:
+      operationId: getNews
+      tags: [news]
+      parameters:
+        - in: path
+          name: slug
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NewsPost"
+
+  /news/id/{id}:
+    patch:
+      operationId: updateNews
+      tags: [news]
+      parameters:
+        - $ref: "#/components/parameters/IdParam"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NewsUpdate"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NewsPost"
+    delete:
+      operationId: deleteNews
+      tags: [news]
+      parameters:
+        - $ref: "#/components/parameters/IdParam"
+      responses:
+        "204":
+          description: Deleted
+
+  /blog:
+    get:
+      operationId: listBlog
+      tags: [blog]
+      parameters:
+        - in: query
+          name: published
+          schema:
+            type: boolean
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/BlogPost"
+    post:
+      operationId: createBlog
+      tags: [blog]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BlogInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BlogPost"
+
+  /blog/{slug}:
+    get:
+      operationId: getBlog
+      tags: [blog]
+      parameters:
+        - in: path
+          name: slug
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BlogPost"
+
+  /blog/id/{id}:
+    patch:
+      operationId: updateBlog
+      tags: [blog]
+      parameters:
+        - $ref: "#/components/parameters/IdParam"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BlogUpdate"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BlogPost"
+    delete:
+      operationId: deleteBlog
+      tags: [blog]
+      parameters:
+        - $ref: "#/components/parameters/IdParam"
+      responses:
+        "204":
+          description: Deleted
+
+  /contact-submissions:
+    get:
+      operationId: listContactSubmissions
+      tags: [contact]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ContactSubmission"
+    post:
+      operationId: createContactSubmission
+      tags: [contact]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ContactSubmissionInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ContactSubmission"
+
+  /contact-submissions/{id}:
+    delete:
+      operationId: deleteContactSubmission
+      tags: [contact]
+      parameters:
+        - $ref: "#/components/parameters/IdParam"
+      responses:
+        "204":
+          description: Deleted
+
+  /sponsors:
+    get:
+      operationId: listSponsors
+      tags: [sponsors]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Sponsor"
+    post:
+      operationId: createSponsor
+      tags: [sponsors]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SponsorInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Sponsor"
+
+  /sponsors/{id}:
+    patch:
+      operationId: updateSponsor
+      tags: [sponsors]
+      parameters:
+        - $ref: "#/components/parameters/IdParam"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SponsorUpdate"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Sponsor"
+    delete:
+      operationId: deleteSponsor
+      tags: [sponsors]
+      parameters:
+        - $ref: "#/components/parameters/IdParam"
+      responses:
+        "204":
+          description: Deleted
+
+  /users:
+    get:
+      operationId: listUsers
+      tags: [users]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AppUser"
+
+  /users/{id}/role:
+    patch:
+      operationId: updateUserRole
+      tags: [users]
+      parameters:
+        - $ref: "#/components/parameters/IdParam"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserRoleUpdate"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AppUser"
+
+  /admin/dashboard:
+    get:
+      operationId: getAdminDashboard
+      tags: [admin]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminDashboard"
+
 components:
+  parameters:
+    IdParam:
+      in: path
+      name: id
+      required: true
+      schema:
+        type: integer
+    PageKey:
+      in: path
+      name: key
+      required: true
+      schema:
+        type: string
+
   schemas:
     HealthStatus:
       type: object
+      required: [status]
       properties:
         status:
           type: string
-      required:
-        - status
 
+    Error:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: string
+
+    Me:
+      type: object
+      required: [id, clerkId, email, role]
+      properties:
+        id: { type: integer }
+        clerkId: { type: string }
+        email: { type: string }
+        firstName: { type: ["string", "null"] }
+        lastName: { type: ["string", "null"] }
+        role: { type: string, enum: [user, admin] }
+
+    AppUser:
+      type: object
+      required: [id, clerkId, email, role, createdAt]
+      properties:
+        id: { type: integer }
+        clerkId: { type: string }
+        email: { type: string }
+        firstName: { type: ["string", "null"] }
+        lastName: { type: ["string", "null"] }
+        role: { type: string, enum: [user, admin] }
+        createdAt: { type: string, format: date-time }
+
+    UserRoleUpdate:
+      type: object
+      required: [role]
+      properties:
+        role: { type: string, enum: [user, admin] }
+
+    SiteSettings:
+      type: object
+      required: [id, conferenceYear, conferenceNumber]
+      properties:
+        id: { type: integer }
+        siteTitleEn: { type: string }
+        siteTitleAr: { type: string }
+        conferenceYear: { type: integer }
+        conferenceNumber: { type: integer }
+        conferenceOrdinalEn: { type: string }
+        conferenceOrdinalAr: { type: string }
+        conferenceDatesEn: { type: string }
+        conferenceDatesAr: { type: string }
+        venueNameEn: { type: string }
+        venueNameAr: { type: string }
+        venueDescEn: { type: string }
+        venueDescAr: { type: string }
+        contactPhone: { type: string }
+        contactWhatsapp: { type: string }
+        contactEmails: { type: array, items: { type: string } }
+        seoTitleEn: { type: string }
+        seoTitleAr: { type: string }
+        seoDescEn: { type: string }
+        seoDescAr: { type: string }
+        footerNoteEn: { type: string }
+        footerNoteAr: { type: string }
+        logoUrl: { type: ["string", "null"] }
+        faviconUrl: { type: ["string", "null"] }
+        socialImageUrl: { type: ["string", "null"] }
+        updatedAt: { type: string, format: date-time }
+
+    SiteSettingsUpdate:
+      type: object
+      properties:
+        siteTitleEn: { type: string }
+        siteTitleAr: { type: string }
+        conferenceYear: { type: integer }
+        conferenceNumber: { type: integer }
+        conferenceOrdinalEn: { type: string }
+        conferenceOrdinalAr: { type: string }
+        conferenceDatesEn: { type: string }
+        conferenceDatesAr: { type: string }
+        venueNameEn: { type: string }
+        venueNameAr: { type: string }
+        venueDescEn: { type: string }
+        venueDescAr: { type: string }
+        contactPhone: { type: string }
+        contactWhatsapp: { type: string }
+        contactEmails: { type: array, items: { type: string } }
+        seoTitleEn: { type: string }
+        seoTitleAr: { type: string }
+        seoDescEn: { type: string }
+        seoDescAr: { type: string }
+        footerNoteEn: { type: string }
+        footerNoteAr: { type: string }
+        logoUrl: { type: ["string", "null"] }
+        faviconUrl: { type: ["string", "null"] }
+        socialImageUrl: { type: ["string", "null"] }
+
+    Page:
+      type: object
+      required: [id, key]
+      properties:
+        id: { type: integer }
+        key: { type: string }
+        titleEn: { type: string }
+        titleAr: { type: string }
+        subtitleEn: { type: string }
+        subtitleAr: { type: string }
+        bodyEn: { type: string }
+        bodyAr: { type: string }
+        sections: {}
+        updatedAt: { type: string, format: date-time }
+
+    PageInput:
+      type: object
+      properties:
+        titleEn: { type: string }
+        titleAr: { type: string }
+        subtitleEn: { type: string }
+        subtitleAr: { type: string }
+        bodyEn: { type: string }
+        bodyAr: { type: string }
+        sections: {}
+
+    Event:
+      type: object
+      required: [id, slug, status]
+      properties:
+        id: { type: integer }
+        slug: { type: string }
+        titleEn: { type: string }
+        titleAr: { type: string }
+        summaryEn: { type: string }
+        summaryAr: { type: string }
+        bodyEn: { type: string }
+        bodyAr: { type: string }
+        venueEn: { type: string }
+        venueAr: { type: string }
+        startsAt: { type: ["string", "null"], format: date-time }
+        endsAt: { type: ["string", "null"], format: date-time }
+        status: { type: string, enum: [draft, coming_soon, open, closed, past] }
+        featured: { type: boolean }
+        posterUrl: { type: ["string", "null"] }
+        seoTitleEn: { type: ["string", "null"] }
+        seoTitleAr: { type: ["string", "null"] }
+        seoDescEn: { type: ["string", "null"] }
+        seoDescAr: { type: ["string", "null"] }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+
+    EventField:
+      type: object
+      required: [id, eventId, fieldKey, fieldType, order]
+      properties:
+        id: { type: integer }
+        eventId: { type: integer }
+        fieldKey: { type: string }
+        fieldType:
+          type: string
+          enum: [short_text, long_text, email, phone, number, dropdown, radio, checkbox, date]
+        labelEn: { type: string }
+        labelAr: { type: string }
+        helpEn: { type: string }
+        helpAr: { type: string }
+        placeholderEn: { type: string }
+        placeholderAr: { type: string }
+        required: { type: boolean }
+        order: { type: integer }
+        options: { type: array, items: { $ref: "#/components/schemas/EventFieldOption" } }
+
+    EventFieldOption:
+      type: object
+      required: [value, labelEn, labelAr]
+      properties:
+        value: { type: string }
+        labelEn: { type: string }
+        labelAr: { type: string }
+
+    EventWithFields:
+      type: object
+      required: [event, fields]
+      properties:
+        event: { $ref: "#/components/schemas/Event" }
+        fields:
+          type: array
+          items:
+            $ref: "#/components/schemas/EventField"
+
+    EventInput:
+      type: object
+      required: [slug, titleEn, titleAr]
+      properties:
+        slug: { type: string }
+        titleEn: { type: string }
+        titleAr: { type: string }
+        summaryEn: { type: string }
+        summaryAr: { type: string }
+        bodyEn: { type: string }
+        bodyAr: { type: string }
+        venueEn: { type: string }
+        venueAr: { type: string }
+        startsAt: { type: ["string", "null"], format: date-time }
+        endsAt: { type: ["string", "null"], format: date-time }
+        status: { type: string, enum: [draft, coming_soon, open, closed, past] }
+        featured: { type: boolean }
+        posterUrl: { type: ["string", "null"] }
+        seoTitleEn: { type: ["string", "null"] }
+        seoTitleAr: { type: ["string", "null"] }
+        seoDescEn: { type: ["string", "null"] }
+        seoDescAr: { type: ["string", "null"] }
+
+    EventUpdate:
+      type: object
+      properties:
+        slug: { type: string }
+        titleEn: { type: string }
+        titleAr: { type: string }
+        summaryEn: { type: string }
+        summaryAr: { type: string }
+        bodyEn: { type: string }
+        bodyAr: { type: string }
+        venueEn: { type: string }
+        venueAr: { type: string }
+        startsAt: { type: ["string", "null"], format: date-time }
+        endsAt: { type: ["string", "null"], format: date-time }
+        status: { type: string, enum: [draft, coming_soon, open, closed, past] }
+        featured: { type: boolean }
+        posterUrl: { type: ["string", "null"] }
+        seoTitleEn: { type: ["string", "null"] }
+        seoTitleAr: { type: ["string", "null"] }
+        seoDescEn: { type: ["string", "null"] }
+        seoDescAr: { type: ["string", "null"] }
+
+    EventFieldInput:
+      type: object
+      required: [fieldKey, fieldType, labelEn, labelAr]
+      properties:
+        fieldKey: { type: string }
+        fieldType:
+          type: string
+          enum: [short_text, long_text, email, phone, number, dropdown, radio, checkbox, date]
+        labelEn: { type: string }
+        labelAr: { type: string }
+        helpEn: { type: string }
+        helpAr: { type: string }
+        placeholderEn: { type: string }
+        placeholderAr: { type: string }
+        required: { type: boolean }
+        order: { type: integer }
+        options: { type: array, items: { $ref: "#/components/schemas/EventFieldOption" } }
+
+    EventFieldsInput:
+      type: object
+      required: [fields]
+      properties:
+        fields:
+          type: array
+          items:
+            $ref: "#/components/schemas/EventFieldInput"
+
+    Registration:
+      type: object
+      required: [id, eventId, userId, status, createdAt, answers]
+      properties:
+        id: { type: integer }
+        eventId: { type: integer }
+        userId: { type: integer }
+        userEmail: { type: ["string", "null"] }
+        userName: { type: ["string", "null"] }
+        eventTitleEn: { type: ["string", "null"] }
+        eventTitleAr: { type: ["string", "null"] }
+        status: { type: string, enum: [submitted, reviewed, accepted, rejected] }
+        notes: { type: ["string", "null"] }
+        answers: {}
+        createdAt: { type: string, format: date-time }
+
+    RegistrationInput:
+      type: object
+      required: [answers]
+      properties:
+        answers: {}
+
+    RegistrationUpdate:
+      type: object
+      properties:
+        status: { type: string, enum: [submitted, reviewed, accepted, rejected] }
+        notes: { type: ["string", "null"] }
+
+    NewsPost:
+      type: object
+      required: [id, slug, titleEn, titleAr, published]
+      properties:
+        id: { type: integer }
+        slug: { type: string }
+        titleEn: { type: string }
+        titleAr: { type: string }
+        excerptEn: { type: string }
+        excerptAr: { type: string }
+        bodyEn: { type: string }
+        bodyAr: { type: string }
+        category: { type: string }
+        coverUrl: { type: ["string", "null"] }
+        published: { type: boolean }
+        publishedAt: { type: ["string", "null"], format: date-time }
+        seoTitleEn: { type: ["string", "null"] }
+        seoTitleAr: { type: ["string", "null"] }
+        seoDescEn: { type: ["string", "null"] }
+        seoDescAr: { type: ["string", "null"] }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+
+    NewsInput:
+      type: object
+      required: [slug, titleEn, titleAr]
+      properties:
+        slug: { type: string }
+        titleEn: { type: string }
+        titleAr: { type: string }
+        excerptEn: { type: string }
+        excerptAr: { type: string }
+        bodyEn: { type: string }
+        bodyAr: { type: string }
+        category: { type: string }
+        coverUrl: { type: ["string", "null"] }
+        published: { type: boolean }
+        publishedAt: { type: ["string", "null"], format: date-time }
+        seoTitleEn: { type: ["string", "null"] }
+        seoTitleAr: { type: ["string", "null"] }
+        seoDescEn: { type: ["string", "null"] }
+        seoDescAr: { type: ["string", "null"] }
+
+    NewsUpdate:
+      type: object
+      properties:
+        slug: { type: string }
+        titleEn: { type: string }
+        titleAr: { type: string }
+        excerptEn: { type: string }
+        excerptAr: { type: string }
+        bodyEn: { type: string }
+        bodyAr: { type: string }
+        category: { type: string }
+        coverUrl: { type: ["string", "null"] }
+        published: { type: boolean }
+        publishedAt: { type: ["string", "null"], format: date-time }
+        seoTitleEn: { type: ["string", "null"] }
+        seoTitleAr: { type: ["string", "null"] }
+        seoDescEn: { type: ["string", "null"] }
+        seoDescAr: { type: ["string", "null"] }
+
+    BlogPost:
+      type: object
+      required: [id, slug, titleEn, titleAr, published]
+      properties:
+        id: { type: integer }
+        slug: { type: string }
+        titleEn: { type: string }
+        titleAr: { type: string }
+        excerptEn: { type: string }
+        excerptAr: { type: string }
+        bodyEn: { type: string }
+        bodyAr: { type: string }
+        tags: { type: array, items: { type: string } }
+        coverUrl: { type: ["string", "null"] }
+        authorName: { type: string }
+        published: { type: boolean }
+        publishedAt: { type: ["string", "null"], format: date-time }
+        seoTitleEn: { type: ["string", "null"] }
+        seoTitleAr: { type: ["string", "null"] }
+        seoDescEn: { type: ["string", "null"] }
+        seoDescAr: { type: ["string", "null"] }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+
+    BlogInput:
+      type: object
+      required: [slug, titleEn, titleAr]
+      properties:
+        slug: { type: string }
+        titleEn: { type: string }
+        titleAr: { type: string }
+        excerptEn: { type: string }
+        excerptAr: { type: string }
+        bodyEn: { type: string }
+        bodyAr: { type: string }
+        tags: { type: array, items: { type: string } }
+        coverUrl: { type: ["string", "null"] }
+        authorName: { type: string }
+        published: { type: boolean }
+        publishedAt: { type: ["string", "null"], format: date-time }
+        seoTitleEn: { type: ["string", "null"] }
+        seoTitleAr: { type: ["string", "null"] }
+        seoDescEn: { type: ["string", "null"] }
+        seoDescAr: { type: ["string", "null"] }
+
+    BlogUpdate:
+      type: object
+      properties:
+        slug: { type: string }
+        titleEn: { type: string }
+        titleAr: { type: string }
+        excerptEn: { type: string }
+        excerptAr: { type: string }
+        bodyEn: { type: string }
+        bodyAr: { type: string }
+        tags: { type: array, items: { type: string } }
+        coverUrl: { type: ["string", "null"] }
+        authorName: { type: string }
+        published: { type: boolean }
+        publishedAt: { type: ["string", "null"], format: date-time }
+        seoTitleEn: { type: ["string", "null"] }
+        seoTitleAr: { type: ["string", "null"] }
+        seoDescEn: { type: ["string", "null"] }
+        seoDescAr: { type: ["string", "null"] }
+
+    ContactSubmission:
+      type: object
+      required: [id, name, email, message, createdAt]
+      properties:
+        id: { type: integer }
+        name: { type: string }
+        email: { type: string }
+        phone: { type: string }
+        subject: { type: string }
+        message: { type: string }
+        createdAt: { type: string, format: date-time }
+
+    ContactSubmissionInput:
+      type: object
+      required: [name, email, message]
+      properties:
+        name: { type: string, minLength: 1 }
+        email: { type: string, minLength: 3 }
+        phone: { type: string }
+        subject: { type: string }
+        message: { type: string, minLength: 1 }
+
+    Sponsor:
+      type: object
+      required: [id, nameEn, nameAr, tier, order]
+      properties:
+        id: { type: integer }
+        nameEn: { type: string }
+        nameAr: { type: string }
+        tier: { type: string, enum: [platinum, gold, silver, supporter, government] }
+        logoUrl: { type: ["string", "null"] }
+        websiteUrl: { type: ["string", "null"] }
+        order: { type: integer }
+
+    SponsorInput:
+      type: object
+      required: [nameEn, nameAr, tier]
+      properties:
+        nameEn: { type: string }
+        nameAr: { type: string }
+        tier: { type: string, enum: [platinum, gold, silver, supporter, government] }
+        logoUrl: { type: ["string", "null"] }
+        websiteUrl: { type: ["string", "null"] }
+        order: { type: integer }
+
+    SponsorUpdate:
+      type: object
+      properties:
+        nameEn: { type: string }
+        nameAr: { type: string }
+        tier: { type: string, enum: [platinum, gold, silver, supporter, government] }
+        logoUrl: { type: ["string", "null"] }
+        websiteUrl: { type: ["string", "null"] }
+        order: { type: integer }
+
+    AdminDashboard:
+      type: object
+      required: [totalUsers, totalEvents, openRegistrations, totalEnrollments, newsPosts, blogPosts, contactSubmissions]
+      properties:
+        totalUsers: { type: integer }
+        totalEvents: { type: integer }
+        openRegistrations: { type: integer }
+        totalEnrollments: { type: integer }
+        newsPosts: { type: integer }
+        blogPosts: { type: integer }
+        contactSubmissions: { type: integer }
+        recentRegistrations:
+          type: array
+          items:
+            $ref: "#/components/schemas/Registration"
+        recentContact:
+          type: array
+          items:
+            $ref: "#/components/schemas/ContactSubmission"
