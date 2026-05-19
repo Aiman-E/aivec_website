@@ -31,7 +31,15 @@ export function Home() {
   const { data: sponsors } = useListSponsors({ query: { queryKey: getListSponsorsQueryKey() } as never });
   const { data: heroImagesData } = useListHeroImages({ query: { queryKey: getListHeroImagesQueryKey() } as never });
   const heroImages = (heroImagesData?.filter(h => h.active) ?? []).map(h => h.url);
-  const slides = heroImages.length > 0 ? heroImages : ["/hero-anatomy.png"];
+  const DEFAULT_HERO_SLIDES = [
+    "/hero-anatomy.png",
+    "/hero-vascular.png",
+    "/hero-aden.png",
+    "/surgical-tools.png",
+    "/stent-macro.png",
+    "/or-atmosphere.png",
+  ];
+  const slides = heroImages.length > 0 ? heroImages : DEFAULT_HERO_SLIDES;
   const [slideIndex, setSlideIndex] = useState(0);
 
   useEffect(() => {
