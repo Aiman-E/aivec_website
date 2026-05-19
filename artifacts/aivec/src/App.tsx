@@ -88,11 +88,16 @@ function LanguageRouter() {
 
 function RootRouter() {
   const [location] = useLocation();
+  const saved = typeof localStorage !== "undefined" ? localStorage.getItem("aivec_lang") : null;
+  const savedLang = saved === "en" || saved === "ar" ? saved : "ar";
 
   if (location === "/") {
-    const saved = localStorage.getItem("aivec_lang");
-    const savedLang = saved === "en" || saved === "ar" ? saved : "ar";
     return <Redirect to={`/${savedLang}`} />;
+  }
+
+  // Accept bare /admin (and /admin/...) without a language prefix
+  if (location === "/admin" || location.startsWith("/admin/")) {
+    return <Redirect to={`/${savedLang}${location}`} />;
   }
 
   return <LanguageRouter />;
