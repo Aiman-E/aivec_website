@@ -16,6 +16,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { Pencil, Trash2, LayoutList, Users } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
+import { ImageUploadField, resolveImageUrl } from "@/components/admin/ImageUploadField";
 
 const eventSchema = z.object({
   slug: z.string().min(1),
@@ -23,6 +24,7 @@ const eventSchema = z.object({
   titleAr: z.string().min(1),
   status: z.enum(["draft", "coming_soon", "open", "closed", "past"]),
   featured: z.boolean().default(false),
+  posterUrl: z.string().optional().default(""),
 });
 
 export function AdminEvents() {
@@ -37,7 +39,7 @@ export function AdminEvents() {
 
   const form = useForm({
     resolver: zodResolver(eventSchema),
-    defaultValues: { slug: "", titleEn: "", titleAr: "", status: "draft" as any, featured: false }
+    defaultValues: { slug: "", titleEn: "", titleAr: "", status: "draft" as any, featured: false, posterUrl: "" }
   });
 
   const onSubmit = (data: any) => {
@@ -52,7 +54,7 @@ export function AdminEvents() {
   };
 
   const handleDelete = (id: number) => {
-    if (confirm("Are you sure?")) {
+    if (confirm(t("Delete this event? This cannot be undone.", "هل تريد حذف هذه الفعالية؟ لا يمكن التراجع عن هذا الإجراء."))) {
       deleteEvent.mutate({ id }, {
         onSuccess: () => {
           toast({ title: "Event deleted" });
@@ -94,6 +96,19 @@ export function AdminEvents() {
                     </Select>
                   </FormItem>
                 )} />
+                <FormField control={form.control} name="posterUrl" render={({field}) => (
+                  <FormItem>
+                    <FormLabel>Poster (optional)</FormLabel>
+                    <FormControl>
+                      <ImageUploadField
+                        value={field.value}
+                        onChange={field.onChange}
+                        hint="Vertical event poster shown on the event page and listings."
+                        previewClassName="w-24 h-32"
+                      />
+                    </FormControl>
+                  </FormItem>
+                )} />
                 <Button type="submit" className="w-full" disabled={createEvent.isPending}>Save</Button>
               </form>
             </Form>
@@ -105,6 +120,7 @@ export function AdminEvents() {
         <Table>
           <TableHeader>
             <TableRow>
+              <TableHead>Poster</TableHead>
               <TableHead>Title</TableHead>
               <TableHead>Status</TableHead>
               <TableHead>Featured</TableHead>
@@ -114,6 +130,13 @@ export function AdminEvents() {
           <TableBody>
             {events?.map(event => (
               <TableRow key={event.id}>
+                <TableCell>
+                  <div className="w-12 h-16 bg-muted border border-border overflow-hidden">
+                    {event.posterUrl ? (
+                      <img src={resolveImageUrl(event.posterUrl)} alt="" className="w-full h-full object-cover" />
+                    ) : null}
+                  </div>
+                </TableCell>
                 <TableCell className="font-medium">{event.titleEn}</TableCell>
                 <TableCell>{event.status}</TableCell>
                 <TableCell>
@@ -133,7 +156,7 @@ export function AdminEvents() {
               </TableRow>
             ))}
             {events?.length === 0 && (
-              <TableRow><TableCell colSpan={4} className="text-center py-8 text-muted-foreground">No events found.</TableCell></TableRow>
+              <TableRow><TableCell colSpan={5} className="text-center py-8 text-muted-foreground">No events found.</TableCell></TableRow>
             )}
           </TableBody>
         </Table>

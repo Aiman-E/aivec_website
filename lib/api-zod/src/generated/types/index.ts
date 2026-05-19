@@ -56,5 +56,7 @@ export * from './sponsorInputTier';
 export * from './sponsorTier';
 export * from './sponsorUpdate';
 export * from './sponsorUpdateTier';
+export * from './uploadUrlRequest';
+export * from './uploadUrlResponse';
 export * from './userRoleUpdate';
 export * from './userRoleUpdateRole';

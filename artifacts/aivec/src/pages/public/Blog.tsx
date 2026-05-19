@@ -1,4 +1,4 @@
-import { useLanguage } from "@/lib/i18n";
+import { useLanguage, useDateLocale } from "@/lib/i18n";
 import { useListBlog } from "@workspace/api-client-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Link } from "wouter";
@@ -8,6 +8,7 @@ import { motion } from "framer-motion";
 
 export function Blog() {
   const { lang, t } = useLanguage();
+  const dateLocale = useDateLocale();
   const { data: posts, isLoading } = useListBlog({ published: true });
   const Arrow = lang === "ar" ? ArrowLeft : ArrowRight;
 
@@ -79,7 +80,7 @@ export function Blog() {
                         <div className="flex items-center gap-3 text-sm font-medium text-accent mb-3">
                           <span className="uppercase tracking-wider">{post.authorName || t("Editorial Board", "هيئة التحرير")}</span>
                           <span className="w-1 h-1 rounded-full bg-border"></span>
-                          <span className="text-muted-foreground">{post.publishedAt ? format(new Date(post.publishedAt), "MMM d, yyyy") : ""}</span>
+                          <span className="text-muted-foreground">{post.publishedAt ? format(new Date(post.publishedAt), "MMM d, yyyy", { locale: dateLocale }) : ""}</span>
                         </div>
                         
                         <h2 className="text-2xl font-serif font-bold mb-4 group-hover:text-accent transition-colors line-clamp-2">

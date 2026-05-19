@@ -22,7 +22,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
   const { data: me, isLoading } = useGetMe();
 
   if (isLoading) {
-    return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
+    return <div className="min-h-screen flex items-center justify-center text-muted-foreground">{t("Loading...", "جاري التحميل...")}</div>;
   }
 
   if (!me || me.role !== "admin") {

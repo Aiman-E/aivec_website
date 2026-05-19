@@ -1,14 +1,15 @@
-import { useLanguage } from "@/lib/i18n";
+import { useLanguage, useLocaleTag } from "@/lib/i18n";
 import { useGetAdminDashboard } from "@workspace/api-client-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Users, CalendarDays, Ticket, Newspaper, PenTool, MessageSquare } from "lucide-react";
 
 export function AdminDashboard() {
-  const { lang, t } = useLanguage();
+  const { lang, t, tStatus } = useLanguage();
+  const localeTag = useLocaleTag();
   const { data: dashboard, isLoading } = useGetAdminDashboard();
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return <div className="text-muted-foreground">{t("Loading...", "جاري التحميل...")}</div>;
   }
 
   const stats = [
@@ -52,7 +53,7 @@ export function AdminDashboard() {
                       <p className="font-medium">{reg.userName || reg.userEmail}</p>
                       <p className="text-muted-foreground">{t(reg.eventTitleEn, reg.eventTitleAr)}</p>
                     </div>
-                    <span className="px-2 py-1 bg-muted rounded text-xs">{reg.status}</span>
+                    <span className="px-2 py-1 bg-muted rounded text-xs">{tStatus(reg.status)}</span>
                   </li>
                 ))}
               </ul>
@@ -73,7 +74,7 @@ export function AdminDashboard() {
                   <li key={msg.id} className="text-sm border-b last:border-0 pb-4 last:pb-0">
                     <div className="flex justify-between items-start mb-1">
                       <p className="font-medium">{msg.name}</p>
-                      <span className="text-xs text-muted-foreground">{new Date(msg.createdAt).toLocaleDateString()}</span>
+                      <span className="text-xs text-muted-foreground">{new Date(msg.createdAt).toLocaleDateString(localeTag)}</span>
                     </div>
                     <p className="text-muted-foreground line-clamp-1">{msg.subject || msg.message}</p>
                   </li>

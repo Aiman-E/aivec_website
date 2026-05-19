@@ -2,6 +2,7 @@ import { useLanguage } from "@/lib/i18n";
 import { useGetPage, useListSponsors } from "@workspace/api-client-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { motion } from "framer-motion";
+import { resolveImageUrl } from "@/components/admin/ImageUploadField";
 
 export function Sponsorship() {
   const { lang, t, tStatus } = useLanguage();
@@ -103,7 +104,7 @@ export function Sponsorship() {
                               'w-32 h-32 md:w-40 md:h-40'
                             }`}>
                               <img 
-                                src={sponsor.logoUrl} 
+                                src={resolveImageUrl(sponsor.logoUrl)} 
                                 alt={t(sponsor.nameEn, sponsor.nameAr)} 
                                 className="max-w-[80%] max-h-[80%] object-contain filter grayscale opacity-70 group-hover:filter-none group-hover:opacity-100 transition-all duration-500" 
                               />

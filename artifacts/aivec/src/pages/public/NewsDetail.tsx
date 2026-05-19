@@ -1,4 +1,4 @@
-import { useLanguage, useNavigateToSection } from "@/lib/i18n";
+import { useLanguage, useNavigateToSection, useDateLocale } from "@/lib/i18n";
 import { useGetNews, getGetNewsQueryKey } from "@workspace/api-client-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useRoute } from "wouter";
@@ -10,6 +10,7 @@ import { motion } from "framer-motion";
 export function NewsDetail() {
   const { lang, t } = useLanguage();
   const goToSection = useNavigateToSection();
+  const dateLocale = useDateLocale();
   const [, params] = useRoute("/:lang/news/:slug");
   const slug = params?.slug || "";
   
@@ -75,7 +76,7 @@ export function NewsDetail() {
             </span>
             <span className="w-1 h-1 rounded-full bg-border"></span>
             <time className="text-muted-foreground font-bold" dateTime={news.publishedAt || undefined}>
-              {news.publishedAt ? format(new Date(news.publishedAt), "MMMM d, yyyy") : ""}
+              {news.publishedAt ? format(new Date(news.publishedAt), "MMMM d, yyyy", { locale: dateLocale }) : ""}
             </time>
           </div>
           

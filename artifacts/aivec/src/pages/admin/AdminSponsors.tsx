@@ -1,5 +1,6 @@
 import { useLanguage } from "@/lib/i18n";
 import { useListSponsors, useCreateSponsor, useDeleteSponsor } from "@workspace/api-client-react";
+import { ImageUploadField, resolveImageUrl } from "@/components/admin/ImageUploadField";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -18,6 +19,8 @@ const sponsorSchema = z.object({
   nameEn: z.string().min(1),
   nameAr: z.string().min(1),
   tier: z.enum(["platinum", "gold", "silver", "supporter", "government"]),
+  logoUrl: z.string().optional().default(""),
+  websiteUrl: z.string().optional().default(""),
 });
 
 export function AdminSponsors() {
@@ -30,7 +33,7 @@ export function AdminSponsors() {
 
   const form = useForm({
     resolver: zodResolver(sponsorSchema),
-    defaultValues: { nameEn: "", nameAr: "", tier: "supporter" as any }
+    defaultValues: { nameEn: "", nameAr: "", tier: "supporter" as any, logoUrl: "", websiteUrl: "" }
   });
 
   const onSubmit = (data: any) => {
@@ -71,6 +74,25 @@ export function AdminSponsors() {
                     </Select>
                   </FormItem>
                 )} />
+                <FormField control={form.control} name="logoUrl" render={({field}) => (
+                  <FormItem>
+                    <FormLabel>Logo</FormLabel>
+                    <FormControl>
+                      <ImageUploadField
+                        value={field.value}
+                        onChange={field.onChange}
+                        hint="Upload the sponsor logo (PNG with transparent background recommended)."
+                        previewClassName="w-24 h-24"
+                      />
+                    </FormControl>
+                  </FormItem>
+                )} />
+                <FormField control={form.control} name="websiteUrl" render={({field}) => (
+                  <FormItem>
+                    <FormLabel>Website (optional)</FormLabel>
+                    <FormControl><Input {...field} dir="ltr" placeholder="https://example.com" /></FormControl>
+                  </FormItem>
+                )} />
                 <Button type="submit" className="w-full">Save</Button>
               </form>
             </Form>
@@ -80,15 +102,24 @@ export function AdminSponsors() {
 
       <Card>
         <Table>
-          <TableHeader><TableRow><TableHead>Name</TableHead><TableHead>Tier</TableHead><TableHead className="text-right">Actions</TableHead></TableRow></TableHeader>
+          <TableHeader><TableRow><TableHead>Logo</TableHead><TableHead>Name</TableHead><TableHead>Tier</TableHead><TableHead className="text-right">Actions</TableHead></TableRow></TableHeader>
           <TableBody>
             {sponsors?.map(item => (
               <TableRow key={item.id}>
+                <TableCell>
+                  <div className="w-16 h-16 bg-muted border border-border flex items-center justify-center overflow-hidden">
+                    {item.logoUrl ? (
+                      <img src={resolveImageUrl(item.logoUrl)} alt="" className="w-full h-full object-contain" />
+                    ) : (
+                      <span className="text-xs text-muted-foreground">—</span>
+                    )}
+                  </div>
+                </TableCell>
                 <TableCell>{item.nameEn}</TableCell>
                 <TableCell className="capitalize">{item.tier}</TableCell>
                 <TableCell className="text-right">
                   <Button variant="outline" size="icon" className="text-destructive" onClick={() => {
-                    if (confirm("Delete?")) deleteSponsor.mutate({id: item.id}, { onSuccess: () => refetch() });
+                    if (confirm(t("Delete this sponsor?", "هل تريد حذف هذا الراعي؟"))) deleteSponsor.mutate({id: item.id}, { onSuccess: () => refetch() });
                   }}><Trash2 className="w-4 h-4" /></Button>
                 </TableCell>
               </TableRow>

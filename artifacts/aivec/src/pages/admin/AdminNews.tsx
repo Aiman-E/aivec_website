@@ -75,7 +75,7 @@ export function AdminNews() {
                 <TableCell>{item.titleEn}</TableCell>
                 <TableCell className="text-right">
                   <Button variant="outline" size="icon" className="text-destructive" onClick={() => {
-                    if (confirm("Delete?")) deleteNews.mutate({id: item.id}, { onSuccess: () => queryClient.invalidateQueries({queryKey: getListNewsQueryKey()})});
+                    if (confirm(t("Delete this news item?", "هل تريد حذف هذا الخبر؟"))) deleteNews.mutate({id: item.id}, { onSuccess: () => queryClient.invalidateQueries({queryKey: getListNewsQueryKey()})});
                   }}><Trash2 className="w-4 h-4" /></Button>
                 </TableCell>
               </TableRow>

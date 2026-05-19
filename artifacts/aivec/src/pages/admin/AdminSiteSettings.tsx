@@ -10,6 +10,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { useEffect } from "react";
+import { ImageUploadField } from "@/components/admin/ImageUploadField";
+
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const settingsSchema = z.object({
   siteTitleEn: z.string().optional(),
@@ -22,11 +25,32 @@ const settingsSchema = z.object({
   venueNameAr: z.string().optional(),
   contactPhone: z.string().optional(),
   contactWhatsapp: z.string().optional(),
-  contactEmails: z.string().optional(),
+  contactEmails: z
+    .string()
+    .optional()
+    .refine(
+      (val) => {
+        if (!val || !val.trim()) return true;
+        return val
+          .split(",")
+          .map((e) => e.trim())
+          .filter(Boolean)
+          .every((e) => EMAIL_RE.test(e));
+      },
+      { message: "One or more emails are invalid" }
+    ),
   footerNoteEn: z.string().optional(),
   footerNoteAr: z.string().optional(),
   fontEn: z.string().optional(),
   fontAr: z.string().optional(),
+  statEditions: z.string().optional(),
+  statDelegates: z.string().optional(),
+  statFaculty: z.string().optional(),
+  statCmeHours: z.string().optional(),
+  statCountries: z.string().optional(),
+  logoUrl: z.string().optional(),
+  faviconUrl: z.string().optional(),
+  socialImageUrl: z.string().optional(),
 });
 
 const EN_FONTS = [
@@ -82,6 +106,14 @@ export function AdminSiteSettings() {
       footerNoteAr: "",
       fontEn: "Fraunces",
       fontAr: "Cairo",
+      statEditions: "02",
+      statDelegates: "500+",
+      statFaculty: "35",
+      statCmeHours: "12",
+      statCountries: "4",
+      logoUrl: "",
+      faviconUrl: "",
+      socialImageUrl: "",
     }
   });
 
@@ -105,6 +137,14 @@ export function AdminSiteSettings() {
     link.href = `https://fonts.googleapis.com/css2?${params}&display=swap`;
   }, [watchedFontEn, watchedFontAr]);
 
+  // Remove the preview <link> when leaving the settings page so it doesn't
+  // keep loading remote fonts on the public site.
+  useEffect(() => {
+    return () => {
+      document.getElementById("aivec-admin-font-preview")?.remove();
+    };
+  }, []);
+
   useEffect(() => {
     if (settings) {
       form.reset({
@@ -123,11 +163,19 @@ export function AdminSiteSettings() {
         footerNoteAr: settings.footerNoteAr || "",
         fontEn: settings.fontEn || "Fraunces",
         fontAr: settings.fontAr || "Cairo",
+        statEditions: settings.statEditions ?? "02",
+        statDelegates: settings.statDelegates ?? "500+",
+        statFaculty: settings.statFaculty ?? "35",
+        statCmeHours: settings.statCmeHours ?? "12",
+        statCountries: settings.statCountries ?? "4",
+        logoUrl: settings.logoUrl ?? "",
+        faviconUrl: settings.faviconUrl ?? "",
+        socialImageUrl: settings.socialImageUrl ?? "",
       });
     }
   }, [settings, form]);
 
-  if (isLoading) return <div>Loading...</div>;
+  if (isLoading) return <div className="text-muted-foreground">{t("Loading...", "جاري التحميل...")}</div>;
 
   function onSubmit(data: SettingsFormValues) {
     const payload = {
@@ -261,6 +309,81 @@ export function AdminSiteSettings() {
                       >
                         مؤتمر عدن الدولي للأوعية الدموية
                       </div>
+                      <FormMessage />
+                    </FormItem>
+                  )} />
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <h3 className="font-semibold text-lg border-b pb-2">{t("Home Page Stats", "إحصائيات الصفحة الرئيسية")}</h3>
+                <p className="text-sm text-muted-foreground">
+                  {t(
+                    "Numbers shown in the stats banner on the home page. You can include suffixes like '500+' or zero-padded values like '02'.",
+                    "الأرقام المعروضة في شريط الإحصائيات على الصفحة الرئيسية. يمكنك استخدام لواحق مثل '+500' أو قيم مثل '02'."
+                  )}
+                </p>
+                <div className="grid md:grid-cols-5 gap-4">
+                  <FormField control={form.control} name="statEditions" render={({ field }) => (
+                    <FormItem><FormLabel>{t("Editions", "النسخ")}</FormLabel><FormControl><Input {...field} dir="ltr" /></FormControl><FormMessage /></FormItem>
+                  )} />
+                  <FormField control={form.control} name="statDelegates" render={({ field }) => (
+                    <FormItem><FormLabel>{t("Delegates", "المشاركون")}</FormLabel><FormControl><Input {...field} dir="ltr" /></FormControl><FormMessage /></FormItem>
+                  )} />
+                  <FormField control={form.control} name="statFaculty" render={({ field }) => (
+                    <FormItem><FormLabel>{t("Faculty", "المتحدثون")}</FormLabel><FormControl><Input {...field} dir="ltr" /></FormControl><FormMessage /></FormItem>
+                  )} />
+                  <FormField control={form.control} name="statCmeHours" render={({ field }) => (
+                    <FormItem><FormLabel>{t("CME Hours", "ساعات معتمدة")}</FormLabel><FormControl><Input {...field} dir="ltr" /></FormControl><FormMessage /></FormItem>
+                  )} />
+                  <FormField control={form.control} name="statCountries" render={({ field }) => (
+                    <FormItem><FormLabel>{t("Countries", "الدول")}</FormLabel><FormControl><Input {...field} dir="ltr" /></FormControl><FormMessage /></FormItem>
+                  )} />
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <h3 className="font-semibold text-lg border-b pb-2">{t("Branding & Images", "الهوية والصور")}</h3>
+                <p className="text-sm text-muted-foreground">
+                  {t(
+                    "Site logo, browser favicon, and the image used when the site is shared on social media.",
+                    "شعار الموقع، أيقونة المتصفح، والصورة المستخدمة عند مشاركة الموقع على وسائل التواصل."
+                  )}
+                </p>
+                <div className="grid gap-6">
+                  <FormField control={form.control} name="logoUrl" render={({ field }) => (
+                    <FormItem>
+                      <ImageUploadField
+                        value={field.value}
+                        onChange={field.onChange}
+                        label={t("Logo", "الشعار")}
+                        previewClassName="w-32 h-20"
+                      />
+                      <FormMessage />
+                    </FormItem>
+                  )} />
+                  <FormField control={form.control} name="faviconUrl" render={({ field }) => (
+                    <FormItem>
+                      <ImageUploadField
+                        value={field.value}
+                        onChange={field.onChange}
+                        label={t("Favicon", "أيقونة المتصفح")}
+                        hint={t("Square image, ideally 256×256 PNG.", "صورة مربعة، يفضّل 256×256 PNG.")}
+                        previewClassName="w-16 h-16"
+                        accept="image/png,image/x-icon,image/svg+xml"
+                      />
+                      <FormMessage />
+                    </FormItem>
+                  )} />
+                  <FormField control={form.control} name="socialImageUrl" render={({ field }) => (
+                    <FormItem>
+                      <ImageUploadField
+                        value={field.value}
+                        onChange={field.onChange}
+                        label={t("Social Share Image", "صورة المشاركة")}
+                        hint={t("Recommended 1200×630 for Facebook/Twitter previews.", "يفضّل 1200×630 لمعاينات فيسبوك وتويتر.")}
+                        previewClassName="w-32 h-20"
+                      />
                       <FormMessage />
                     </FormItem>
                   )} />

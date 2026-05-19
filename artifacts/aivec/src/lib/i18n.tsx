@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
 import { useLocation } from "wouter";
+import { ar as arLocale } from "date-fns/locale";
 
 export type Language = "en" | "ar";
 
@@ -106,14 +107,38 @@ export function useLanguage() {
 // Shared cross-route section navigator. Wouter strips hashes from
 // setLocation, so when navigating from a detail page back to the home page
 // we queue the target in sessionStorage; Home.tsx polls for the element on
-// mount and scrolls when it appears.
+// mount and scrolls when it appears. When already on the home page, we
+// also retry for a short window in case the target section is rendered
+// lazily (e.g. data-driven Program/Sponsors).
+// Returns the date-fns locale matching the current UI language, so date
+// formatting helpers (`format(d, fmt, { locale })`) render month names,
+// day names, AM/PM markers, etc. in Arabic when appropriate.
+export function useDateLocale() {
+  const { lang } = useLanguage();
+  return lang === "ar" ? arLocale : undefined;
+}
+
+// Native-Date locale tag, for `.toLocaleDateString(localeTag())`.
+export function useLocaleTag() {
+  const { lang } = useLanguage();
+  return lang === "ar" ? "ar" : "en-US";
+}
+
 export function useNavigateToSection() {
   const { lang } = useLanguage();
   const [location, setLocation] = useLocation();
   return (hash: string) => {
     if (location === `/${lang}`) {
-      const el = document.querySelector(hash);
-      if (el) el.scrollIntoView({ behavior: "smooth" });
+      let attempts = 0;
+      const tryScroll = () => {
+        const el = document.querySelector(hash);
+        if (el) {
+          el.scrollIntoView({ behavior: "smooth" });
+        } else if (attempts++ < 20) {
+          setTimeout(tryScroll, 150);
+        }
+      };
+      tryScroll();
     } else {
       sessionStorage.setItem("aivec_scroll_to", hash);
       setLocation(`/${lang}`);

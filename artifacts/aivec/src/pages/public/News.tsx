@@ -1,4 +1,4 @@
-import { useLanguage } from "@/lib/i18n";
+import { useLanguage, useDateLocale } from "@/lib/i18n";
 import { useListNews } from "@workspace/api-client-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Link } from "wouter";
@@ -8,6 +8,7 @@ import { motion } from "framer-motion";
 
 export function News() {
   const { lang, t } = useLanguage();
+  const dateLocale = useDateLocale();
   const { data: news, isLoading } = useListNews({ published: true });
   const Arrow = lang === "ar" ? ArrowLeft : ArrowRight;
 
@@ -80,7 +81,7 @@ export function News() {
                       
                       <div className="flex-1 flex flex-col">
                         <div className="text-sm font-medium text-primary mb-3">
-                          {item.publishedAt ? format(new Date(item.publishedAt), "MMMM d, yyyy") : ""}
+                          {item.publishedAt ? format(new Date(item.publishedAt), "MMMM d, yyyy", { locale: dateLocale }) : ""}
                         </div>
                         
                         <h2 className="text-2xl font-serif font-bold mb-4 group-hover:text-primary transition-colors line-clamp-2">

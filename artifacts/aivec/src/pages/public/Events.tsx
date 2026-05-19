@@ -1,4 +1,4 @@
-import { useLanguage } from "@/lib/i18n";
+import { useLanguage, useDateLocale } from "@/lib/i18n";
 import { useListEvents } from "@workspace/api-client-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
@@ -9,6 +9,7 @@ import { motion } from "framer-motion";
 
 export function Events() {
   const { lang, t, tStatus } = useLanguage();
+  const dateLocale = useDateLocale();
   const { data: events, isLoading } = useListEvents();
   const Arrow = lang === "ar" ? ArrowLeft : ArrowRight;
 
@@ -78,11 +79,11 @@ export function Events() {
                           <div className="flex items-center gap-2 text-primary font-bold">
                             <Clock className="w-4 h-4" />
                             <span>
-                              {event.startsAt ? format(new Date(event.startsAt), "h:mm a") : t("TBA", "يحدد لاحقاً")}
+                              {event.startsAt ? format(new Date(event.startsAt), "h:mm a", { locale: dateLocale }) : t("TBA", "يحدد لاحقاً")}
                             </span>
                           </div>
                           <div className="text-sm text-muted-foreground font-medium">
-                            {event.startsAt ? format(new Date(event.startsAt), "MMMM d, yyyy") : ""}
+                            {event.startsAt ? format(new Date(event.startsAt), "MMMM d, yyyy", { locale: dateLocale }) : ""}
                           </div>
                           
                           <div className="mt-2">

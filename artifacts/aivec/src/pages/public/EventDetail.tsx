@@ -1,4 +1,4 @@
-import { useLanguage, useNavigateToSection } from "@/lib/i18n";
+import { useLanguage, useNavigateToSection, useDateLocale } from "@/lib/i18n";
 import { useGetEvent, useRegisterForEvent, getGetEventQueryKey } from "@workspace/api-client-react";
 import { useRoute } from "wouter";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -17,10 +17,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast";
 import { SignInButton, useUser } from "@clerk/react";
 import { motion } from "framer-motion";
+import { resolveImageUrl } from "@/components/admin/ImageUploadField";
 
 export function EventDetail() {
   const { lang, t, tStatus } = useLanguage();
   const goToSection = useNavigateToSection();
+  const dateLocale = useDateLocale();
   const [, params] = useRoute("/:lang/events/:slug");
   const slug = params?.slug || "";
   const { toast } = useToast();
@@ -172,7 +174,7 @@ export function EventDetail() {
                     <div className="text-[10px] uppercase text-muted-foreground font-bold mb-2">{t("Date", "التاريخ")}</div>
                     <div className="flex items-center gap-3">
                       <Calendar className="w-4 h-4 text-primary" />
-                      <span>{format(new Date(event.startsAt), "MMM d, yyyy")}</span>
+                      <span>{format(new Date(event.startsAt), "MMM d, yyyy", { locale: dateLocale })}</span>
                     </div>
                   </div>
                   <div>
@@ -203,7 +205,7 @@ export function EventDetail() {
           <div className="lg:col-span-7 xl:col-span-8">
             {event.posterUrl && (
               <div className="mb-16 border border-border bg-card p-3 shadow-2xl relative">
-                <img src={event.posterUrl} alt="" className="w-full h-auto object-cover max-h-[700px] filter contrast-125" />
+                <img src={resolveImageUrl(event.posterUrl)} alt="" className="w-full h-auto object-cover max-h-[700px] filter contrast-125" />
               </div>
             )}
 

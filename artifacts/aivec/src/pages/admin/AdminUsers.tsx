@@ -1,4 +1,4 @@
-import { useLanguage } from "@/lib/i18n";
+import { useLanguage, useLocaleTag } from "@/lib/i18n";
 import { useListUsers, useUpdateUserRole } from "@workspace/api-client-react";
 import { Card } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -7,6 +7,7 @@ import { useToast } from "@/hooks/use-toast";
 
 export function AdminUsers() {
   const { lang, t } = useLanguage();
+  const localeTag = useLocaleTag();
   const { data: users, refetch } = useListUsers();
   const updateRole = useUpdateUserRole();
   const { toast } = useToast();
@@ -47,7 +48,7 @@ export function AdminUsers() {
                     </SelectContent>
                   </Select>
                 </TableCell>
-                <TableCell>{new Date(user.createdAt).toLocaleDateString()}</TableCell>
+                <TableCell>{new Date(user.createdAt).toLocaleDateString(localeTag)}</TableCell>
               </TableRow>
             ))}
           </TableBody>

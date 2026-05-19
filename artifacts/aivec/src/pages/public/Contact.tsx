@@ -9,22 +9,38 @@ import { Textarea } from "@/components/ui/textarea";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
 import { motion } from "framer-motion";
+import { useMemo } from "react";
 
-const contactSchema = z.object({
-  name: z.string().min(1, "Name is required"),
-  email: z.string().email("Valid email is required"),
-  phone: z.string().optional(),
-  subject: z.string().optional(),
-  message: z.string().min(1, "Message is required"),
-});
-
-type ContactFormValues = z.infer<typeof contactSchema>;
+type ContactFormValues = {
+  name: string;
+  email: string;
+  phone?: string;
+  subject?: string;
+  message: string;
+};
 
 export function Contact() {
   const { lang, t } = useLanguage();
   const { data: settings } = useGetSiteSettings();
   const { toast } = useToast();
   const createContact = useCreateContactSubmission();
+
+  // Build the schema per-render so validation errors are in the current
+  // language. Cheap to recreate; only changes when language changes.
+  const contactSchema = useMemo(
+    () =>
+      z.object({
+        name: z.string().min(1, t("Name is required", "الاسم مطلوب")),
+        email: z.string().email(t("A valid email is required", "البريد الإلكتروني غير صالح")),
+        phone: z.string().optional(),
+        subject: z.string().optional(),
+        message: z.string().min(1, t("Message is required", "الرسالة مطلوبة")),
+      }),
+    // Rebuild only when the active language changes so validation
+    // messages match the UI; the `t` identity is unstable per render.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [lang]
+  );
 
   const form = useForm<ContactFormValues>({
     resolver: zodResolver(contactSchema),

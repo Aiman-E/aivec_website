@@ -1,4 +1,4 @@
-import { useLanguage } from "@/lib/i18n";
+import { useLanguage, useDateLocale } from "@/lib/i18n";
 import { useListMyRegistrations } from "@workspace/api-client-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 
 export function MyRegistrations() {
   const { lang, t, tStatus } = useLanguage();
+  const dateLocale = useDateLocale();
   const { data: registrations, isLoading } = useListMyRegistrations();
 
   const getStatusColor = (status: string) => {
@@ -49,7 +50,7 @@ export function MyRegistrations() {
                     {t(reg.eventTitleEn, reg.eventTitleAr) || t("Event", "فعالية")}
                   </CardTitle>
                   <div className="text-sm text-muted-foreground">
-                    {t("Submitted on", "تم التسجيل في")}: {format(new Date(reg.createdAt), "PPP")}
+                    {t("Submitted on", "تم التسجيل في")}: {format(new Date(reg.createdAt), "PPP", { locale: dateLocale })}
                   </div>
                 </div>
                 <Badge className={getStatusColor(reg.status)}>

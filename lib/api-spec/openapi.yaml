@@ -19,8 +19,40 @@ tags:
   - name: sponsors
   - name: users
   - name: admin
+  - name: storage
 
 paths:
+  /storage/uploads/request-url:
+    post:
+      tags: [storage]
+      operationId: requestUploadUrl
+      summary: Request a presigned URL for file upload
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UploadUrlRequest"
+      responses:
+        "200":
+          description: Presigned upload URL generated.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UploadUrlResponse"
+        "400":
+          description: Missing or invalid required fields.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "500":
+          description: Failed to generate upload URL.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
   /healthz:
     get:
       operationId: healthCheck
@@ -680,6 +712,23 @@ components:
         error:
           type: string
 
+    UploadUrlRequest:
+      type: object
+      required: [name, size, contentType]
+      properties:
+        name: { type: string, minLength: 1 }
+        size: { type: integer, minimum: 1 }
+        contentType: { type: string, minLength: 1 }
+
+    UploadUrlResponse:
+      type: object
+      required: [uploadURL, objectPath]
+      properties:
+        uploadURL: { type: string, format: uri }
+        objectPath: { type: string }
+        metadata:
+          $ref: "#/components/schemas/UploadUrlRequest"
+
     Me:
       type: object
       required: [id, clerkId, email, role]
@@ -740,6 +789,11 @@ components:
         socialImageUrl: { type: ["string", "null"] }
         fontEn: { type: string }
         fontAr: { type: string }
+        statEditions: { type: string }
+        statDelegates: { type: string }
+        statFaculty: { type: string }
+        statCmeHours: { type: string }
+        statCountries: { type: string }
         updatedAt: { type: string, format: date-time }
 
     SiteSettingsUpdate:
@@ -771,6 +825,11 @@ components:
         socialImageUrl: { type: ["string", "null"] }
         fontEn: { type: string }
         fontAr: { type: string }
+        statEditions: { type: string }
+        statDelegates: { type: string }
+        statFaculty: { type: string }
+        statCmeHours: { type: string }
+        statCountries: { type: string }
 
     Page:
       type: object

@@ -75,7 +75,7 @@ export function AdminBlog() {
                 <TableCell>{item.titleEn}</TableCell>
                 <TableCell className="text-right">
                   <Button variant="outline" size="icon" className="text-destructive" onClick={() => {
-                    if (confirm("Delete?")) deleteBlog.mutate({id: item.id}, { onSuccess: () => queryClient.invalidateQueries({queryKey: getListBlogQueryKey()})});
+                    if (confirm(t("Delete this article?", "هل تريد حذف هذا المقال؟"))) deleteBlog.mutate({id: item.id}, { onSuccess: () => queryClient.invalidateQueries({queryKey: getListBlogQueryKey()})});
                   }}><Trash2 className="w-4 h-4" /></Button>
                 </TableCell>
               </TableRow>

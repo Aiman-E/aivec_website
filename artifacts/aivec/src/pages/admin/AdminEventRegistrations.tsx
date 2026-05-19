@@ -1,4 +1,4 @@
-import { useLanguage } from "@/lib/i18n";
+import { useLanguage, useLocaleTag } from "@/lib/i18n";
 import { useListEventRegistrations, getListEventRegistrationsQueryKey, useUpdateRegistration } from "@workspace/api-client-react";
 import { useRoute } from "wouter";
 import { Card } from "@/components/ui/card";
@@ -9,6 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 
 export function AdminEventRegistrations() {
   const { lang, t } = useLanguage();
+  const localeTag = useLocaleTag();
   const [match, params] = useRoute("/:lang/admin/events/:id/registrations");
   const eventId = Number(params?.id);
   const { data: registrations, isLoading } = useListEventRegistrations(eventId, { query: { enabled: !!eventId } as never });
@@ -54,7 +55,7 @@ export function AdminEventRegistrations() {
                     </SelectContent>
                   </Select>
                 </TableCell>
-                <TableCell>{new Date(reg.createdAt).toLocaleDateString()}</TableCell>
+                <TableCell>{new Date(reg.createdAt).toLocaleDateString(localeTag)}</TableCell>
               </TableRow>
             ))}
           </TableBody>

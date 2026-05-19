@@ -8,6 +8,36 @@
 import * as zod from 'zod';
 
 
+/**
+ * @summary Request a presigned URL for file upload
+ */
+
+
+
+
+
+export const RequestUploadUrlBody = zod.object({
+  "name": zod.string().min(1),
+  "size": zod.number().min(1),
+  "contentType": zod.string().min(1)
+})
+
+
+
+
+
+
+export const RequestUploadUrlResponse = zod.object({
+  "uploadURL": zod.string().url(),
+  "objectPath": zod.string(),
+  "metadata": zod.object({
+  "name": zod.string().min(1),
+  "size": zod.number().min(1),
+  "contentType": zod.string().min(1)
+}).optional()
+})
+
+
 export const HealthCheckResponse = zod.object({
   "status": zod.string()
 })
@@ -54,6 +84,11 @@ export const GetSiteSettingsResponse = zod.object({
   "socialImageUrl": zod.string().nullish(),
   "fontEn": zod.string().optional(),
   "fontAr": zod.string().optional(),
+  "statEditions": zod.string().optional(),
+  "statDelegates": zod.string().optional(),
+  "statFaculty": zod.string().optional(),
+  "statCmeHours": zod.string().optional(),
+  "statCountries": zod.string().optional(),
   "updatedAt": zod.coerce.date().optional()
 })
 
@@ -84,7 +119,12 @@ export const UpdateSiteSettingsBody = zod.object({
   "faviconUrl": zod.string().nullish(),
   "socialImageUrl": zod.string().nullish(),
   "fontEn": zod.string().optional(),
-  "fontAr": zod.string().optional()
+  "fontAr": zod.string().optional(),
+  "statEditions": zod.string().optional(),
+  "statDelegates": zod.string().optional(),
+  "statFaculty": zod.string().optional(),
+  "statCmeHours": zod.string().optional(),
+  "statCountries": zod.string().optional()
 })
 
 export const UpdateSiteSettingsResponse = zod.object({
@@ -115,6 +155,11 @@ export const UpdateSiteSettingsResponse = zod.object({
   "socialImageUrl": zod.string().nullish(),
   "fontEn": zod.string().optional(),
   "fontAr": zod.string().optional(),
+  "statEditions": zod.string().optional(),
+  "statDelegates": zod.string().optional(),
+  "statFaculty": zod.string().optional(),
+  "statCmeHours": zod.string().optional(),
+  "statCountries": zod.string().optional(),
   "updatedAt": zod.coerce.date().optional()
 })
 

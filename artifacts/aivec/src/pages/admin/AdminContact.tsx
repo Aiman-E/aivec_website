@@ -1,4 +1,4 @@
-import { useLanguage } from "@/lib/i18n";
+import { useLanguage, useLocaleTag } from "@/lib/i18n";
 import { useListContactSubmissions, useDeleteContactSubmission } from "@workspace/api-client-react";
 import { Card } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -8,12 +8,13 @@ import { useToast } from "@/hooks/use-toast";
 
 export function AdminContact() {
   const { lang, t } = useLanguage();
+  const localeTag = useLocaleTag();
   const { data: contacts, refetch } = useListContactSubmissions();
   const deleteContact = useDeleteContactSubmission();
   const { toast } = useToast();
 
   const handleDelete = (id: number) => {
-    if (confirm("Delete this message?")) {
+    if (confirm(t("Delete this message?", "هل تريد حذف هذه الرسالة؟"))) {
       deleteContact.mutate({ id }, {
         onSuccess: () => {
           toast({ title: "Deleted" });
@@ -43,7 +44,7 @@ export function AdminContact() {
                 <TableCell className="font-medium">{contact.name}</TableCell>
                 <TableCell>{contact.email}</TableCell>
                 <TableCell>{contact.subject}</TableCell>
-                <TableCell>{new Date(contact.createdAt).toLocaleDateString()}</TableCell>
+                <TableCell>{new Date(contact.createdAt).toLocaleDateString(localeTag)}</TableCell>
                 <TableCell className="text-right">
                   <Button variant="outline" size="icon" className="text-destructive" onClick={() => handleDelete(contact.id)}>
                     <Trash2 className="w-4 h-4" />

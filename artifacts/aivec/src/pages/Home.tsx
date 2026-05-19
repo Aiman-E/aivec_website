@@ -19,6 +19,7 @@ import { format } from "date-fns";
 import { ar as arLocale } from "date-fns/locale";
 import { ArrowRight, ArrowLeft, Calendar, MapPin, ArrowUpRight, Phone, Mail } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { resolveImageUrl } from "@/components/admin/ImageUploadField";
 
 export function Home() {
   const { lang, t } = useLanguage();
@@ -31,7 +32,7 @@ export function Home() {
   const { data: news } = useListNews(undefined, { query: { queryKey: getListNewsQueryKey() } as never });
   const { data: sponsors } = useListSponsors({ query: { queryKey: getListSponsorsQueryKey() } as never });
   const { data: heroImagesData } = useListHeroImages({ query: { queryKey: getListHeroImagesQueryKey() } as never });
-  const heroImages = (heroImagesData?.filter(h => h.active) ?? []).map(h => h.url);
+  const heroImages = (heroImagesData?.filter(h => h.active) ?? []).map(h => resolveImageUrl(h.url));
   const DEFAULT_HERO_SLIDES = [
     "/hero-anatomy.png",
     "/hero-vascular.png",
@@ -200,26 +201,28 @@ export function Home() {
       {/* HORIZONTAL STATS BANNER */}
       <section className="border-y border-border/50 bg-card py-16 overflow-hidden">
         <div className="container mx-auto px-6 md:px-12 flex flex-wrap justify-between items-center gap-12 font-serif text-center md:text-left rtl:md:text-right">
-          <div className="flex-1 min-w-[150px]">
-            <div className="text-6xl md:text-7xl font-light text-primary mb-2 font-mono tracking-tighter">02</div>
-            <div className="text-xs uppercase tracking-[0.2em] text-muted-foreground font-bold">{t("Editions", "النسخ")}</div>
-          </div>
-          <div className="flex-1 min-w-[150px]">
-            <div className="text-6xl md:text-7xl font-light text-primary mb-2 font-mono tracking-tighter">500<span className="text-4xl text-primary/60">+</span></div>
-            <div className="text-xs uppercase tracking-[0.2em] text-muted-foreground font-bold">{t("Delegates", "المشاركون")}</div>
-          </div>
-          <div className="flex-1 min-w-[150px]">
-            <div className="text-6xl md:text-7xl font-light text-primary mb-2 font-mono tracking-tighter">35</div>
-            <div className="text-xs uppercase tracking-[0.2em] text-muted-foreground font-bold">{t("Faculty", "المتحدثون")}</div>
-          </div>
-          <div className="flex-1 min-w-[150px]">
-            <div className="text-6xl md:text-7xl font-light text-primary mb-2 font-mono tracking-tighter">12</div>
-            <div className="text-xs uppercase tracking-[0.2em] text-muted-foreground font-bold">{t("CME Hours", "ساعات معتمدة")}</div>
-          </div>
-          <div className="flex-1 min-w-[150px]">
-            <div className="text-6xl md:text-7xl font-light text-primary mb-2 font-mono tracking-tighter">4</div>
-            <div className="text-xs uppercase tracking-[0.2em] text-muted-foreground font-bold">{t("Countries", "الدول")}</div>
-          </div>
+          {([
+            { value: settings?.statEditions ?? "02", label: t("Editions", "النسخ") },
+            { value: settings?.statDelegates ?? "500+", label: t("Delegates", "المشاركون") },
+            { value: settings?.statFaculty ?? "35", label: t("Faculty", "المتحدثون") },
+            { value: settings?.statCmeHours ?? "12", label: t("CME Hours", "ساعات معتمدة") },
+            { value: settings?.statCountries ?? "4", label: t("Countries", "الدول") },
+          ]).map((stat, i) => {
+            // Render the trailing '+' (or other non-digit suffix) at a
+            // smaller scale to preserve the editorial typography.
+            const m = stat.value.match(/^([\d.,]*)(.*)$/);
+            const main = m?.[1] || stat.value;
+            const suffix = m?.[2] || "";
+            return (
+              <div key={i} className="flex-1 min-w-[150px]">
+                <div className="text-6xl md:text-7xl font-light text-primary mb-2 font-mono tracking-tighter">
+                  {main}
+                  {suffix && <span className="text-4xl text-primary/60">{suffix}</span>}
+                </div>
+                <div className="text-xs uppercase tracking-[0.2em] text-muted-foreground font-bold">{stat.label}</div>
+              </div>
+            );
+          })}
         </div>
       </section>
 
@@ -488,7 +491,7 @@ export function Home() {
                         }`}
                       >
                         {sponsor.logoUrl ? (
-                          <img src={sponsor.logoUrl} alt={t(sponsor.nameEn, sponsor.nameAr)} className="w-full h-auto object-contain mix-blend-multiply dark:mix-blend-normal" />
+                          <img src={resolveImageUrl(sponsor.logoUrl)} alt={t(sponsor.nameEn, sponsor.nameAr)} className="w-full h-auto object-contain mix-blend-multiply dark:mix-blend-normal" />
                         ) : (
                           <div className={`font-serif font-bold ${tier === 'platinum' ? 'text-4xl' : 'text-2xl'}`}>
                             {t(sponsor.nameEn, sponsor.nameAr)}

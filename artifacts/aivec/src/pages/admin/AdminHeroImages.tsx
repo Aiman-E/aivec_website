@@ -1,3 +1,4 @@
+import { useLanguage } from "@/lib/i18n";
 import {
   useListHeroImages,
   useCreateHeroImage,
@@ -36,6 +37,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useToast } from "@/hooks/use-toast";
 import { Trash2 } from "lucide-react";
+import { ImageUploadField, resolveImageUrl } from "@/components/admin/ImageUploadField";
 
 const heroImageSchema = z.object({
   url: z.string().min(1, "URL is required"),
@@ -47,6 +49,7 @@ const heroImageSchema = z.object({
 type HeroImageFormValues = z.infer<typeof heroImageSchema>;
 
 export function AdminHeroImages() {
+  const { t } = useLanguage();
   const { data: images, refetch } = useListHeroImages();
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const createImage = useCreateHeroImage();
@@ -107,11 +110,13 @@ export function AdminHeroImages() {
                   name="url"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Image URL</FormLabel>
+                      <FormLabel>Image</FormLabel>
                       <FormControl>
-                        <Input
-                          placeholder="https://example.com/photo.jpg or /hero-anatomy.png"
-                          {...field}
+                        <ImageUploadField
+                          value={field.value}
+                          onChange={field.onChange}
+                          hint="Upload an image or paste a URL. Recommended 1920×1080."
+                          previewClassName="w-32 h-20"
                         />
                       </FormControl>
                     </FormItem>
@@ -179,7 +184,7 @@ export function AdminHeroImages() {
                 <TableCell>
                   <div className="w-24 h-16 bg-muted overflow-hidden border border-border">
                     <img
-                      src={item.url}
+                      src={resolveImageUrl(item.url)}
                       alt=""
                       className="w-full h-full object-cover"
                     />
@@ -201,7 +206,7 @@ export function AdminHeroImages() {
                     size="icon"
                     className="text-destructive"
                     onClick={() => {
-                      if (confirm("Delete this hero image?"))
+                      if (confirm(t("Delete this hero image?", "هل تريد حذف هذه الصورة؟")))
                         deleteImage.mutate(
                           { id: item.id },
                           { onSuccess: () => refetch() }

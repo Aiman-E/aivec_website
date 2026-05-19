@@ -48,8 +48,8 @@ export function AdminEventFields() {
     }
   }, [eventData, eventId]);
 
-  if (isLoading) return <div>Loading...</div>;
-  if (!eventData) return <div>Event not found</div>;
+  if (isLoading) return <div className="text-muted-foreground">{t("Loading...", "جاري التحميل...")}</div>;
+  if (!eventData) return <div className="text-muted-foreground">{t("Event not found", "الفعالية غير موجودة")}</div>;
 
   const addField = () => {
     setFields([...fields, {

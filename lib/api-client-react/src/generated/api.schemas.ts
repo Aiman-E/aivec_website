@@ -13,6 +13,21 @@ export interface Error {
   error: string;
 }
 
+export interface UploadUrlRequest {
+  /** @minLength 1 */
+  name: string;
+  /** @minimum 1 */
+  size: number;
+  /** @minLength 1 */
+  contentType: string;
+}
+
+export interface UploadUrlResponse {
+  uploadURL: string;
+  objectPath: string;
+  metadata?: UploadUrlRequest;
+}
+
 export type MeRole = typeof MeRole[keyof typeof MeRole];
 
 
@@ -95,6 +110,11 @@ export interface SiteSettings {
   socialImageUrl?: string | null;
   fontEn?: string;
   fontAr?: string;
+  statEditions?: string;
+  statDelegates?: string;
+  statFaculty?: string;
+  statCmeHours?: string;
+  statCountries?: string;
   updatedAt?: string;
 }
 
@@ -128,6 +148,11 @@ export interface SiteSettingsUpdate {
   socialImageUrl?: string | null;
   fontEn?: string;
   fontAr?: string;
+  statEditions?: string;
+  statDelegates?: string;
+  statFaculty?: string;
+  statCmeHours?: string;
+  statCountries?: string;
 }
 
 export interface Page {

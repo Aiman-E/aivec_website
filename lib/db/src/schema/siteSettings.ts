@@ -28,6 +28,11 @@ export const siteSettingsTable = pgTable("site_settings", {
   socialImageUrl: text("social_image_url"),
   fontEn: text("font_en").notNull().default("Fraunces"),
   fontAr: text("font_ar").notNull().default("Cairo"),
+  statEditions: text("stat_editions").notNull().default("02"),
+  statDelegates: text("stat_delegates").notNull().default("500+"),
+  statFaculty: text("stat_faculty").notNull().default("35"),
+  statCmeHours: text("stat_cme_hours").notNull().default("12"),
+  statCountries: text("stat_countries").notNull().default("4"),
   updatedAt: timestamp("updated_at", { withTimezone: true })
     .notNull()
     .defaultNow()

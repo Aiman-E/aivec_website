@@ -36,4 +36,9 @@ export interface SiteSettingsUpdate {
   socialImageUrl?: string | null;
   fontEn?: string;
   fontAr?: string;
+  statEditions?: string;
+  statDelegates?: string;
+  statFaculty?: string;
+  statCmeHours?: string;
+  statCountries?: string;
 }

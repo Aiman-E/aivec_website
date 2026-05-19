@@ -1,10 +1,30 @@
-import { useLanguage } from "@/lib/i18n";
+import { useLanguage, useNavigateToSection } from "@/lib/i18n";
 import { Link } from "wouter";
 import { useGetSiteSettings } from "@workspace/api-client-react";
 
 export function Footer() {
   const { lang, t } = useLanguage();
+  const goToSection = useNavigateToSection();
   const { data: settings } = useGetSiteSettings();
+
+  const navLinkClass = "text-background/80 hover:text-primary transition-colors font-bold text-sm uppercase tracking-widest";
+
+  // Use real anchor links (preserves middle-click, copy-link, SEO, no-JS
+  // fallback) but intercept the click to use the in-app section scroller
+  // so the page doesn't fully reload.
+  const sectionLink = (hash: string, label: string) => (
+    <a
+      href={`/${lang}${hash}`}
+      onClick={(e) => {
+        if (e.metaKey || e.ctrlKey || e.shiftKey || e.button === 1) return;
+        e.preventDefault();
+        goToSection(hash);
+      }}
+      className={navLinkClass}
+    >
+      {label}
+    </a>
+  );
 
   const currentYear = new Date().getFullYear();
 
@@ -49,26 +69,10 @@ export function Footer() {
               {t("Navigation", "روابط")}
             </h4>
             <ul className="space-y-4">
-              <li>
-                <a href={`/${lang}#about`} className="text-background/80 hover:text-primary transition-colors font-bold text-sm uppercase tracking-widest">
-                  {t("About", "عن المؤتمر")}
-                </a>
-              </li>
-              <li>
-                <a href={`/${lang}#program`} className="text-background/80 hover:text-primary transition-colors font-bold text-sm uppercase tracking-widest">
-                  {t("Program", "البرنامج")}
-                </a>
-              </li>
-              <li>
-                <a href={`/${lang}#sponsors`} className="text-background/80 hover:text-primary transition-colors font-bold text-sm uppercase tracking-widest">
-                  {t("Sponsors", "الرعاة")}
-                </a>
-              </li>
-              <li>
-                <a href={`/${lang}#contact`} className="text-background/80 hover:text-primary transition-colors font-bold text-sm uppercase tracking-widest">
-                  {t("Contact", "اتصل بنا")}
-                </a>
-              </li>
+              <li>{sectionLink("#about", t("About", "عن المؤتمر"))}</li>
+              <li>{sectionLink("#program", t("Program", "البرنامج"))}</li>
+              <li>{sectionLink("#sponsors", t("Sponsors", "الرعاة"))}</li>
+              <li>{sectionLink("#contact", t("Contact", "اتصل بنا"))}</li>
             </ul>
           </div>
         </div>

@@ -53,7 +53,7 @@ export function AdminPageEdit() {
     }
   }, [page, form]);
 
-  if (isLoading) return <div>Loading...</div>;
+  if (isLoading) return <div className="text-muted-foreground">{t("Loading...", "جاري التحميل...")}</div>;
 
   function onSubmit(data: PageFormValues) {
     updatePage.mutate({ key, data }, {
