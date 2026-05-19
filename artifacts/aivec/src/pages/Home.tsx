@@ -6,11 +6,13 @@ import {
   useListNews, 
   useListSponsors, 
   useGetPage,
+  useListHeroImages,
   getGetPageQueryKey,
   getGetSiteSettingsQueryKey,
   getListEventsQueryKey,
   getListNewsQueryKey,
-  getListSponsorsQueryKey
+  getListSponsorsQueryKey,
+  getListHeroImagesQueryKey
 } from "@workspace/api-client-react";
 import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
 import { format } from "date-fns";
@@ -27,6 +29,16 @@ export function Home() {
   const { data: events } = useListEvents(undefined, { query: { queryKey: getListEventsQueryKey() } as never });
   const { data: news } = useListNews(undefined, { query: { queryKey: getListNewsQueryKey() } as never });
   const { data: sponsors } = useListSponsors({ query: { queryKey: getListSponsorsQueryKey() } as never });
+  const { data: heroImagesData } = useListHeroImages({ query: { queryKey: getListHeroImagesQueryKey() } as never });
+  const heroImages = (heroImagesData?.filter(h => h.active) ?? []).map(h => h.url);
+  const slides = heroImages.length > 0 ? heroImages : ["/hero-anatomy.png"];
+  const [slideIndex, setSlideIndex] = useState(0);
+
+  useEffect(() => {
+    if (slides.length <= 1) return;
+    const id = setInterval(() => setSlideIndex(i => (i + 1) % slides.length), 6000);
+    return () => clearInterval(id);
+  }, [slides.length]);
   
   const { data: pageAbout } = useGetPage('about', { query: { queryKey: getGetPageQueryKey('about') } as never });
   const { data: pageVision } = useGetPage('vision', { query: { queryKey: getGetPageQueryKey('vision') } as never });
@@ -61,87 +73,111 @@ export function Home() {
   return (
     <div className="bg-background text-foreground selection:bg-primary selection:text-primary-foreground" ref={containerRef}>
       
-      {/* HERO SECTION - ASYMMETRIC */}
-      <section id="home" className="relative lg:min-h-[100dvh] pt-24 lg:pt-28 pb-16 overflow-hidden flex flex-col justify-center">
+      {/* HERO SECTION - FULL-BLEED BACKGROUND SLIDESHOW */}
+      <section id="home" className="relative min-h-[100dvh] pt-28 lg:pt-32 pb-16 overflow-hidden flex flex-col justify-center">
+        {/* Background slideshow */}
+        <motion.div
+          className="absolute inset-0 z-0"
+          style={{ y: yHero, opacity: opacityHero }}
+        >
+          <AnimatePresence>
+            <motion.div
+              key={slides[slideIndex]}
+              initial={{ opacity: 0, scale: 1.08 }}
+              animate={{ opacity: 1, scale: 1.0 }}
+              exit={{ opacity: 0 }}
+              transition={{ opacity: { duration: 1.6, ease: "easeInOut" }, scale: { duration: 6, ease: "linear" } }}
+              className="absolute inset-0"
+            >
+              <img
+                src={slides[slideIndex]}
+                alt=""
+                className="w-full h-full object-cover object-center"
+              />
+            </motion.div>
+          </AnimatePresence>
+          {/* Editorial wash to keep typography legible */}
+          <div className="absolute inset-0 bg-background/55 backdrop-blur-[2px]" />
+          <div className="absolute inset-0 bg-gradient-to-b from-background/70 via-background/30 to-background" />
+          <div className="absolute inset-0 bg-gradient-to-r from-background/60 via-transparent to-background/40 rtl:from-background/40 rtl:to-background/60" />
+        </motion.div>
+
         <div className="container mx-auto px-6 md:px-12 relative z-10 flex-1 flex flex-col justify-center">
-          <div className="grid lg:grid-cols-12 gap-10 lg:gap-12 items-center h-full">
-            
-            {/* Typographic Masthead */}
-            <div className="lg:col-span-7 flex flex-col justify-center order-1 lg:order-1">
-              <motion.div
-                initial={{ opacity: 0, y: 40 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-              >
-                <div className="flex items-center gap-4 mb-8">
-                  <div className="h-px bg-primary w-12" />
-                  <span className="text-xs uppercase tracking-[0.2em] font-bold text-primary">
-                    {settings ? t(settings.conferenceOrdinalEn, settings.conferenceOrdinalAr) : "2nd"} {t("Edition", "النسخة")}
-                  </span>
-                </div>
-                
-                <h1 className="text-[15vw] sm:text-[10vw] lg:text-[7.5rem] leading-[0.85] font-serif font-bold text-foreground mb-8 tracking-tighter">
-                  {t("Aden Intl.", "مؤتمر عدن")}<br />
-                  <span className="text-primary italic font-light ml-[6%] sm:ml-[10%] rtl:ml-0 rtl:mr-[6%] sm:rtl:mr-[10%] inline-block">
-                    {t("Vascular", "الدولي")}
-                  </span><br />
-                  {t("Conference", "للأوعية الدموية")}
-                </h1>
+          <div className="max-w-4xl">
+            <motion.div
+              initial={{ opacity: 0, y: 40 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+            >
+              <div className="flex items-center gap-4 mb-8">
+                <div className="h-px bg-primary w-12" />
+                <span className="text-xs uppercase tracking-[0.2em] font-bold text-primary">
+                  {settings ? t(settings.conferenceOrdinalEn, settings.conferenceOrdinalAr) : "2nd"} {t("Edition", "النسخة")}
+                </span>
+              </div>
 
-                <div className="grid sm:grid-cols-2 gap-6 sm:gap-8 mt-10 lg:mt-16 max-w-2xl border-t border-border/50 pt-8">
-                  <div>
-                    <p className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold mb-2">
-                      {t("Date & Time", "الزمان")}
-                    </p>
-                    <p className="text-lg font-serif">
-                      {settings ? t(settings.conferenceDatesEn, settings.conferenceDatesAr) : "Dec 1–3, 2026"}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold mb-2">
-                      {t("Location", "المكان")}
-                    </p>
-                    <p className="text-lg font-serif">
-                      {settings ? t(settings.venueNameEn, settings.venueNameAr) : "Saba Grand Hall, Aden"}
-                    </p>
-                  </div>
-                </div>
+              <h1 className="text-[14vw] sm:text-[9vw] lg:text-[8rem] leading-[0.85] font-serif font-bold text-foreground mb-8 tracking-tighter drop-shadow-sm">
+                {t("Aden Intl.", "مؤتمر عدن")}<br />
+                <span className="text-primary italic font-light ml-[6%] sm:ml-[10%] rtl:ml-0 rtl:mr-[6%] sm:rtl:mr-[10%] inline-block">
+                  {t("Vascular", "الدولي")}
+                </span><br />
+                {t("Conference", "للأوعية الدموية")}
+              </h1>
 
-                <div className="mt-10 lg:mt-12 flex flex-wrap gap-4 sm:gap-6 items-center">
-                  <button 
-                    onClick={() => document.querySelector('#program')?.scrollIntoView({ behavior: 'smooth' })}
-                    className="group flex items-center justify-between px-6 sm:px-8 py-4 sm:py-5 bg-primary text-primary-foreground font-bold text-xs uppercase tracking-widest hover:bg-primary/90 transition-all border border-primary relative overflow-hidden w-full sm:w-auto"
-                  >
-                    <span className="relative z-10">{t("Explore Program", "استعرض البرنامج")}</span>
-                    <ArrowRight className={`w-4 h-4 ml-4 relative z-10 transition-transform group-hover:translate-x-1 ${isRtl ? 'rotate-180 ml-0 mr-4 group-hover:-translate-x-1' : ''}`} />
-                  </button>
-                  <button 
-                    onClick={() => document.querySelector('#contact')?.scrollIntoView({ behavior: 'smooth' })}
-                    className="group flex items-center justify-between px-6 sm:px-8 py-4 sm:py-5 bg-transparent text-foreground font-bold text-xs uppercase tracking-widest hover:bg-muted transition-all border border-border relative overflow-hidden w-full sm:w-auto"
-                  >
-                    <span className="relative z-10">{t("Contact Us", "تواصل معنا")}</span>
-                  </button>
+              <div className="grid sm:grid-cols-2 gap-6 sm:gap-8 mt-10 lg:mt-14 max-w-2xl border-t border-border/50 pt-8">
+                <div>
+                  <p className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold mb-2">
+                    {t("Date & Time", "الزمان")}
+                  </p>
+                  <p className="text-lg font-serif">
+                    {settings ? t(settings.conferenceDatesEn, settings.conferenceDatesAr) : "Dec 1–3, 2026"}
+                  </p>
                 </div>
-              </motion.div>
-            </div>
+                <div>
+                  <p className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold mb-2">
+                    {t("Location", "المكان")}
+                  </p>
+                  <p className="text-lg font-serif">
+                    {settings ? t(settings.venueNameEn, settings.venueNameAr) : "Saba Grand Hall, Aden"}
+                  </p>
+                </div>
+              </div>
 
-            {/* Vertical Image Bleed */}
-            <div className="lg:col-span-5 h-[55vh] sm:h-[65vh] lg:h-[85vh] relative order-2 lg:order-2 w-full">
-              <motion.div 
-                className="absolute inset-0 z-0 bg-muted overflow-hidden border border-border shadow-2xl"
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
-              >
-                <motion.div style={{ y: yHero, scale: 1.1 }} className="w-full h-full">
-                  <img src="/hero-anatomy.png" alt="Anatomy" className="w-full h-full object-cover object-center mix-blend-multiply opacity-90 dark:opacity-70 dark:mix-blend-normal dark:filter dark:grayscale dark:contrast-150" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-background/40 to-transparent mix-blend-overlay"></div>
-                </motion.div>
-              </motion.div>
-            </div>
-            
+              <div className="mt-10 lg:mt-12 flex flex-wrap gap-4 sm:gap-6 items-center">
+                <button
+                  onClick={() => document.querySelector('#program')?.scrollIntoView({ behavior: 'smooth' })}
+                  className="group flex items-center justify-between px-6 sm:px-8 py-4 sm:py-5 bg-primary text-primary-foreground font-bold text-xs uppercase tracking-widest hover:bg-primary/90 transition-all border border-primary relative overflow-hidden w-full sm:w-auto shadow-lg"
+                >
+                  <span className="relative z-10">{t("Explore Program", "استعرض البرنامج")}</span>
+                  <ArrowRight className={`w-4 h-4 ml-4 relative z-10 transition-transform group-hover:translate-x-1 ${isRtl ? 'rotate-180 ml-0 mr-4 group-hover:-translate-x-1' : ''}`} />
+                </button>
+                <button
+                  onClick={() => document.querySelector('#contact')?.scrollIntoView({ behavior: 'smooth' })}
+                  className="group flex items-center justify-between px-6 sm:px-8 py-4 sm:py-5 bg-background/60 backdrop-blur-md text-foreground font-bold text-xs uppercase tracking-widest hover:bg-background transition-all border border-border relative overflow-hidden w-full sm:w-auto"
+                >
+                  <span className="relative z-10">{t("Contact Us", "تواصل معنا")}</span>
+                </button>
+              </div>
+            </motion.div>
           </div>
         </div>
+
+        {/* Slide indicator dots */}
+        {slides.length > 1 && (
+          <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 flex gap-2">
+            {slides.map((_, i) => (
+              <button
+                key={i}
+                aria-label={`Slide ${i + 1}`}
+                aria-current={i === slideIndex ? "true" : undefined}
+                onClick={() => setSlideIndex(i)}
+                className={`h-1 transition-all duration-500 ${
+                  i === slideIndex ? "w-10 bg-primary" : "w-5 bg-foreground/30 hover:bg-foreground/60"
+                }`}
+              />
+            ))}
+          </div>
+        )}
       </section>
 
       {/* HORIZONTAL STATS BANNER */}

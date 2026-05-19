@@ -1,4 +1,4 @@
-import { pgTable, serial, text, timestamp, varchar, boolean } from "drizzle-orm/pg-core";
+import { pgTable, serial, text, timestamp, varchar, boolean, integer } from "drizzle-orm/pg-core";
 
 export const newsPostsTable = pgTable("news_posts", {
   id: serial("id").primaryKey(),
@@ -76,3 +76,15 @@ export const sponsorsTable = pgTable("sponsors", {
 });
 
 export type Sponsor = typeof sponsorsTable.$inferSelect;
+
+export const heroImagesTable = pgTable("hero_images", {
+  id: serial("id").primaryKey(),
+  url: text("url").notNull(),
+  captionEn: text("caption_en").notNull().default(""),
+  captionAr: text("caption_ar").notNull().default(""),
+  order: integer("order").notNull().default(0),
+  active: boolean("active").notNull().default(true),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
+export type HeroImage = typeof heroImagesTable.$inferSelect;

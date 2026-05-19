@@ -35,6 +35,9 @@ import type {
   EventUpdate,
   EventWithFields,
   HealthStatus,
+  HeroImage,
+  HeroImageInput,
+  HeroImageUpdate,
   ListBlogParams,
   ListEventsParams,
   ListNewsParams,
@@ -2324,6 +2327,272 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
         TContext
       > => {
       return useMutation(getDeleteSponsorMutationOptions(options));
+    }
+
+export const getListHeroImagesUrl = () => {
+
+
+
+
+  return `/api/hero-images`
+}
+
+export const listHeroImages = async ( options?: RequestInit): Promise<HeroImage[]> => {
+
+  return customFetch<HeroImage[]>(getListHeroImagesUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListHeroImagesQueryKey = () => {
+    return [
+    `/api/hero-images`
+    ] as const;
+    }
+
+
+export const getListHeroImagesQueryOptions = <TData = Awaited<ReturnType<typeof listHeroImages>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listHeroImages>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListHeroImagesQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listHeroImages>>> = ({ signal }) => listHeroImages({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listHeroImages>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListHeroImagesQueryResult = NonNullable<Awaited<ReturnType<typeof listHeroImages>>>
+export type ListHeroImagesQueryError = ErrorType<unknown>
+
+
+
+export function useListHeroImages<TData = Awaited<ReturnType<typeof listHeroImages>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listHeroImages>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListHeroImagesQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getCreateHeroImageUrl = () => {
+
+
+
+
+  return `/api/hero-images`
+}
+
+export const createHeroImage = async (heroImageInput: HeroImageInput, options?: RequestInit): Promise<HeroImage> => {
+
+  return customFetch<HeroImage>(getCreateHeroImageUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      heroImageInput,)
+  }
+);}
+
+
+
+
+export const getCreateHeroImageMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createHeroImage>>, TError,{data: BodyType<HeroImageInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof createHeroImage>>, TError,{data: BodyType<HeroImageInput>}, TContext> => {
+
+const mutationKey = ['createHeroImage'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createHeroImage>>, {data: BodyType<HeroImageInput>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  createHeroImage(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateHeroImageMutationResult = NonNullable<Awaited<ReturnType<typeof createHeroImage>>>
+    export type CreateHeroImageMutationBody = BodyType<HeroImageInput>
+    export type CreateHeroImageMutationError = ErrorType<unknown>
+
+    export const useCreateHeroImage = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createHeroImage>>, TError,{data: BodyType<HeroImageInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof createHeroImage>>,
+        TError,
+        {data: BodyType<HeroImageInput>},
+        TContext
+      > => {
+      return useMutation(getCreateHeroImageMutationOptions(options));
+    }
+
+export const getUpdateHeroImageUrl = (id: number,) => {
+
+
+
+
+  return `/api/hero-images/${id}`
+}
+
+export const updateHeroImage = async (id: number,
+    heroImageUpdate: HeroImageUpdate, options?: RequestInit): Promise<HeroImage> => {
+
+  return customFetch<HeroImage>(getUpdateHeroImageUrl(id),
+  {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      heroImageUpdate,)
+  }
+);}
+
+
+
+
+export const getUpdateHeroImageMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateHeroImage>>, TError,{id: number;data: BodyType<HeroImageUpdate>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateHeroImage>>, TError,{id: number;data: BodyType<HeroImageUpdate>}, TContext> => {
+
+const mutationKey = ['updateHeroImage'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateHeroImage>>, {id: number;data: BodyType<HeroImageUpdate>}> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  updateHeroImage(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateHeroImageMutationResult = NonNullable<Awaited<ReturnType<typeof updateHeroImage>>>
+    export type UpdateHeroImageMutationBody = BodyType<HeroImageUpdate>
+    export type UpdateHeroImageMutationError = ErrorType<unknown>
+
+    export const useUpdateHeroImage = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateHeroImage>>, TError,{id: number;data: BodyType<HeroImageUpdate>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof updateHeroImage>>,
+        TError,
+        {id: number;data: BodyType<HeroImageUpdate>},
+        TContext
+      > => {
+      return useMutation(getUpdateHeroImageMutationOptions(options));
+    }
+
+export const getDeleteHeroImageUrl = (id: number,) => {
+
+
+
+
+  return `/api/hero-images/${id}`
+}
+
+export const deleteHeroImage = async (id: number, options?: RequestInit): Promise<void> => {
+
+  return customFetch<void>(getDeleteHeroImageUrl(id),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+export const getDeleteHeroImageMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteHeroImage>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteHeroImage>>, TError,{id: number}, TContext> => {
+
+const mutationKey = ['deleteHeroImage'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteHeroImage>>, {id: number}> = (props) => {
+          const {id} = props ?? {};
+
+          return  deleteHeroImage(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteHeroImageMutationResult = NonNullable<Awaited<ReturnType<typeof deleteHeroImage>>>
+
+    export type DeleteHeroImageMutationError = ErrorType<unknown>
+
+    export const useDeleteHeroImage = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteHeroImage>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof deleteHeroImage>>,
+        TError,
+        {id: number},
+        TContext
+      > => {
+      return useMutation(getDeleteHeroImageMutationOptions(options));
     }
 
 export const getListUsersUrl = () => {

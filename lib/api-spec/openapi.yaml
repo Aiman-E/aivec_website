@@ -546,6 +546,64 @@ paths:
         "204":
           description: Deleted
 
+  /hero-images:
+    get:
+      operationId: listHeroImages
+      tags: [hero-images]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/HeroImage"
+    post:
+      operationId: createHeroImage
+      tags: [hero-images]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/HeroImageInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HeroImage"
+
+  /hero-images/{id}:
+    patch:
+      operationId: updateHeroImage
+      tags: [hero-images]
+      parameters:
+        - $ref: "#/components/parameters/IdParam"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/HeroImageUpdate"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HeroImage"
+    delete:
+      operationId: deleteHeroImage
+      tags: [hero-images]
+      parameters:
+        - $ref: "#/components/parameters/IdParam"
+      responses:
+        "204":
+          description: Deleted
+
   /users:
     get:
       operationId: listUsers
@@ -1081,6 +1139,36 @@ components:
         logoUrl: { type: ["string", "null"] }
         websiteUrl: { type: ["string", "null"] }
         order: { type: integer }
+
+    HeroImage:
+      type: object
+      required: [id, url, captionEn, captionAr, order, active]
+      properties:
+        id: { type: integer }
+        url: { type: string }
+        captionEn: { type: string }
+        captionAr: { type: string }
+        order: { type: integer }
+        active: { type: boolean }
+
+    HeroImageInput:
+      type: object
+      required: [url]
+      properties:
+        url: { type: string, minLength: 1 }
+        captionEn: { type: string }
+        captionAr: { type: string }
+        order: { type: integer }
+        active: { type: boolean }
+
+    HeroImageUpdate:
+      type: object
+      properties:
+        url: { type: string, minLength: 1 }
+        captionEn: { type: string }
+        captionAr: { type: string }
+        order: { type: integer }
+        active: { type: boolean }
 
     AdminDashboard:
       type: object

@@ -634,6 +634,33 @@ export interface SponsorUpdate {
   order?: number;
 }
 
+export interface HeroImage {
+  id: number;
+  url: string;
+  captionEn: string;
+  captionAr: string;
+  order: number;
+  active: boolean;
+}
+
+export interface HeroImageInput {
+  /** @minLength 1 */
+  url: string;
+  captionEn?: string;
+  captionAr?: string;
+  order?: number;
+  active?: boolean;
+}
+
+export interface HeroImageUpdate {
+  /** @minLength 1 */
+  url?: string;
+  captionEn?: string;
+  captionAr?: string;
+  order?: number;
+  active?: boolean;
+}
+
 export interface AdminDashboard {
   totalUsers: number;
   totalEvents: number;

@@ -8,6 +8,7 @@ import newsRouter from "./news";
 import blogRouter from "./blog";
 import contactRouter from "./contact";
 import sponsorsRouter from "./sponsors";
+import heroImagesRouter from "./heroImages";
 import usersRouter from "./users";
 import adminRouter from "./admin";
 
@@ -22,6 +23,7 @@ router.use(newsRouter);
 router.use(blogRouter);
 router.use(contactRouter);
 router.use(sponsorsRouter);
+router.use(heroImagesRouter);
 router.use(usersRouter);
 router.use(adminRouter);
 

@@ -761,6 +761,59 @@ export const DeleteSponsorParams = zod.object({
 })
 
 
+export const ListHeroImagesResponseItem = zod.object({
+  "id": zod.number(),
+  "url": zod.string(),
+  "captionEn": zod.string(),
+  "captionAr": zod.string(),
+  "order": zod.number(),
+  "active": zod.boolean()
+})
+export const ListHeroImagesResponse = zod.array(ListHeroImagesResponseItem)
+
+
+
+
+
+export const CreateHeroImageBody = zod.object({
+  "url": zod.string().min(1),
+  "captionEn": zod.string().optional(),
+  "captionAr": zod.string().optional(),
+  "order": zod.number().optional(),
+  "active": zod.boolean().optional()
+})
+
+
+export const UpdateHeroImageParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+
+
+
+export const UpdateHeroImageBody = zod.object({
+  "url": zod.string().min(1).optional(),
+  "captionEn": zod.string().optional(),
+  "captionAr": zod.string().optional(),
+  "order": zod.number().optional(),
+  "active": zod.boolean().optional()
+})
+
+export const UpdateHeroImageResponse = zod.object({
+  "id": zod.number(),
+  "url": zod.string(),
+  "captionEn": zod.string(),
+  "captionAr": zod.string(),
+  "order": zod.number(),
+  "active": zod.boolean()
+})
+
+
+export const DeleteHeroImageParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+
 export const ListUsersResponseItem = zod.object({
   "id": zod.number(),
   "clerkId": zod.string(),

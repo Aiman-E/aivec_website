@@ -10,6 +10,7 @@ import {
   PenTool, 
   MessageSquare, 
   Award, 
+  Image as ImageIcon,
   Users,
   LogOut
 } from "lucide-react";
@@ -36,6 +37,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
     { href: `/${lang}/admin/blog`, icon: PenTool, label: t("Blog", "المدونة") },
     { href: `/${lang}/admin/contact`, icon: MessageSquare, label: t("Messages", "الرسائل") },
     { href: `/${lang}/admin/sponsors`, icon: Award, label: t("Sponsors", "الرعاة") },
+    { href: `/${lang}/admin/hero-images`, icon: ImageIcon, label: t("Hero Images", "صور الخلفية") },
     { href: `/${lang}/admin/users`, icon: Users, label: t("Users", "المستخدمين") },
     { href: `/${lang}/admin/site-settings`, icon: Settings, label: t("Settings", "الإعدادات") },
   ];
