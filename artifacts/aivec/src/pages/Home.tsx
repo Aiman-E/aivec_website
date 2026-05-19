@@ -559,8 +559,9 @@ export function Home() {
               </div>
             </div>
             
-            <div className="relative min-h-[500px] lg:min-h-full bg-muted border-b lg:border-b-0 lg:border-l border-border order-1 lg:order-2">
-              <img src="/aden-landscape.png" alt="Aden Landscape" className="w-full h-full object-cover grayscale contrast-125 mix-blend-multiply opacity-80 dark:mix-blend-normal dark:opacity-60" />
+            <div className="relative min-h-[320px] sm:min-h-[420px] lg:min-h-full bg-muted border-b lg:border-b-0 lg:border-l border-border order-1 lg:order-2 overflow-hidden">
+              <img src="/aden-landscape.png" alt="Aden Landscape" className="absolute inset-0 w-full h-full object-cover grayscale contrast-110" />
+              <div className="absolute inset-0 bg-gradient-to-t from-background/40 via-transparent to-transparent pointer-events-none" />
             </div>
             
           </div>
