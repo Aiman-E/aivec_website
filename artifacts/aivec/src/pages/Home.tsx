@@ -225,11 +225,11 @@ export function Home() {
       <section className="border-y border-border/50 bg-card py-16 overflow-hidden">
         <div className="container mx-auto px-6 md:px-12 flex flex-wrap justify-between items-center gap-12 font-serif text-center md:text-left rtl:md:text-right">
           {([
-            { value: settings?.statEditions ?? "02", label: t("Editions", "النسخ") },
-            { value: settings?.statDelegates ?? "500+", label: t("Delegates", "المشاركون") },
-            { value: settings?.statFaculty ?? "35", label: t("Faculty", "المتحدثون") },
-            { value: settings?.statCmeHours ?? "12", label: t("CME Hours", "ساعات معتمدة") },
-            { value: settings?.statCountries ?? "4", label: t("Countries", "الدول") },
+            { value: settings?.statEditions ?? "02", label: t(settings?.statEditionsLabelEn?.trim() || "Edition", settings?.statEditionsLabelAr?.trim() || "النسخة") },
+            { value: settings?.statDelegates ?? "500+", label: t(settings?.statDelegatesLabelEn?.trim() || "Delegates", settings?.statDelegatesLabelAr?.trim() || "المشاركون") },
+            { value: settings?.statFaculty ?? "35", label: t(settings?.statFacultyLabelEn?.trim() || "Faculty", settings?.statFacultyLabelAr?.trim() || "المتحدثون") },
+            { value: settings?.statCmeHours ?? "12", label: t(settings?.statCmeHoursLabelEn?.trim() || "CME Hours", settings?.statCmeHoursLabelAr?.trim() || "ساعات معتمدة") },
+            { value: settings?.statCountries ?? "4", label: t(settings?.statCountriesLabelEn?.trim() || "Countries", settings?.statCountriesLabelAr?.trim() || "الدول") },
           ]).map((stat, i) => {
             // Render the trailing '+' (or other non-digit suffix) at a
             // smaller scale to preserve the editorial typography.

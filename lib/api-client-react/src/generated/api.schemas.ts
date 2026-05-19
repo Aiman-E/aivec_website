@@ -111,10 +111,20 @@ export interface SiteSettings {
   fontEn?: string;
   fontAr?: string;
   statEditions?: string;
+  statEditionsLabelEn?: string;
+  statEditionsLabelAr?: string;
   statDelegates?: string;
+  statDelegatesLabelEn?: string;
+  statDelegatesLabelAr?: string;
   statFaculty?: string;
+  statFacultyLabelEn?: string;
+  statFacultyLabelAr?: string;
   statCmeHours?: string;
+  statCmeHoursLabelEn?: string;
+  statCmeHoursLabelAr?: string;
   statCountries?: string;
+  statCountriesLabelEn?: string;
+  statCountriesLabelAr?: string;
   /** @nullable */
   heroCtaFormSlug?: string | null;
   heroCtaLabelEn?: string;
@@ -153,10 +163,20 @@ export interface SiteSettingsUpdate {
   fontEn?: string;
   fontAr?: string;
   statEditions?: string;
+  statEditionsLabelEn?: string;
+  statEditionsLabelAr?: string;
   statDelegates?: string;
+  statDelegatesLabelEn?: string;
+  statDelegatesLabelAr?: string;
   statFaculty?: string;
+  statFacultyLabelEn?: string;
+  statFacultyLabelAr?: string;
   statCmeHours?: string;
+  statCmeHoursLabelEn?: string;
+  statCmeHoursLabelAr?: string;
   statCountries?: string;
+  statCountriesLabelEn?: string;
+  statCountriesLabelAr?: string;
   /** @nullable */
   heroCtaFormSlug?: string | null;
   heroCtaLabelEn?: string;

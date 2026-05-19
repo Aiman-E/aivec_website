@@ -44,10 +44,20 @@ const settingsSchema = z.object({
   fontEn: z.string().optional(),
   fontAr: z.string().optional(),
   statEditions: z.string().optional(),
+  statEditionsLabelEn: z.string().optional(),
+  statEditionsLabelAr: z.string().optional(),
   statDelegates: z.string().optional(),
+  statDelegatesLabelEn: z.string().optional(),
+  statDelegatesLabelAr: z.string().optional(),
   statFaculty: z.string().optional(),
+  statFacultyLabelEn: z.string().optional(),
+  statFacultyLabelAr: z.string().optional(),
   statCmeHours: z.string().optional(),
+  statCmeHoursLabelEn: z.string().optional(),
+  statCmeHoursLabelAr: z.string().optional(),
   statCountries: z.string().optional(),
+  statCountriesLabelEn: z.string().optional(),
+  statCountriesLabelAr: z.string().optional(),
   heroCtaFormSlug: z.string().optional(),
   heroCtaLabelEn: z.string().optional(),
   heroCtaLabelAr: z.string().optional(),
@@ -111,10 +121,20 @@ export function AdminSiteSettings() {
       fontEn: "Fraunces",
       fontAr: "Cairo",
       statEditions: "02",
+      statEditionsLabelEn: "",
+      statEditionsLabelAr: "",
       statDelegates: "500+",
+      statDelegatesLabelEn: "",
+      statDelegatesLabelAr: "",
       statFaculty: "35",
+      statFacultyLabelEn: "",
+      statFacultyLabelAr: "",
       statCmeHours: "12",
+      statCmeHoursLabelEn: "",
+      statCmeHoursLabelAr: "",
       statCountries: "4",
+      statCountriesLabelEn: "",
+      statCountriesLabelAr: "",
       heroCtaFormSlug: "",
       heroCtaLabelEn: "",
       heroCtaLabelAr: "",
@@ -171,10 +191,20 @@ export function AdminSiteSettings() {
         fontEn: settings.fontEn || "Fraunces",
         fontAr: settings.fontAr || "Cairo",
         statEditions: settings.statEditions ?? "02",
+        statEditionsLabelEn: settings.statEditionsLabelEn ?? "",
+        statEditionsLabelAr: settings.statEditionsLabelAr ?? "",
         statDelegates: settings.statDelegates ?? "500+",
+        statDelegatesLabelEn: settings.statDelegatesLabelEn ?? "",
+        statDelegatesLabelAr: settings.statDelegatesLabelAr ?? "",
         statFaculty: settings.statFaculty ?? "35",
+        statFacultyLabelEn: settings.statFacultyLabelEn ?? "",
+        statFacultyLabelAr: settings.statFacultyLabelAr ?? "",
         statCmeHours: settings.statCmeHours ?? "12",
+        statCmeHoursLabelEn: settings.statCmeHoursLabelEn ?? "",
+        statCmeHoursLabelAr: settings.statCmeHoursLabelAr ?? "",
         statCountries: settings.statCountries ?? "4",
+        statCountriesLabelEn: settings.statCountriesLabelEn ?? "",
+        statCountriesLabelAr: settings.statCountriesLabelAr ?? "",
         heroCtaFormSlug: settings.heroCtaFormSlug ?? "",
         heroCtaLabelEn: settings.heroCtaLabelEn ?? "",
         heroCtaLabelAr: settings.heroCtaLabelAr ?? "",
@@ -372,27 +402,34 @@ export function AdminSiteSettings() {
                 <h3 className="font-semibold text-lg border-b pb-2">{t("Home Page Stats", "إحصائيات الصفحة الرئيسية")}</h3>
                 <p className="text-sm text-muted-foreground">
                   {t(
-                    "Numbers shown in the stats banner on the home page. You can include suffixes like '500+' or zero-padded values like '02'.",
-                    "الأرقام المعروضة في شريط الإحصائيات على الصفحة الرئيسية. يمكنك استخدام لواحق مثل '+500' أو قيم مثل '02'."
+                    "Numbers and labels shown in the stats banner on the home page. Numbers can include suffixes like '500+' or zero-padded values like '02'. Leave a label empty to use the default.",
+                    "الأرقام والتسميات المعروضة في شريط الإحصائيات على الصفحة الرئيسية. يمكن أن تتضمن الأرقام لواحق مثل '+500' أو قيمًا مثل '02'. اترك التسمية فارغة لاستخدام الافتراضي."
                   )}
                 </p>
-                <div className="grid md:grid-cols-5 gap-4">
-                  <FormField control={form.control} name="statEditions" render={({ field }) => (
-                    <FormItem><FormLabel>{t("Editions", "النسخ")}</FormLabel><FormControl><Input {...field} dir="ltr" /></FormControl><FormMessage /></FormItem>
-                  )} />
-                  <FormField control={form.control} name="statDelegates" render={({ field }) => (
-                    <FormItem><FormLabel>{t("Delegates", "المشاركون")}</FormLabel><FormControl><Input {...field} dir="ltr" /></FormControl><FormMessage /></FormItem>
-                  )} />
-                  <FormField control={form.control} name="statFaculty" render={({ field }) => (
-                    <FormItem><FormLabel>{t("Faculty", "المتحدثون")}</FormLabel><FormControl><Input {...field} dir="ltr" /></FormControl><FormMessage /></FormItem>
-                  )} />
-                  <FormField control={form.control} name="statCmeHours" render={({ field }) => (
-                    <FormItem><FormLabel>{t("CME Hours", "ساعات معتمدة")}</FormLabel><FormControl><Input {...field} dir="ltr" /></FormControl><FormMessage /></FormItem>
-                  )} />
-                  <FormField control={form.control} name="statCountries" render={({ field }) => (
-                    <FormItem><FormLabel>{t("Countries", "الدول")}</FormLabel><FormControl><Input {...field} dir="ltr" /></FormControl><FormMessage /></FormItem>
-                  )} />
-                </div>
+                {([
+                  { key: "Editions", defaultEn: "Edition", defaultAr: "النسخة",
+                    num: "statEditions", labelEn: "statEditionsLabelEn", labelAr: "statEditionsLabelAr" },
+                  { key: "Delegates", defaultEn: "Delegates", defaultAr: "المشاركون",
+                    num: "statDelegates", labelEn: "statDelegatesLabelEn", labelAr: "statDelegatesLabelAr" },
+                  { key: "Faculty", defaultEn: "Faculty", defaultAr: "المتحدثون",
+                    num: "statFaculty", labelEn: "statFacultyLabelEn", labelAr: "statFacultyLabelAr" },
+                  { key: "CME Hours", defaultEn: "CME Hours", defaultAr: "ساعات معتمدة",
+                    num: "statCmeHours", labelEn: "statCmeHoursLabelEn", labelAr: "statCmeHoursLabelAr" },
+                  { key: "Countries", defaultEn: "Countries", defaultAr: "الدول",
+                    num: "statCountries", labelEn: "statCountriesLabelEn", labelAr: "statCountriesLabelAr" },
+                ] as const).map((s) => (
+                  <div key={s.key} className="grid md:grid-cols-3 gap-4 p-4 border border-border/40 rounded-sm">
+                    <FormField control={form.control} name={s.num} render={({ field }) => (
+                      <FormItem><FormLabel>{s.defaultEn} — {t("Number", "الرقم")}</FormLabel><FormControl><Input {...field} dir="ltr" /></FormControl><FormMessage /></FormItem>
+                    )} />
+                    <FormField control={form.control} name={s.labelEn} render={({ field }) => (
+                      <FormItem><FormLabel>{t("Label (EN)", "التسمية (EN)")}</FormLabel><FormControl><Input {...field} placeholder={s.defaultEn} /></FormControl><FormMessage /></FormItem>
+                    )} />
+                    <FormField control={form.control} name={s.labelAr} render={({ field }) => (
+                      <FormItem><FormLabel>{t("Label (AR)", "التسمية (AR)")}</FormLabel><FormControl><Input {...field} dir="rtl" placeholder={s.defaultAr} /></FormControl><FormMessage /></FormItem>
+                    )} />
+                  </div>
+                ))}
               </div>
 
               <div className="space-y-4">

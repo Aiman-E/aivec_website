@@ -935,10 +935,20 @@ components:
         fontEn: { type: string }
         fontAr: { type: string }
         statEditions: { type: string }
+        statEditionsLabelEn: { type: string }
+        statEditionsLabelAr: { type: string }
         statDelegates: { type: string }
+        statDelegatesLabelEn: { type: string }
+        statDelegatesLabelAr: { type: string }
         statFaculty: { type: string }
+        statFacultyLabelEn: { type: string }
+        statFacultyLabelAr: { type: string }
         statCmeHours: { type: string }
+        statCmeHoursLabelEn: { type: string }
+        statCmeHoursLabelAr: { type: string }
         statCountries: { type: string }
+        statCountriesLabelEn: { type: string }
+        statCountriesLabelAr: { type: string }
         heroCtaFormSlug: { type: ["string", "null"] }
         heroCtaLabelEn: { type: string }
         heroCtaLabelAr: { type: string }
@@ -974,10 +984,20 @@ components:
         fontEn: { type: string }
         fontAr: { type: string }
         statEditions: { type: string }
+        statEditionsLabelEn: { type: string }
+        statEditionsLabelAr: { type: string }
         statDelegates: { type: string }
+        statDelegatesLabelEn: { type: string }
+        statDelegatesLabelAr: { type: string }
         statFaculty: { type: string }
+        statFacultyLabelEn: { type: string }
+        statFacultyLabelAr: { type: string }
         statCmeHours: { type: string }
+        statCmeHoursLabelEn: { type: string }
+        statCmeHoursLabelAr: { type: string }
         statCountries: { type: string }
+        statCountriesLabelEn: { type: string }
+        statCountriesLabelAr: { type: string }
         heroCtaFormSlug: { type: ["string", "null"] }
         heroCtaLabelEn: { type: string }
         heroCtaLabelAr: { type: string }
