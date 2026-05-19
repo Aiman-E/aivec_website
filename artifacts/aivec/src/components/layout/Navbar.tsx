@@ -5,6 +5,8 @@ import { SignInButton, UserButton, useUser } from "@clerk/react";
 import { Menu, X } from "lucide-react";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useGetSiteSettings } from "@workspace/api-client-react";
+import { resolveImageUrl } from "@/components/admin/ImageUploadField";
 
 export function Navbar() {
   const { lang, setLang, t } = useLanguage();
@@ -12,6 +14,11 @@ export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [location, setLocation] = useLocation();
+  const { data: settings } = useGetSiteSettings();
+  const logoSrc = settings?.logoUrl ? resolveImageUrl(settings.logoUrl) : null;
+  const siteTitle = lang === "ar"
+    ? (settings?.siteTitleAr || "مؤتمر عدن الدولي")
+    : (settings?.siteTitleEn || "AIVEC 2026");
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -106,13 +113,19 @@ export function Navbar() {
       >
         <div className="container mx-auto px-6 md:px-12 flex items-center justify-between">
           <Link href={`/${lang}`} className="flex items-center gap-4 z-50 group">
-            <div className="w-12 h-12 bg-primary flex items-center justify-center rounded-sm overflow-hidden relative shadow-lg">
-              <div className="absolute inset-0 bg-[url('/vein-abstract.png')] opacity-30 bg-cover bg-center"></div>
-              <span className="text-primary-foreground font-serif font-bold text-2xl relative z-10">A</span>
-            </div>
+            {logoSrc ? (
+              <div className="w-12 h-12 flex items-center justify-center rounded-sm overflow-hidden bg-background border border-border/40">
+                <img src={logoSrc} alt={siteTitle} className="w-full h-full object-contain" />
+              </div>
+            ) : (
+              <div className="w-12 h-12 bg-primary flex items-center justify-center rounded-sm overflow-hidden relative shadow-lg">
+                <div className="absolute inset-0 bg-[url('/vein-abstract.png')] opacity-30 bg-cover bg-center"></div>
+                <span className="text-primary-foreground font-serif font-bold text-2xl relative z-10">A</span>
+              </div>
+            )}
             <div className="flex flex-col">
               <span className="font-serif font-bold text-lg leading-none tracking-tight transition-colors text-foreground group-hover:text-accent">
-                {t("AIVEC 2026", "مؤتمر عدن الدولي")}
+                {siteTitle}
               </span>
               <span className="text-[10px] uppercase tracking-widest font-medium mt-1 text-muted-foreground">
                 {t("Vascular Conference", "جراحة الأوعية الدموية")}

@@ -20,6 +20,8 @@ import {
   Menu,
   X,
 } from "lucide-react";
+import { useGetSiteSettings } from "@workspace/api-client-react";
+import { resolveImageUrl } from "@/components/admin/ImageUploadField";
 
 function AdminLoginScreen() {
   const { lang, setLang, t } = useLanguage();
@@ -27,6 +29,8 @@ function AdminLoginScreen() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const login = useAdminLogin();
+  const { data: settings } = useGetSiteSettings();
+  const logoSrc = settings?.logoUrl ? resolveImageUrl(settings.logoUrl) : null;
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -62,7 +66,11 @@ function AdminLoginScreen() {
           </div>
         </div>
         <div className="text-center mb-6">
-          <ShieldCheck className="w-10 h-10 mx-auto mb-3 text-primary" />
+          {logoSrc ? (
+            <img src={logoSrc} alt="" className="w-14 h-14 mx-auto mb-3 object-contain" />
+          ) : (
+            <ShieldCheck className="w-10 h-10 mx-auto mb-3 text-primary" />
+          )}
           <h1 className="text-2xl font-serif font-semibold mb-1">
             {t("Admin Panel", "لوحة الإدارة")}
           </h1>
@@ -126,6 +134,8 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
   const { lang, setLang, t } = useLanguage();
   const [location] = useLocation();
   const { data: me, isLoading } = useAdminMe();
+  const { data: settings } = useGetSiteSettings();
+  const logoSrc = settings?.logoUrl ? resolveImageUrl(settings.logoUrl) : null;
   const logout = useAdminLogout();
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
@@ -178,11 +188,16 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
   const sidebarContent = (
     <>
       <div className="p-6 pb-2 flex items-start justify-between gap-2">
-        <div className="min-w-0">
-          <h2 className="text-lg font-serif font-semibold text-primary">{t("Admin Panel", "لوحة الإدارة")}</h2>
-          <p className="text-xs text-muted-foreground mt-1 truncate">
-            {me.displayName || me.username}
-          </p>
+        <div className="min-w-0 flex items-center gap-3">
+          {logoSrc && (
+            <img src={logoSrc} alt="" className="w-9 h-9 object-contain rounded-sm border border-border/40 bg-background p-0.5 shrink-0" />
+          )}
+          <div className="min-w-0">
+            <h2 className="text-lg font-serif font-semibold text-primary truncate">{t("Admin Panel", "لوحة الإدارة")}</h2>
+            <p className="text-xs text-muted-foreground mt-0.5 truncate">
+              {me.displayName || me.username}
+            </p>
+          </div>
         </div>
         <button
           type="button"
