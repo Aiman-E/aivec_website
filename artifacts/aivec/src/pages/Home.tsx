@@ -16,6 +16,7 @@ import {
 } from "@workspace/api-client-react";
 import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
 import { format } from "date-fns";
+import { ar as arLocale } from "date-fns/locale";
 import { ArrowRight, ArrowLeft, Calendar, MapPin, ArrowUpRight, Phone, Mail } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
@@ -124,9 +125,9 @@ export function Home() {
                 </span>
               </div>
 
-              <h1 className="text-[14vw] sm:text-[9vw] lg:text-[8rem] leading-[0.85] font-serif font-bold text-foreground mb-8 tracking-tighter drop-shadow-sm">
+              <h1 className="text-[13vw] sm:text-[9vw] lg:text-[8rem] leading-[0.9] rtl:leading-[1.15] font-serif rtl:font-arabic font-bold text-foreground mb-8 tracking-tighter rtl:tracking-normal drop-shadow-sm">
                 {t("Aden Intl.", "مؤتمر عدن")}<br />
-                <span className="text-primary italic font-light ml-[6%] sm:ml-[10%] rtl:ml-0 rtl:mr-[6%] sm:rtl:mr-[10%] inline-block">
+                <span className="text-primary italic rtl:not-italic font-light ml-[6%] sm:ml-[10%] rtl:ml-0 rtl:mr-[4%] sm:rtl:mr-[8%] inline-block">
                   {t("Vascular", "الدولي")}
                 </span><br />
                 {t("Conference", "للأوعية الدموية")}
@@ -334,7 +335,7 @@ export function Home() {
                     <div className="md:col-span-2 text-sm font-mono text-muted-foreground uppercase tracking-widest flex flex-col gap-2 border-l-2 border-primary/20 pl-4 rtl:pl-0 rtl:border-l-0 rtl:border-r-2 rtl:pr-4">
                       {event.startsAt && (
                         <>
-                          <span className="font-bold text-primary">{format(new Date(event.startsAt), "MMM d")}</span>
+                          <span className="font-bold text-primary">{format(new Date(event.startsAt), "MMM d", isRtl ? { locale: arLocale } : undefined)}</span>
                           <span dir="ltr">{format(new Date(event.startsAt), "HH:mm")}</span>
                         </>
                       )}
@@ -419,7 +420,7 @@ export function Home() {
                         № {String(i + 1).padStart(2, '0')}
                       </span>
                       <span className="font-mono text-[10px] tracking-[0.25em] text-muted-foreground uppercase">
-                        {item.publishedAt ? format(new Date(item.publishedAt), "MMMM d, yyyy") : ""}
+                        {item.publishedAt ? format(new Date(item.publishedAt), "MMMM d, yyyy", isRtl ? { locale: arLocale } : undefined) : ""}
                       </span>
                     </div>
                     <h4 className={`${isLead ? 'text-4xl md:text-5xl lg:text-6xl' : 'text-2xl md:text-3xl'} font-serif font-bold mb-5 leading-[1.05] tracking-tight group-hover:text-primary transition-colors`}>

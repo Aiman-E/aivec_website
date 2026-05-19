@@ -216,7 +216,9 @@ router.post("/events/id/:id/register", requireAuth, async (req, res): Promise<vo
       res.status(409).json({ error: "You have already registered for this event" });
       return;
     }
-    throw err;
+    req.log.error({ err }, "event registration failed");
+    res.status(500).json({ error: "Registration failed" });
+    return;
   }
   res.status(201).json({
     ...row,

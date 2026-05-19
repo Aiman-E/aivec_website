@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Trash2, Plus, GripVertical, ChevronLeft, ChevronRight } from "lucide-react";
 import type { EventFieldInput, EventFieldOption } from "@workspace/api-client-react";
 
@@ -25,9 +25,12 @@ export function AdminEventFields() {
   const setEventFields = useSetEventFields();
 
   const [fields, setFields] = useState<EventFieldInput[]>([]);
+  const loadedForEventRef = useRef<number | null>(null);
 
   useEffect(() => {
-    if (eventData?.fields) {
+    // Only hydrate local state once per event id so background refetches
+    // don't wipe in-progress edits.
+    if (eventData?.fields && loadedForEventRef.current !== eventId) {
       setFields(eventData.fields.map(f => ({
         fieldKey: f.fieldKey,
         fieldType: f.fieldType,
@@ -41,8 +44,9 @@ export function AdminEventFields() {
         order: f.order,
         options: f.options || []
       })));
+      loadedForEventRef.current = eventId;
     }
-  }, [eventData]);
+  }, [eventData, eventId]);
 
   if (isLoading) return <div>Loading...</div>;
   if (!eventData) return <div>Event not found</div>;

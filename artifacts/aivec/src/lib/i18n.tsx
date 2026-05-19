@@ -50,9 +50,8 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   };
 
   const t = (en: string | undefined | null, ar: string | undefined | null) => {
-    if (lang === "ar" && ar) return ar;
-    if (lang === "en" && en) return en;
-    return ar || en || "";
+    if (lang === "ar") return (ar || en || "");
+    return (en || ar || "");
   };
 
   return (

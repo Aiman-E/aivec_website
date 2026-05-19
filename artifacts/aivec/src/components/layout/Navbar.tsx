@@ -43,6 +43,7 @@ export function Navbar() {
     <div
       role="group"
       aria-label="Language"
+      dir="ltr"
       className={`relative inline-flex items-center h-9 rounded-full border border-border/70 bg-background/60 backdrop-blur-md p-1 select-none ${className}`}
     >
       <motion.span
