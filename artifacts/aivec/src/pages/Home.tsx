@@ -7,6 +7,7 @@ import {
   useListSponsors, 
   useGetPage,
   useListHeroImages,
+  useListForms,
   getGetPageQueryKey,
   getGetSiteSettingsQueryKey,
   getListEventsQueryKey,
@@ -32,6 +33,11 @@ export function Home() {
   const { data: news } = useListNews(undefined, { query: { queryKey: getListNewsQueryKey() } as never });
   const { data: sponsors } = useListSponsors({ query: { queryKey: getListSponsorsQueryKey() } as never });
   const { data: heroImagesData } = useListHeroImages({ query: { queryKey: getListHeroImagesQueryKey() } as never });
+  const { data: openForms } = useListForms({ status: "open" });
+  const heroCtaSlug =
+    settings?.heroCtaFormSlug?.trim() ||
+    openForms?.[0]?.slug ||
+    null;
   const heroImages = (heroImagesData?.filter(h => h.active) ?? []).map(h => resolveImageUrl(h.url));
   const DEFAULT_HERO_SLIDES = [
     "/hero-anatomy.png",
@@ -171,8 +177,8 @@ export function Home() {
                   const arrow = (
                     <ArrowRight className={`w-4 h-4 ml-4 relative z-10 transition-transform group-hover:translate-x-1 ${isRtl ? 'rotate-180 ml-0 mr-4 group-hover:-translate-x-1' : ''}`} />
                   );
-                  return settings?.heroCtaFormSlug ? (
-                    <Link href={`/${lang}/forms/${settings.heroCtaFormSlug}`} className={ctaClass}>
+                  return heroCtaSlug ? (
+                    <Link href={`/${lang}/forms/${heroCtaSlug}`} className={ctaClass}>
                       <span className="relative z-10">{ctaLabel}</span>
                       {arrow}
                     </Link>
