@@ -1,6 +1,6 @@
 import { useLanguage } from "@/lib/i18n";
-import { Link, useRoute } from "wouter";
-import { useState } from "react";
+import { Link, useLocation } from "wouter";
+import { useEffect, useState } from "react";
 import { useAdminMe, useAdminLogin, useAdminLogout } from "@/lib/admin-api";
 import {
   LayoutDashboard,
@@ -17,6 +17,8 @@ import {
   LogIn,
   ShieldCheck,
   UserCog,
+  Menu,
+  X,
 } from "lucide-react";
 
 function AdminLoginScreen() {
@@ -102,9 +104,22 @@ function AdminLoginScreen() {
 
 export function AdminLayout({ children }: { children: React.ReactNode }) {
   const { lang, t } = useLanguage();
-  const [match] = useRoute("/:lang/admin/*?");
+  const [location] = useLocation();
   const { data: me, isLoading } = useAdminMe();
   const logout = useAdminLogout();
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
+
+  useEffect(() => {
+    setMobileNavOpen(false);
+  }, [location]);
+
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    document.body.style.overflow = mobileNavOpen ? "hidden" : "";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [mobileNavOpen]);
 
   if (isLoading) {
     return <div className="min-h-screen flex items-center justify-center text-muted-foreground">{t("Loading...", "جاري التحميل...")}</div>;
@@ -136,48 +151,103 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
     }
   }
 
-  return (
-    <div className="flex min-h-screen bg-muted/30" dir={lang === "ar" ? "rtl" : "ltr"}>
-      <aside className="w-64 bg-card border-r flex-shrink-0 sticky top-16 h-[calc(100vh-4rem)] overflow-y-auto flex flex-col">
-        <div className="p-6 pb-2">
+  const activePage = navItems.find((item) =>
+    item.exact ? location === item.href : location.startsWith(item.href),
+  );
+
+  const sidebarContent = (
+    <>
+      <div className="p-6 pb-2 flex items-start justify-between gap-2">
+        <div>
           <h2 className="text-lg font-serif font-semibold text-primary">{t("Admin Panel", "لوحة الإدارة")}</h2>
-          <p className="text-xs text-muted-foreground mt-1">
+          <p className="text-xs text-muted-foreground mt-1 truncate">
             {me.displayName || me.username}
           </p>
         </div>
-        <nav className="p-4 space-y-1 flex-1">
-          {navItems.map((item) => {
-            const isActive = item.exact
-              ? location.pathname === item.href
-              : location.pathname.startsWith(item.href);
+        <button
+          type="button"
+          onClick={() => setMobileNavOpen(false)}
+          className="lg:hidden -m-2 p-2 text-muted-foreground hover:text-foreground"
+          aria-label={t("Close menu", "إغلاق القائمة")}
+        >
+          <X className="w-5 h-5" />
+        </button>
+      </div>
+      <nav className="p-4 space-y-1 flex-1 overflow-y-auto">
+        {navItems.map((item) => {
+          const isActive = item.exact
+            ? location === item.href
+            : location.startsWith(item.href);
 
-            return (
-              <Link key={item.href} href={item.href}>
-                <a className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors ${
-                  isActive
-                    ? "bg-primary/10 text-primary font-medium"
-                    : "text-muted-foreground hover:bg-muted hover:text-foreground"
-                }`}>
-                  <item.icon className="w-4 h-4" />
-                  {item.label}
-                </a>
-              </Link>
-            );
-          })}
-        </nav>
-        <div className="p-4 border-t">
+          return (
+            <Link key={item.href} href={item.href}>
+              <a className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors ${
+                isActive
+                  ? "bg-primary/10 text-primary font-medium"
+                  : "text-muted-foreground hover:bg-muted hover:text-foreground"
+              }`}>
+                <item.icon className="w-4 h-4 flex-shrink-0" />
+                <span className="truncate">{item.label}</span>
+              </a>
+            </Link>
+          );
+        })}
+      </nav>
+      <div className="p-4 border-t">
+        <button
+          type="button"
+          onClick={onLogout}
+          disabled={logout.isPending}
+          className="w-full flex items-center gap-3 px-3 py-2 rounded-md text-sm text-muted-foreground hover:bg-muted hover:text-foreground transition-colors disabled:opacity-60"
+        >
+          <LogOut className="w-4 h-4" />
+          {t("Sign Out", "تسجيل الخروج")}
+        </button>
+      </div>
+    </>
+  );
+
+  return (
+    <div className="lg:flex min-h-screen bg-muted/30" dir={lang === "ar" ? "rtl" : "ltr"}>
+      {/* Mobile top bar */}
+      <div className="lg:hidden sticky top-16 z-30 flex items-center gap-3 bg-card border-b px-4 py-3">
+        <button
+          type="button"
+          onClick={() => setMobileNavOpen(true)}
+          className="-m-2 p-2 text-muted-foreground hover:text-foreground"
+          aria-label={t("Open menu", "فتح القائمة")}
+        >
+          <Menu className="w-5 h-5" />
+        </button>
+        <div className="flex-1 min-w-0">
+          <p className="text-xs text-muted-foreground leading-none">{t("Admin", "الإدارة")}</p>
+          <p className="text-sm font-medium truncate">
+            {activePage?.label ?? t("Dashboard", "لوحة القيادة")}
+          </p>
+        </div>
+      </div>
+
+      {/* Desktop sidebar */}
+      <aside className="hidden lg:flex w-64 bg-card border-r flex-shrink-0 sticky top-16 h-[calc(100vh-4rem)] flex-col">
+        {sidebarContent}
+      </aside>
+
+      {/* Mobile drawer */}
+      {mobileNavOpen && (
+        <div className="lg:hidden fixed inset-0 z-50 flex" dir={lang === "ar" ? "rtl" : "ltr"}>
           <button
             type="button"
-            onClick={onLogout}
-            disabled={logout.isPending}
-            className="w-full flex items-center gap-3 px-3 py-2 rounded-md text-sm text-muted-foreground hover:bg-muted hover:text-foreground transition-colors disabled:opacity-60"
-          >
-            <LogOut className="w-4 h-4" />
-            {t("Sign Out", "تسجيل الخروج")}
-          </button>
+            aria-label={t("Close menu", "إغلاق القائمة")}
+            className="absolute inset-0 bg-black/50"
+            onClick={() => setMobileNavOpen(false)}
+          />
+          <aside className={`relative bg-card w-72 max-w-[85vw] h-full flex flex-col shadow-xl ${lang === "ar" ? "ml-auto" : "mr-auto"}`}>
+            {sidebarContent}
+          </aside>
         </div>
-      </aside>
-      <main className="flex-1 p-8">
+      )}
+
+      <main className="flex-1 min-w-0 p-4 sm:p-6 lg:p-8">
         {children}
       </main>
     </div>
