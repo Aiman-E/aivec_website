@@ -114,11 +114,13 @@ export function Navbar() {
         <div className="container mx-auto px-6 md:px-12 flex items-center justify-between gap-3">
           <Link href={`/${lang}`} className="flex items-center gap-3 lg:gap-4 z-50 group min-w-0 flex-1 lg:flex-initial">
             {logoSrc ? (
-              <div className="w-10 h-10 lg:w-12 lg:h-12 shrink-0 flex items-center justify-center rounded-sm overflow-hidden bg-background border border-border/40">
-                <img src={logoSrc} alt={siteTitle} className="w-full h-full object-contain" />
-              </div>
+              <img
+                src={logoSrc}
+                alt={siteTitle}
+                className="w-[50px] h-[50px] lg:w-[60px] lg:h-[60px] shrink-0 object-contain"
+              />
             ) : (
-              <div className="w-10 h-10 lg:w-12 lg:h-12 shrink-0 bg-primary flex items-center justify-center rounded-sm overflow-hidden relative shadow-lg">
+              <div className="w-[50px] h-[50px] lg:w-[60px] lg:h-[60px] shrink-0 bg-primary flex items-center justify-center rounded-sm overflow-hidden relative shadow-lg">
                 <div className="absolute inset-0 bg-[url('/vein-abstract.png')] opacity-30 bg-cover bg-center"></div>
                 <span className="text-primary-foreground font-serif font-bold text-xl lg:text-2xl relative z-10">A</span>
               </div>
