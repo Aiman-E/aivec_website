@@ -36,7 +36,11 @@ app.use(
 
 app.use(CLERK_PROXY_PATH, clerkProxyMiddleware());
 
-app.set("trust proxy", true);
+// Trust Replit's managed edge proxy (single hop) so req.hostname and req.secure
+// reflect the public-facing host/scheme. Do NOT use `true` here — that would
+// trust X-Forwarded-* from any upstream and enable IP/host spoofing for
+// downstream consumers (e.g. the rate limiter in routes/storage.ts).
+app.set("trust proxy", 1);
 
 const normalizeOrigin = (d: string): string => {
   const trimmed = d.trim();
@@ -44,39 +48,46 @@ const normalizeOrigin = (d: string): string => {
   return trimmed.startsWith("http") ? trimmed : `https://${trimmed}`;
 };
 
-const envAllowedOrigins = [
-  ...(process.env["REPLIT_DOMAINS"] ?? "").split(","),
-  ...(process.env["ALLOWED_ORIGINS"] ?? "").split(","),
-]
-  .map(normalizeOrigin)
-  .filter(Boolean);
+const envAllowedOrigins = new Set(
+  [
+    ...(process.env["REPLIT_DOMAINS"] ?? "").split(","),
+    ...(process.env["ALLOWED_ORIGINS"] ?? "").split(","),
+  ]
+    .map(normalizeOrigin)
+    .filter(Boolean),
+);
 
-// Mirror the request's own Host into the allowed list BEFORE CORS runs so
-// same-origin requests (including from custom domains) are always accepted
-// without requiring ALLOWED_ORIGINS to be set explicitly.
-app.use((req, _res, next) => {
-  const host = req.headers.host;
-  if (host) {
-    const httpsCandidate = `https://${host}`;
-    if (!envAllowedOrigins.includes(httpsCandidate)) envAllowedOrigins.push(httpsCandidate);
-    const httpCandidate = `http://${host}`;
-    if (!envAllowedOrigins.includes(httpCandidate)) envAllowedOrigins.push(httpCandidate);
-  }
-  next();
-});
+const envAllowedHosts = new Set(
+  [...envAllowedOrigins].map((o) => {
+    try { return new URL(o).host; } catch { return ""; }
+  }).filter(Boolean),
+);
 
-app.use(
+// Per-request CORS check. Same-origin requests are always allowed: we trust
+// req.hostname (derived from X-Forwarded-Host through one proxy hop, which is
+// Replit's edge) and compare its host to the Origin's host. We never mutate
+// shared state, so a request with a spoofed Host header cannot poison the
+// allowlist for other requests.
+app.use((req, res, next) => {
   cors({
     credentials: true,
     origin: (origin, cb) => {
-      // Same-origin / non-browser requests have no Origin header.
       if (!origin) return cb(null, true);
       if (process.env["NODE_ENV"] !== "production") return cb(null, true);
-      if (envAllowedOrigins.includes(origin)) return cb(null, true);
+      if (envAllowedOrigins.has(origin)) return cb(null, true);
+      try {
+        const originHost = new URL(origin).host;
+        if (envAllowedHosts.has(originHost)) return cb(null, true);
+        // Same-origin: the page that issued this request was served from
+        // req.hostname, so an Origin matching that host is by definition
+        // same-origin and safe (no other site can forge this combination
+        // through a browser).
+        if (originHost === req.hostname) return cb(null, true);
+      } catch { /* fall through */ }
       cb(new Error(`Origin ${origin} not allowed by CORS`));
     },
-  }),
-);
+  })(req, res, next);
+});
 app.use(express.json({ limit: "2mb" }));
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
