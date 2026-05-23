@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { LanguageProvider } from "@/lib/i18n";
 import { ClerkProvider } from "@clerk/react";
+import { publishableKeyFromHost } from "@clerk/react/internal";
 import { FontLoader } from "@/components/FontLoader";
 import NotFound from "@/pages/not-found";
 
@@ -39,7 +40,17 @@ import { AdminAccounts } from "@/pages/admin/AdminAccounts";
 
 const queryClient = new QueryClient();
 
-const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
+// REQUIRED — copy verbatim. Resolves the key from window.location.hostname so the
+// same build serves multiple Clerk custom domains. Do not inline the env var.
+const PUBLISHABLE_KEY = publishableKeyFromHost(
+  typeof window !== "undefined" ? window.location.hostname : "",
+  import.meta.env.VITE_CLERK_PUBLISHABLE_KEY,
+);
+
+// REQUIRED — copy verbatim. Empty in dev (Clerk hits dev FAPI directly), auto-set
+// in prod. Do NOT gate on import.meta.env.PROD / NODE_ENV — the empty dev value
+// is intentional, and any branching breaks the prod proxy.
+const CLERK_PROXY_URL = import.meta.env.VITE_CLERK_PROXY_URL;
 
 function AdminRouter() {
   return (
@@ -131,11 +142,15 @@ function App() {
   }
 
   return (
-    <ClerkProvider publishableKey={PUBLISHABLE_KEY} appearance={{
-      variables: {
-        colorPrimary: "hsl(355 65% 25%)",
-      }
-    }}>
+    <ClerkProvider
+      publishableKey={PUBLISHABLE_KEY}
+      proxyUrl={CLERK_PROXY_URL}
+      appearance={{
+        variables: {
+          colorPrimary: "hsl(355 65% 25%)",
+        },
+      }}
+    >
       <QueryClientProvider client={queryClient}>
         <TooltipProvider>
           <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
