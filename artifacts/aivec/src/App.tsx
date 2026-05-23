@@ -149,6 +149,14 @@ function App() {
         variables: {
           colorPrimary: "hsl(355 65% 25%)",
         },
+        elements: {
+          socialButtons: { display: "none" },
+          socialButtonsBlockButton: { display: "none" },
+          socialButtonsIconButton: { display: "none" },
+          dividerRow: { display: "none" },
+          dividerText: { display: "none" },
+          dividerLine: { display: "none" },
+        },
       }}
     >
       <QueryClientProvider client={queryClient}>
