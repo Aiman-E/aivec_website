@@ -32,6 +32,23 @@ _Populate as you build — non-obvious choices a reader couldn't infer from the 
 
 _Describe the high-level user-facing capabilities of this app once they exist._
 
+## Data portability (running off Replit)
+
+This project is **not locked to Replit**. Everything user-facing lives in services you control:
+
+- **User accounts** — Every user that signs in has their `clerkId`, email, first/last name, role, and join date written to the `users` table in your Postgres database (see `lib/db/src/schema/auth.ts` and `getOrCreateLocalUser` in `artifacts/api-server/src/lib/auth.ts`). Admin → Users has an **Export CSV** button to back this up at any time.
+- **All content** (pages, events, news, blog, sponsors, contact submissions, scientific researches, site settings, admin accounts) — lives in the same Postgres DB. A `pg_dump` of `DATABASE_URL` is a full backup.
+- **Uploaded files** (hero images, sponsor logos, scientific paper PDFs) — live in the configured object storage bucket. On Replit this is App Storage; on another host, point `DEFAULT_OBJECT_STORAGE_BUCKET_ID` / `PRIVATE_OBJECT_DIR` / `PUBLIC_OBJECT_SEARCH_PATHS` at any S3-compatible bucket.
+- **Passwords** — Clerk handles password verification on its own servers. Your DB never sees plaintext passwords, and Clerk does not share password hashes. If you ever drop Clerk, users will need to set a new password with the replacement auth provider; their **identities (email, name, role) remain in your DB**.
+
+To run the app off Replit, point these env vars at your own infrastructure:
+
+- `DATABASE_URL` — your Postgres
+- `VITE_CLERK_PUBLISHABLE_KEY` + Clerk secret key — your Clerk account (works on any host; not Replit-tied)
+- `DEFAULT_OBJECT_STORAGE_BUCKET_ID`, `PRIVATE_OBJECT_DIR`, `PUBLIC_OBJECT_SEARCH_PATHS` — your object storage
+- `AIVEC_ADMIN_EMAILS` — comma-separated emails auto-promoted to admin on first sign-in
+- `ADMIN_INITIAL_USERNAME` / `ADMIN_INITIAL_PASSWORD` — initial admin-panel credentials (see Admin access)
+
 ## Admin access
 
 - Admin panel: `/<lang>/admin` (e.g. `/en/admin`) — separate from public Clerk login.
