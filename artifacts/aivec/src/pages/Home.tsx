@@ -278,7 +278,7 @@ export function Home() {
                       whileInView={{ scale: 1 }}
                       transition={{ duration: 1.5 }}
                       viewport={{ once: true }}
-                      src="/tools-editorial.png" alt="Editorial Tools" className="w-full h-full object-cover grayscale contrast-125" 
+                      src={settings?.aboutImageUrl ? resolveImageUrl(settings.aboutImageUrl) : "/tools-editorial.png"} alt="Editorial Tools" className="w-full h-full object-cover grayscale contrast-125" 
                     />
                   </div>
                   <div className="absolute -bottom-12 -right-12 w-2/3 aspect-square bg-muted border border-border/50 p-2 z-20 hidden md:block shadow-2xl">
@@ -423,7 +423,7 @@ export function Home() {
       <section className="h-[70vh] relative overflow-hidden">
         <div className="absolute inset-0 z-0">
           <motion.div style={{ y: useTransform(scrollYProgress, [0.5, 1], ["-20%", "20%"]) }} className="w-full h-[140%] -top-[20%] relative">
-            <img src="/faculty-portrait.png" alt="Faculty" className="w-full h-full object-cover object-top grayscale" />
+            <img src={settings?.quoteImageUrl ? resolveImageUrl(settings.quoteImageUrl) : "/faculty-portrait.png"} alt="Faculty" className="w-full h-full object-cover object-top grayscale" />
             <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent"></div>
           </motion.div>
         </div>

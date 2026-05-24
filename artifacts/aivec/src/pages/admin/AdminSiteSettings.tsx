@@ -74,6 +74,8 @@ const settingsSchema = z.object({
   faviconUrl: z.string().optional(),
   socialImageUrl: z.string().optional(),
   venueImageUrl: z.string().optional(),
+  aboutImageUrl: z.string().optional(),
+  quoteImageUrl: z.string().optional(),
 });
 
 const EN_FONTS = [
@@ -155,6 +157,8 @@ export function AdminSiteSettings() {
       faviconUrl: "",
       socialImageUrl: "",
       venueImageUrl: "",
+      aboutImageUrl: "",
+      quoteImageUrl: "",
     }
   });
 
@@ -253,6 +257,8 @@ export function AdminSiteSettings() {
         faviconUrl: settings.faviconUrl ?? "",
         socialImageUrl: settings.socialImageUrl ?? "",
         venueImageUrl: settings.venueImageUrl ?? "",
+        aboutImageUrl: settings.aboutImageUrl ?? "",
+        quoteImageUrl: settings.quoteImageUrl ?? "",
       });
     }
   }, [settings, form]);
@@ -276,6 +282,8 @@ export function AdminSiteSettings() {
       fontEnUrl: data.fontEnUrl?.trim() ? data.fontEnUrl.trim() : null,
       fontArUrl: data.fontArUrl?.trim() ? data.fontArUrl.trim() : null,
       venueImageUrl: data.venueImageUrl?.trim() ? data.venueImageUrl.trim() : null,
+      aboutImageUrl: data.aboutImageUrl?.trim() ? data.aboutImageUrl.trim() : null,
+      quoteImageUrl: data.quoteImageUrl?.trim() ? data.quoteImageUrl.trim() : null,
     };
     
     updateSettings.mutate({ data: payload }, {
@@ -612,6 +620,36 @@ export function AdminSiteSettings() {
                         hint={t(
                           "Shown in the Venue & Contact section on the home page. Wide landscape works best.",
                           "تظهر في قسم المكان والتواصل بالصفحة الرئيسية. تعمل الصور الأفقية العريضة بشكل أفضل."
+                        )}
+                        previewClassName="w-32 h-20"
+                      />
+                      <FormMessage />
+                    </FormItem>
+                  )} />
+                  <FormField control={form.control} name="aboutImageUrl" render={({ field }) => (
+                    <FormItem>
+                      <ImageUploadField
+                        value={field.value}
+                        onChange={field.onChange}
+                        label={t("About / The Congress Image", "صورة قسم عن المؤتمر")}
+                        hint={t(
+                          "Portrait image shown next to the About AIVEC section. Tall (3:4) works best.",
+                          "صورة عمودية تظهر بجانب قسم عن المؤتمر. تعمل النسبة 3:4 بشكل أفضل."
+                        )}
+                        previewClassName="w-20 h-28"
+                      />
+                      <FormMessage />
+                    </FormItem>
+                  )} />
+                  <FormField control={form.control} name="quoteImageUrl" render={({ field }) => (
+                    <FormItem>
+                      <ImageUploadField
+                        value={field.value}
+                        onChange={field.onChange}
+                        label={t("Quote / Banner Image", "صورة الاقتباس")}
+                        hint={t(
+                          "Full-width background behind the \"Advancing vascular care…\" quote. Wide landscape works best.",
+                          "خلفية عرضية خلف اقتباس «النهوض برعاية الأوعية الدموية…». الصور الأفقية الواسعة أفضل."
                         )}
                         previewClassName="w-32 h-20"
                       />

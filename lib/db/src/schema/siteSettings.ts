@@ -32,6 +32,8 @@ export const siteSettingsTable = pgTable("site_settings", {
   faviconUrl: text("favicon_url"),
   socialImageUrl: text("social_image_url"),
   venueImageUrl: text("venue_image_url"),
+  aboutImageUrl: text("about_image_url"),
+  quoteImageUrl: text("quote_image_url"),
   fontEn: text("font_en").notNull().default("Fraunces"),
   fontAr: text("font_ar").notNull().default("Cairo"),
   fontEnUrl: text("font_en_url"),

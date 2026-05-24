@@ -43,6 +43,10 @@ export interface SiteSettings {
   socialImageUrl?: string | null;
   /** @nullable */
   venueImageUrl?: string | null;
+  /** @nullable */
+  aboutImageUrl?: string | null;
+  /** @nullable */
+  quoteImageUrl?: string | null;
   fontEn?: string;
   fontAr?: string;
   /** @nullable */

@@ -943,6 +943,8 @@ components:
         faviconUrl: { type: ["string", "null"] }
         socialImageUrl: { type: ["string", "null"] }
         venueImageUrl: { type: ["string", "null"] }
+        aboutImageUrl: { type: ["string", "null"] }
+        quoteImageUrl: { type: ["string", "null"] }
         fontEn: { type: string }
         fontAr: { type: string }
         fontEnUrl: { type: ["string", "null"] }
@@ -998,6 +1000,8 @@ components:
         faviconUrl: { type: ["string", "null"] }
         socialImageUrl: { type: ["string", "null"] }
         venueImageUrl: { type: ["string", "null"] }
+        aboutImageUrl: { type: ["string", "null"] }
+        quoteImageUrl: { type: ["string", "null"] }
         fontEn: { type: string }
         fontAr: { type: string }
         fontEnUrl: { type: ["string", "null"] }
