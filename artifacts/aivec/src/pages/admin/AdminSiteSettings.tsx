@@ -559,7 +559,7 @@ function ContactPhonesField() {
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
-        <FormLabel>Phone numbers</FormLabel>
+        <div className="text-sm font-medium">Phone numbers</div>
         <Button
           type="button"
           size="sm"
@@ -623,7 +623,7 @@ function ContactEmailsField() {
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
-        <FormLabel>Emails</FormLabel>
+        <div className="text-sm font-medium">Emails</div>
         <Button
           type="button"
           size="sm"
