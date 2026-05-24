@@ -942,6 +942,7 @@ components:
         logoUrl: { type: ["string", "null"] }
         faviconUrl: { type: ["string", "null"] }
         socialImageUrl: { type: ["string", "null"] }
+        venueImageUrl: { type: ["string", "null"] }
         fontEn: { type: string }
         fontAr: { type: string }
         fontEnUrl: { type: ["string", "null"] }
@@ -996,6 +997,7 @@ components:
         logoUrl: { type: ["string", "null"] }
         faviconUrl: { type: ["string", "null"] }
         socialImageUrl: { type: ["string", "null"] }
+        venueImageUrl: { type: ["string", "null"] }
         fontEn: { type: string }
         fontAr: { type: string }
         fontEnUrl: { type: ["string", "null"] }

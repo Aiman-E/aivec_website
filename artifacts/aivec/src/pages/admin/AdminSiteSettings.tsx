@@ -73,6 +73,7 @@ const settingsSchema = z.object({
   logoUrl: z.string().optional(),
   faviconUrl: z.string().optional(),
   socialImageUrl: z.string().optional(),
+  venueImageUrl: z.string().optional(),
 });
 
 const EN_FONTS = [
@@ -153,6 +154,7 @@ export function AdminSiteSettings() {
       logoUrl: "",
       faviconUrl: "",
       socialImageUrl: "",
+      venueImageUrl: "",
     }
   });
 
@@ -250,6 +252,7 @@ export function AdminSiteSettings() {
         logoUrl: settings.logoUrl ?? "",
         faviconUrl: settings.faviconUrl ?? "",
         socialImageUrl: settings.socialImageUrl ?? "",
+        venueImageUrl: settings.venueImageUrl ?? "",
       });
     }
   }, [settings, form]);
@@ -272,6 +275,7 @@ export function AdminSiteSettings() {
       heroVideoUrl: data.heroVideoUrl?.trim() ? data.heroVideoUrl.trim() : null,
       fontEnUrl: data.fontEnUrl?.trim() ? data.fontEnUrl.trim() : null,
       fontArUrl: data.fontArUrl?.trim() ? data.fontArUrl.trim() : null,
+      venueImageUrl: data.venueImageUrl?.trim() ? data.venueImageUrl.trim() : null,
     };
     
     updateSettings.mutate({ data: payload }, {
@@ -594,6 +598,21 @@ export function AdminSiteSettings() {
                         onChange={field.onChange}
                         label={t("Social Share Image", "صورة المشاركة")}
                         hint={t("Recommended 1200×630 for Facebook/Twitter previews.", "يفضّل 1200×630 لمعاينات فيسبوك وتويتر.")}
+                        previewClassName="w-32 h-20"
+                      />
+                      <FormMessage />
+                    </FormItem>
+                  )} />
+                  <FormField control={form.control} name="venueImageUrl" render={({ field }) => (
+                    <FormItem>
+                      <ImageUploadField
+                        value={field.value}
+                        onChange={field.onChange}
+                        label={t("Venue Image", "صورة المكان")}
+                        hint={t(
+                          "Shown in the Venue & Contact section on the home page. Wide landscape works best.",
+                          "تظهر في قسم المكان والتواصل بالصفحة الرئيسية. تعمل الصور الأفقية العريضة بشكل أفضل."
+                        )}
                         previewClassName="w-32 h-20"
                       />
                       <FormMessage />
