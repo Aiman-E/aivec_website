@@ -21,6 +21,7 @@ import { ar as arLocale } from "date-fns/locale";
 import { ArrowRight, ArrowLeft, Calendar, MapPin, ArrowUpRight, Phone, Mail } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { resolveImageUrl } from "@/components/admin/ImageUploadField";
+import { PaperUploadDialog } from "@/components/PaperUploadDialog";
 
 export function Home() {
   const { lang, t } = useLanguage();
@@ -51,6 +52,7 @@ export function Home() {
   ];
   const slides = heroImages.length > 0 ? heroImages : DEFAULT_HERO_SLIDES;
   const [slideIndex, setSlideIndex] = useState(0);
+  const [paperDialogOpen, setPaperDialogOpen] = useState(false);
 
   useEffect(() => {
     if (slides.length <= 1) return;
@@ -207,12 +209,31 @@ export function Home() {
                     </button>
                   );
                 })()}
-                <button
-                  onClick={() => document.querySelector('#contact')?.scrollIntoView({ behavior: 'smooth' })}
-                  className="group flex items-center justify-between px-6 sm:px-8 py-4 sm:py-5 bg-background/60 backdrop-blur-md text-foreground font-bold text-xs uppercase tracking-widest hover:bg-background transition-all border border-border relative overflow-hidden w-full sm:w-auto"
-                >
-                  <span className="relative z-10">{t("Contact Us", "تواصل معنا")}</span>
-                </button>
+                {(() => {
+                  const secondaryMode = settings?.heroSecondaryCtaMode === "upload_research" ? "upload_research" : "contact";
+                  const defaultLabel = secondaryMode === "upload_research"
+                    ? t("Upload Scientific Paper", "إرسال بحث علمي")
+                    : t("Contact Us", "تواصل معنا");
+                  const secondaryLabel = t(
+                    settings?.heroSecondaryCtaLabelEn || (secondaryMode === "upload_research" ? "Upload Scientific Paper" : "Contact Us"),
+                    settings?.heroSecondaryCtaLabelAr || (secondaryMode === "upload_research" ? "إرسال بحث علمي" : "تواصل معنا"),
+                  ) || defaultLabel;
+                  const onClick = () => {
+                    if (secondaryMode === "upload_research") {
+                      setPaperDialogOpen(true);
+                    } else {
+                      document.querySelector('#contact')?.scrollIntoView({ behavior: 'smooth' });
+                    }
+                  };
+                  return (
+                    <button
+                      onClick={onClick}
+                      className="group flex items-center justify-between px-6 sm:px-8 py-4 sm:py-5 bg-background/60 backdrop-blur-md text-foreground font-bold text-xs uppercase tracking-widest hover:bg-background transition-all border border-border relative overflow-hidden w-full sm:w-auto"
+                    >
+                      <span className="relative z-10">{secondaryLabel}</span>
+                    </button>
+                  );
+                })()}
               </div>
             </motion.div>
           </div>
@@ -590,6 +611,7 @@ export function Home() {
         </div>
       </section>
 
+      <PaperUploadDialog open={paperDialogOpen} onOpenChange={setPaperDialogOpen} />
     </div>
   );
 }

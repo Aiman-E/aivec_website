@@ -65,6 +65,8 @@ export * from './registrationInput';
 export * from './registrationStatus';
 export * from './registrationUpdate';
 export * from './registrationUpdateStatus';
+export * from './scientificResearch';
+export * from './scientificResearchInput';
 export * from './siteSettings';
 export * from './siteSettingsHeroMode';
 export * from './siteSettingsUpdate';

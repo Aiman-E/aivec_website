@@ -71,4 +71,7 @@ export interface SiteSettingsUpdate {
   heroCtaFormSlug?: string | null;
   heroCtaLabelEn?: string;
   heroCtaLabelAr?: string;
+  heroSecondaryCtaMode?: string;
+  heroSecondaryCtaLabelEn?: string;
+  heroSecondaryCtaLabelAr?: string;
 }

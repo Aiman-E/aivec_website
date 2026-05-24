@@ -35,6 +35,7 @@ import { AdminBlog } from "@/pages/admin/AdminBlog";
 import { AdminContact } from "@/pages/admin/AdminContact";
 import { AdminSponsors } from "@/pages/admin/AdminSponsors";
 import { AdminHeroImages } from "@/pages/admin/AdminHeroImages";
+import { AdminScientificResearches } from "@/pages/admin/AdminScientificResearches";
 import { AdminUsers } from "@/pages/admin/AdminUsers";
 import { AdminAccounts } from "@/pages/admin/AdminAccounts";
 
@@ -71,6 +72,7 @@ function AdminRouter() {
         <Route path="/:lang/admin/contact" component={AdminContact} />
         <Route path="/:lang/admin/sponsors" component={AdminSponsors} />
         <Route path="/:lang/admin/hero-images" component={AdminHeroImages} />
+        <Route path="/:lang/admin/scientific-researches" component={AdminScientificResearches} />
         <Route path="/:lang/admin/users" component={AdminUsers} />
         <Route path="/:lang/admin/accounts" component={AdminAccounts} />
       </Switch>

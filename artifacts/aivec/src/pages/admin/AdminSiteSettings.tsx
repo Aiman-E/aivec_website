@@ -70,6 +70,9 @@ const settingsSchema = z.object({
   heroCtaFormSlug: z.string().optional(),
   heroCtaLabelEn: z.string().optional(),
   heroCtaLabelAr: z.string().optional(),
+  heroSecondaryCtaMode: z.string().optional(),
+  heroSecondaryCtaLabelEn: z.string().optional(),
+  heroSecondaryCtaLabelAr: z.string().optional(),
   logoUrl: z.string().optional(),
   faviconUrl: z.string().optional(),
   socialImageUrl: z.string().optional(),
@@ -153,6 +156,9 @@ export function AdminSiteSettings() {
       heroCtaFormSlug: "",
       heroCtaLabelEn: "",
       heroCtaLabelAr: "",
+      heroSecondaryCtaMode: "contact",
+      heroSecondaryCtaLabelEn: "",
+      heroSecondaryCtaLabelAr: "",
       logoUrl: "",
       faviconUrl: "",
       socialImageUrl: "",
@@ -253,6 +259,9 @@ export function AdminSiteSettings() {
         heroCtaFormSlug: settings.heroCtaFormSlug ?? "",
         heroCtaLabelEn: settings.heroCtaLabelEn ?? "",
         heroCtaLabelAr: settings.heroCtaLabelAr ?? "",
+        heroSecondaryCtaMode: settings.heroSecondaryCtaMode ?? "contact",
+        heroSecondaryCtaLabelEn: settings.heroSecondaryCtaLabelEn ?? "",
+        heroSecondaryCtaLabelAr: settings.heroSecondaryCtaLabelAr ?? "",
         logoUrl: settings.logoUrl ?? "",
         faviconUrl: settings.faviconUrl ?? "",
         socialImageUrl: settings.socialImageUrl ?? "",
@@ -361,6 +370,35 @@ export function AdminSiteSettings() {
                   )} />
                   <FormField control={form.control} name="heroCtaLabelAr" render={({ field }) => (
                     <FormItem><FormLabel>نص الزر (AR)</FormLabel><FormControl><Input {...field} dir="rtl" placeholder="انضم إلى المؤتمر" /></FormControl><FormMessage /></FormItem>
+                  )} />
+                </div>
+
+                <h4 className="font-medium text-base pt-4">{t("Secondary Button", "الزر الثانوي")}</h4>
+                <p className="text-xs text-muted-foreground -mt-2">
+                  {t(
+                    "The smaller outlined button next to the main CTA. Choose what it does and what it says.",
+                    "الزر الأصغر الموجود بجانب الزر الرئيسي. اختر وظيفته والنص الذي يظهر عليه."
+                  )}
+                </p>
+                <div className="grid md:grid-cols-2 gap-4">
+                  <FormField control={form.control} name="heroSecondaryCtaMode" render={({ field }) => (
+                    <FormItem className="md:col-span-2">
+                      <FormLabel>{t("Action", "الإجراء")}</FormLabel>
+                      <Select onValueChange={field.onChange} value={field.value || "contact"}>
+                        <FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl>
+                        <SelectContent>
+                          <SelectItem value="contact">{t("Scroll to Contact section", "التمرير إلى قسم التواصل")}</SelectItem>
+                          <SelectItem value="upload_research">{t("Open scientific paper upload popup", "فتح نافذة إرسال بحث علمي")}</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )} />
+                  <FormField control={form.control} name="heroSecondaryCtaLabelEn" render={({ field }) => (
+                    <FormItem><FormLabel>Button Label (EN)</FormLabel><FormControl><Input {...field} placeholder="Contact Us" /></FormControl><FormMessage /></FormItem>
+                  )} />
+                  <FormField control={form.control} name="heroSecondaryCtaLabelAr" render={({ field }) => (
+                    <FormItem><FormLabel>نص الزر (AR)</FormLabel><FormControl><Input {...field} dir="rtl" placeholder="تواصل معنا" /></FormControl><FormMessage /></FormItem>
                   )} />
                 </div>
               </div>

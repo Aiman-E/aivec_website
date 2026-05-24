@@ -56,6 +56,9 @@ export const siteSettingsTable = pgTable("site_settings", {
   heroCtaFormSlug: text("hero_cta_form_slug"),
   heroCtaLabelEn: text("hero_cta_label_en").notNull().default(""),
   heroCtaLabelAr: text("hero_cta_label_ar").notNull().default(""),
+  heroSecondaryCtaMode: varchar("hero_secondary_cta_mode", { length: 32 }).notNull().default("contact"),
+  heroSecondaryCtaLabelEn: text("hero_secondary_cta_label_en").notNull().default(""),
+  heroSecondaryCtaLabelAr: text("hero_secondary_cta_label_ar").notNull().default(""),
   updatedAt: timestamp("updated_at", { withTimezone: true })
     .notNull()
     .defaultNow()

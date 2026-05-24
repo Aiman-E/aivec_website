@@ -544,6 +544,46 @@ paths:
         "204":
           description: Deleted
 
+  /scientific-researches:
+    get:
+      operationId: listScientificResearches
+      tags: [scientificResearches]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ScientificResearch"
+    post:
+      operationId: createScientificResearch
+      tags: [scientificResearches]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ScientificResearchInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ScientificResearch"
+
+  /scientific-researches/id/{id}:
+    delete:
+      operationId: deleteScientificResearch
+      tags: [scientificResearches]
+      parameters:
+        - $ref: "#/components/parameters/IdParam"
+      responses:
+        "204":
+          description: Deleted
+
   /blog:
     get:
       operationId: listBlog
@@ -967,6 +1007,9 @@ components:
         heroCtaFormSlug: { type: ["string", "null"] }
         heroCtaLabelEn: { type: string }
         heroCtaLabelAr: { type: string }
+        heroSecondaryCtaMode: { type: string }
+        heroSecondaryCtaLabelEn: { type: string }
+        heroSecondaryCtaLabelAr: { type: string }
         updatedAt: { type: string, format: date-time }
 
     SiteSettingsUpdate:
@@ -1024,6 +1067,9 @@ components:
         heroCtaFormSlug: { type: ["string", "null"] }
         heroCtaLabelEn: { type: string }
         heroCtaLabelAr: { type: string }
+        heroSecondaryCtaMode: { type: string }
+        heroSecondaryCtaLabelEn: { type: string }
+        heroSecondaryCtaLabelAr: { type: string }
 
     Page:
       type: object
@@ -1340,6 +1386,36 @@ components:
         answers: {}
         submitterName: { type: ["string", "null"] }
         submitterEmail: { type: ["string", "null"] }
+
+    ScientificResearch:
+      type: object
+      required: [id, title, abstract, uploaderName, uploaderEmail, fileUrl, fileName, fileSize, fileContentType, createdAt]
+      properties:
+        id: { type: integer }
+        title: { type: string }
+        abstract: { type: string }
+        uploaderName: { type: string }
+        uploaderEmail: { type: string }
+        uploaderUserId: { type: ["string", "null"] }
+        fileUrl: { type: string }
+        fileName: { type: string }
+        fileSize: { type: integer }
+        fileContentType: { type: string }
+        createdAt: { type: string, format: date-time }
+
+    ScientificResearchInput:
+      type: object
+      required: [title, abstract, uploaderName, fileUrl]
+      properties:
+        title: { type: string, minLength: 1 }
+        abstract: { type: string, minLength: 1 }
+        uploaderName: { type: string, minLength: 1 }
+        uploaderEmail: { type: string }
+        uploaderUserId: { type: ["string", "null"] }
+        fileUrl: { type: string, minLength: 1 }
+        fileName: { type: string }
+        fileSize: { type: integer }
+        fileContentType: { type: string }
 
     NewsPost:
       type: object

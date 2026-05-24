@@ -113,6 +113,9 @@ export const GetSiteSettingsResponse = zod.object({
   "heroCtaFormSlug": zod.string().nullish(),
   "heroCtaLabelEn": zod.string().optional(),
   "heroCtaLabelAr": zod.string().optional(),
+  "heroSecondaryCtaMode": zod.string().optional(),
+  "heroSecondaryCtaLabelEn": zod.string().optional(),
+  "heroSecondaryCtaLabelAr": zod.string().optional(),
   "updatedAt": zod.coerce.date().optional()
 })
 
@@ -172,7 +175,10 @@ export const UpdateSiteSettingsBody = zod.object({
   "statCountriesLabelAr": zod.string().optional(),
   "heroCtaFormSlug": zod.string().nullish(),
   "heroCtaLabelEn": zod.string().optional(),
-  "heroCtaLabelAr": zod.string().optional()
+  "heroCtaLabelAr": zod.string().optional(),
+  "heroSecondaryCtaMode": zod.string().optional(),
+  "heroSecondaryCtaLabelEn": zod.string().optional(),
+  "heroSecondaryCtaLabelAr": zod.string().optional()
 })
 
 export const UpdateSiteSettingsResponse = zod.object({
@@ -232,6 +238,9 @@ export const UpdateSiteSettingsResponse = zod.object({
   "heroCtaFormSlug": zod.string().nullish(),
   "heroCtaLabelEn": zod.string().optional(),
   "heroCtaLabelAr": zod.string().optional(),
+  "heroSecondaryCtaMode": zod.string().optional(),
+  "heroSecondaryCtaLabelEn": zod.string().optional(),
+  "heroSecondaryCtaLabelAr": zod.string().optional(),
   "updatedAt": zod.coerce.date().optional()
 })
 
@@ -865,6 +874,46 @@ export const UpdateNewsResponse = zod.object({
 
 
 export const DeleteNewsParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+
+export const ListScientificResearchesResponseItem = zod.object({
+  "id": zod.number(),
+  "title": zod.string(),
+  "abstract": zod.string(),
+  "uploaderName": zod.string(),
+  "uploaderEmail": zod.string(),
+  "uploaderUserId": zod.string().nullish(),
+  "fileUrl": zod.string(),
+  "fileName": zod.string(),
+  "fileSize": zod.number(),
+  "fileContentType": zod.string(),
+  "createdAt": zod.coerce.date()
+})
+export const ListScientificResearchesResponse = zod.array(ListScientificResearchesResponseItem)
+
+
+
+
+
+
+
+
+export const CreateScientificResearchBody = zod.object({
+  "title": zod.string().min(1),
+  "abstract": zod.string().min(1),
+  "uploaderName": zod.string().min(1),
+  "uploaderEmail": zod.string().optional(),
+  "uploaderUserId": zod.string().nullish(),
+  "fileUrl": zod.string().min(1),
+  "fileName": zod.string().optional(),
+  "fileSize": zod.number().optional(),
+  "fileContentType": zod.string().optional()
+})
+
+
+export const DeleteScientificResearchParams = zod.object({
   "id": zod.coerce.number()
 })
 

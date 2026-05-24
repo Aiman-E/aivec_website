@@ -88,3 +88,19 @@ export const heroImagesTable = pgTable("hero_images", {
 });
 
 export type HeroImage = typeof heroImagesTable.$inferSelect;
+
+export const scientificResearchesTable = pgTable("scientific_researches", {
+  id: serial("id").primaryKey(),
+  title: text("title").notNull().default(""),
+  abstract: text("abstract").notNull().default(""),
+  uploaderName: text("uploader_name").notNull().default(""),
+  uploaderEmail: text("uploader_email").notNull().default(""),
+  uploaderUserId: text("uploader_user_id"),
+  fileUrl: text("file_url").notNull(),
+  fileName: text("file_name").notNull().default(""),
+  fileSize: integer("file_size").notNull().default(0),
+  fileContentType: text("file_content_type").notNull().default(""),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
+export type ScientificResearch = typeof scientificResearchesTable.$inferSelect;

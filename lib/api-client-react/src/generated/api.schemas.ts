@@ -156,6 +156,9 @@ export interface SiteSettings {
   heroCtaFormSlug?: string | null;
   heroCtaLabelEn?: string;
   heroCtaLabelAr?: string;
+  heroSecondaryCtaMode?: string;
+  heroSecondaryCtaLabelEn?: string;
+  heroSecondaryCtaLabelAr?: string;
   updatedAt?: string;
 }
 
@@ -230,6 +233,9 @@ export interface SiteSettingsUpdate {
   heroCtaFormSlug?: string | null;
   heroCtaLabelEn?: string;
   heroCtaLabelAr?: string;
+  heroSecondaryCtaMode?: string;
+  heroSecondaryCtaLabelEn?: string;
+  heroSecondaryCtaLabelAr?: string;
 }
 
 export interface Page {
@@ -680,6 +686,38 @@ export interface FormSubmissionInput {
   submitterName?: string | null;
   /** @nullable */
   submitterEmail?: string | null;
+}
+
+export interface ScientificResearch {
+  id: number;
+  title: string;
+  abstract: string;
+  uploaderName: string;
+  uploaderEmail: string;
+  /** @nullable */
+  uploaderUserId?: string | null;
+  fileUrl: string;
+  fileName: string;
+  fileSize: number;
+  fileContentType: string;
+  createdAt: string;
+}
+
+export interface ScientificResearchInput {
+  /** @minLength 1 */
+  title: string;
+  /** @minLength 1 */
+  abstract: string;
+  /** @minLength 1 */
+  uploaderName: string;
+  uploaderEmail?: string;
+  /** @nullable */
+  uploaderUserId?: string | null;
+  /** @minLength 1 */
+  fileUrl: string;
+  fileName?: string;
+  fileSize?: number;
+  fileContentType?: string;
 }
 
 export interface NewsPost {

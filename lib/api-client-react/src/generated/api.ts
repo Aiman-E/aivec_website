@@ -59,6 +59,8 @@ import type {
   Registration,
   RegistrationInput,
   RegistrationUpdate,
+  ScientificResearch,
+  ScientificResearchInput,
   SiteSettings,
   SiteSettingsUpdate,
   Sponsor,
@@ -2146,6 +2148,206 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
         TContext
       > => {
       return useMutation(getDeleteNewsMutationOptions(options));
+    }
+
+export const getListScientificResearchesUrl = () => {
+
+
+
+
+  return `/api/scientific-researches`
+}
+
+export const listScientificResearches = async ( options?: RequestInit): Promise<ScientificResearch[]> => {
+
+  return customFetch<ScientificResearch[]>(getListScientificResearchesUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListScientificResearchesQueryKey = () => {
+    return [
+    `/api/scientific-researches`
+    ] as const;
+    }
+
+
+export const getListScientificResearchesQueryOptions = <TData = Awaited<ReturnType<typeof listScientificResearches>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listScientificResearches>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListScientificResearchesQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listScientificResearches>>> = ({ signal }) => listScientificResearches({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listScientificResearches>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListScientificResearchesQueryResult = NonNullable<Awaited<ReturnType<typeof listScientificResearches>>>
+export type ListScientificResearchesQueryError = ErrorType<unknown>
+
+
+
+export function useListScientificResearches<TData = Awaited<ReturnType<typeof listScientificResearches>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listScientificResearches>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListScientificResearchesQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getCreateScientificResearchUrl = () => {
+
+
+
+
+  return `/api/scientific-researches`
+}
+
+export const createScientificResearch = async (scientificResearchInput: ScientificResearchInput, options?: RequestInit): Promise<ScientificResearch> => {
+
+  return customFetch<ScientificResearch>(getCreateScientificResearchUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      scientificResearchInput,)
+  }
+);}
+
+
+
+
+export const getCreateScientificResearchMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createScientificResearch>>, TError,{data: BodyType<ScientificResearchInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof createScientificResearch>>, TError,{data: BodyType<ScientificResearchInput>}, TContext> => {
+
+const mutationKey = ['createScientificResearch'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createScientificResearch>>, {data: BodyType<ScientificResearchInput>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  createScientificResearch(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateScientificResearchMutationResult = NonNullable<Awaited<ReturnType<typeof createScientificResearch>>>
+    export type CreateScientificResearchMutationBody = BodyType<ScientificResearchInput>
+    export type CreateScientificResearchMutationError = ErrorType<unknown>
+
+    export const useCreateScientificResearch = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createScientificResearch>>, TError,{data: BodyType<ScientificResearchInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof createScientificResearch>>,
+        TError,
+        {data: BodyType<ScientificResearchInput>},
+        TContext
+      > => {
+      return useMutation(getCreateScientificResearchMutationOptions(options));
+    }
+
+export const getDeleteScientificResearchUrl = (id: number,) => {
+
+
+
+
+  return `/api/scientific-researches/id/${id}`
+}
+
+export const deleteScientificResearch = async (id: number, options?: RequestInit): Promise<void> => {
+
+  return customFetch<void>(getDeleteScientificResearchUrl(id),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+export const getDeleteScientificResearchMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteScientificResearch>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteScientificResearch>>, TError,{id: number}, TContext> => {
+
+const mutationKey = ['deleteScientificResearch'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteScientificResearch>>, {id: number}> = (props) => {
+          const {id} = props ?? {};
+
+          return  deleteScientificResearch(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteScientificResearchMutationResult = NonNullable<Awaited<ReturnType<typeof deleteScientificResearch>>>
+
+    export type DeleteScientificResearchMutationError = ErrorType<unknown>
+
+    export const useDeleteScientificResearch = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteScientificResearch>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof deleteScientificResearch>>,
+        TError,
+        {id: number},
+        TContext
+      > => {
+      return useMutation(getDeleteScientificResearchMutationOptions(options));
     }
 
 export const getListBlogUrl = (params?: ListBlogParams,) => {
