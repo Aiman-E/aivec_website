@@ -944,6 +944,8 @@ components:
         socialImageUrl: { type: ["string", "null"] }
         fontEn: { type: string }
         fontAr: { type: string }
+        fontEnUrl: { type: ["string", "null"] }
+        fontArUrl: { type: ["string", "null"] }
         statEditions: { type: string }
         statEditionsLabelEn: { type: string }
         statEditionsLabelAr: { type: string }
@@ -996,6 +998,8 @@ components:
         socialImageUrl: { type: ["string", "null"] }
         fontEn: { type: string }
         fontAr: { type: string }
+        fontEnUrl: { type: ["string", "null"] }
+        fontArUrl: { type: ["string", "null"] }
         statEditions: { type: string }
         statEditionsLabelEn: { type: string }
         statEditionsLabelAr: { type: string }

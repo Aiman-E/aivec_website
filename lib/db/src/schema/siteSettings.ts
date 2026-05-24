@@ -33,6 +33,8 @@ export const siteSettingsTable = pgTable("site_settings", {
   socialImageUrl: text("social_image_url"),
   fontEn: text("font_en").notNull().default("Fraunces"),
   fontAr: text("font_ar").notNull().default("Cairo"),
+  fontEnUrl: text("font_en_url"),
+  fontArUrl: text("font_ar_url"),
   statEditions: text("stat_editions").notNull().default("02"),
   statEditionsLabelEn: text("stat_editions_label_en").notNull().default(""),
   statEditionsLabelAr: text("stat_editions_label_ar").notNull().default(""),

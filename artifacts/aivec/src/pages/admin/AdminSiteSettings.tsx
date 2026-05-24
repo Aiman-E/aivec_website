@@ -13,6 +13,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useEffect } from "react";
 import { Plus, Trash2 } from "lucide-react";
 import { ImageUploadField } from "@/components/admin/ImageUploadField";
+import { sanitizeFontName, sanitizeFontUrl, applyFontFaces, applyGoogleFontsLink } from "@/components/FontLoader";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -49,6 +50,8 @@ const settingsSchema = z.object({
   footerNoteAr: z.string().optional(),
   fontEn: z.string().optional(),
   fontAr: z.string().optional(),
+  fontEnUrl: z.string().optional(),
+  fontArUrl: z.string().optional(),
   statEditions: z.string().optional(),
   statEditionsLabelEn: z.string().optional(),
   statEditionsLabelAr: z.string().optional(),
@@ -127,6 +130,8 @@ export function AdminSiteSettings() {
       footerNoteAr: "",
       fontEn: "Fraunces",
       fontAr: "Cairo",
+      fontEnUrl: "",
+      fontArUrl: "",
       statEditions: "02",
       statEditionsLabelEn: "",
       statEditionsLabelAr: "",
@@ -153,29 +158,40 @@ export function AdminSiteSettings() {
 
   const watchedFontEn = form.watch("fontEn");
   const watchedFontAr = form.watch("fontAr");
+  const watchedFontEnUrl = form.watch("fontEnUrl");
+  const watchedFontArUrl = form.watch("fontArUrl");
 
   useEffect(() => {
-    const families = [watchedFontEn, watchedFontAr].filter(Boolean) as string[];
-    if (families.length === 0) return;
-    const id = "aivec-admin-font-preview";
-    let link = document.getElementById(id) as HTMLLinkElement | null;
-    if (!link) {
-      link = document.createElement("link");
-      link.id = id;
-      link.rel = "stylesheet";
-      document.head.appendChild(link);
-    }
-    const params = families
-      .map((f) => `family=${encodeURIComponent(f.trim()).replace(/%20/g, "+")}:wght@400;600;700`)
-      .join("&");
-    link.href = `https://fonts.googleapis.com/css2?${params}&display=swap`;
-  }, [watchedFontEn, watchedFontAr]);
+    const linkId = "aivec-admin-font-preview";
+    const styleId = "aivec-admin-font-preview-style";
+    const fontEn = sanitizeFontName(watchedFontEn, "Fraunces");
+    const fontAr = sanitizeFontName(watchedFontAr, "Cairo");
+    const enUrl = sanitizeFontUrl(watchedFontEnUrl);
+    const arUrl = sanitizeFontUrl(watchedFontArUrl);
 
-  // Remove the preview <link> when leaving the settings page so it doesn't
-  // keep loading remote fonts on the public site.
+    let style = document.getElementById(styleId) as HTMLStyleElement | null;
+    if (!style) {
+      style = document.createElement("style");
+      style.id = styleId;
+      document.head.appendChild(style);
+    }
+    applyFontFaces(style, [
+      { family: fontEn, url: enUrl },
+      { family: fontAr, url: arUrl },
+    ]);
+
+    applyGoogleFontsLink(linkId, [
+      enUrl ? "" : fontEn,
+      arUrl ? "" : fontAr,
+    ].filter(Boolean));
+  }, [watchedFontEn, watchedFontAr, watchedFontEnUrl, watchedFontArUrl]);
+
+  // Remove the preview <link> and @font-face style when leaving the settings
+  // page so they don't keep loading remote fonts on the public site.
   useEffect(() => {
     return () => {
       document.getElementById("aivec-admin-font-preview")?.remove();
+      document.getElementById("aivec-admin-font-preview-style")?.remove();
     };
   }, []);
 
@@ -211,6 +227,8 @@ export function AdminSiteSettings() {
         footerNoteAr: settings.footerNoteAr || "",
         fontEn: settings.fontEn || "Fraunces",
         fontAr: settings.fontAr || "Cairo",
+        fontEnUrl: settings.fontEnUrl ?? "",
+        fontArUrl: settings.fontArUrl ?? "",
         statEditions: settings.statEditions ?? "02",
         statEditionsLabelEn: settings.statEditionsLabelEn ?? "",
         statEditionsLabelAr: settings.statEditionsLabelAr ?? "",
@@ -252,6 +270,8 @@ export function AdminSiteSettings() {
         .map((e) => e.value.trim())
         .filter(Boolean),
       heroVideoUrl: data.heroVideoUrl?.trim() ? data.heroVideoUrl.trim() : null,
+      fontEnUrl: data.fontEnUrl?.trim() ? data.fontEnUrl.trim() : null,
+      fontArUrl: data.fontArUrl?.trim() ? data.fontArUrl.trim() : null,
     };
     
     updateSettings.mutate({ data: payload }, {
@@ -406,57 +426,97 @@ export function AdminSiteSettings() {
                     "اختر خط العرض لكل لغة. تُطبَّق التغييرات على الموقع بعد الحفظ."
                   )}
                 </p>
-                <div className="grid md:grid-cols-2 gap-4">
-                  <FormField control={form.control} name="fontEn" render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>English Font</FormLabel>
-                      <Select onValueChange={field.onChange} value={field.value || "Fraunces"}>
+                <p className="text-xs text-muted-foreground">
+                  {t(
+                    "Pick a Google Font by name, or upload your own font file (.woff2, .woff, .ttf, .otf). When you upload a file, that file is used for the family name you typed.",
+                    "اختر خط Google بالاسم، أو ارفع ملف خط خاص بك (.woff2 أو .woff أو .ttf أو .otf). عند رفع ملف، يُستخدم هذا الملف للاسم الذي كتبته."
+                  )}
+                </p>
+                <div className="grid md:grid-cols-2 gap-6">
+                  <div className="space-y-3 p-4 border border-border/40 rounded-sm">
+                    <FormField control={form.control} name="fontEn" render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>English Font Family</FormLabel>
                         <FormControl>
-                          <SelectTrigger><SelectValue /></SelectTrigger>
+                          <Input
+                            {...field}
+                            dir="ltr"
+                            list="aivec-en-font-suggestions"
+                            placeholder="Fraunces"
+                          />
                         </FormControl>
-                        <SelectContent>
-                          {EN_FONTS.map((f) => (
-                            <SelectItem key={f} value={f} style={{ fontFamily: `'${f}', serif` }}>
-                              {f}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <div
-                        className="mt-2 px-3 py-3 border bg-muted/30 text-2xl"
-                        style={{ fontFamily: `'${field.value || "Fraunces"}', serif` }}
-                      >
-                        AIVEC 2026 — Aden Vascular Conference
-                      </div>
-                      <FormMessage />
-                    </FormItem>
-                  )} />
+                        <datalist id="aivec-en-font-suggestions">
+                          {EN_FONTS.map((f) => <option key={f} value={f} />)}
+                        </datalist>
+                        <FormMessage />
+                      </FormItem>
+                    )} />
+                    <FormField control={form.control} name="fontEnUrl" render={({ field }) => (
+                      <FormItem>
+                        <ImageUploadField
+                          value={field.value}
+                          onChange={field.onChange}
+                          label={t("Custom Font File (optional)", "ملف خط مخصص (اختياري)")}
+                          hint={t(
+                            ".woff2 recommended. The file becomes the source for the family name above.",
+                            "يفضّل .woff2. سيُستخدم الملف كمصدر للخط بالاسم أعلاه."
+                          )}
+                          previewClassName="w-20 h-20"
+                          accept=".woff2,.woff,.ttf,.otf,font/woff2,font/woff,font/ttf,font/otf"
+                        />
+                        <FormMessage />
+                      </FormItem>
+                    )} />
+                    <div
+                      className="mt-2 px-3 py-3 border bg-muted/30 text-2xl"
+                      style={{ fontFamily: `'${form.watch("fontEn") || "Fraunces"}', serif` }}
+                    >
+                      AIVEC 2026 — Aden Vascular Conference
+                    </div>
+                  </div>
 
-                  <FormField control={form.control} name="fontAr" render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>الخط العربي</FormLabel>
-                      <Select onValueChange={field.onChange} value={field.value || "Cairo"}>
+                  <div className="space-y-3 p-4 border border-border/40 rounded-sm">
+                    <FormField control={form.control} name="fontAr" render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>الخط العربي</FormLabel>
                         <FormControl>
-                          <SelectTrigger><SelectValue /></SelectTrigger>
+                          <Input
+                            {...field}
+                            dir="ltr"
+                            list="aivec-ar-font-suggestions"
+                            placeholder="Cairo"
+                          />
                         </FormControl>
-                        <SelectContent>
-                          {AR_FONTS.map((f) => (
-                            <SelectItem key={f} value={f} style={{ fontFamily: `'${f}', sans-serif` }}>
-                              {f}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <div
-                        dir="rtl"
-                        className="mt-2 px-3 py-3 border bg-muted/30 text-2xl"
-                        style={{ fontFamily: `'${field.value || "Cairo"}', sans-serif` }}
-                      >
-                        مؤتمر عدن الدولي للأوعية الدموية
-                      </div>
-                      <FormMessage />
-                    </FormItem>
-                  )} />
+                        <datalist id="aivec-ar-font-suggestions">
+                          {AR_FONTS.map((f) => <option key={f} value={f} />)}
+                        </datalist>
+                        <FormMessage />
+                      </FormItem>
+                    )} />
+                    <FormField control={form.control} name="fontArUrl" render={({ field }) => (
+                      <FormItem>
+                        <ImageUploadField
+                          value={field.value}
+                          onChange={field.onChange}
+                          label={t("Custom Font File (optional)", "ملف خط مخصص (اختياري)")}
+                          hint={t(
+                            ".woff2 recommended. The file becomes the source for the family name above.",
+                            "يفضّل .woff2. سيُستخدم الملف كمصدر للخط بالاسم أعلاه."
+                          )}
+                          previewClassName="w-20 h-20"
+                          accept=".woff2,.woff,.ttf,.otf,font/woff2,font/woff,font/ttf,font/otf"
+                        />
+                        <FormMessage />
+                      </FormItem>
+                    )} />
+                    <div
+                      dir="rtl"
+                      className="mt-2 px-3 py-3 border bg-muted/30 text-2xl"
+                      style={{ fontFamily: `'${form.watch("fontAr") || "Cairo"}', sans-serif` }}
+                    >
+                      مؤتمر عدن الدولي للأوعية الدموية
+                    </div>
+                  </div>
                 </div>
               </div>
 

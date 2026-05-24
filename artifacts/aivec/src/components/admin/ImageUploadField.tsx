@@ -2,7 +2,7 @@ import { useRef, useState } from "react";
 import { useUpload } from "@workspace/object-storage-web";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Upload, X, Loader2 } from "lucide-react";
+import { Upload, X, Loader2, FileText } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 export function resolveImageUrl(value: string | null | undefined): string {
@@ -62,15 +62,27 @@ export function ImageUploadField({
         <div
           className={`${previewClassName} shrink-0 bg-muted border border-border overflow-hidden flex items-center justify-center text-xs text-muted-foreground`}
         >
-          {shownSrc ? (
-            accept.startsWith("video/") ? (
-              <video src={shownSrc} className="w-full h-full object-contain" muted playsInline controls />
-            ) : (
-              <img src={shownSrc} alt="" className="w-full h-full object-contain" />
-            )
-          ) : (
-            <span>{accept.startsWith("video/") ? "No video" : "No image"}</span>
-          )}
+          {(() => {
+            const isVideo = accept.startsWith("video/");
+            const isImage = accept.startsWith("image/") || accept === "image/*";
+            if (!shownSrc) {
+              return <span>{isVideo ? "No video" : isImage ? "No image" : "No file"}</span>;
+            }
+            if (isVideo) {
+              return <video src={shownSrc} className="w-full h-full object-contain" muted playsInline controls />;
+            }
+            if (isImage) {
+              return <img src={shownSrc} alt="" className="w-full h-full object-contain" />;
+            }
+            return (
+              <div className="flex flex-col items-center gap-1 px-1 text-center">
+                <FileText className="w-6 h-6" />
+                <span className="text-[10px] break-all line-clamp-2">
+                  {(value ?? "").split("/").pop()}
+                </span>
+              </div>
+            );
+          })()}
         </div>
         <div className="flex-1 space-y-2 min-w-0">
           <div className="flex gap-2">

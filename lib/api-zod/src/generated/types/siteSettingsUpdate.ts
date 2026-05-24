@@ -42,6 +42,10 @@ export interface SiteSettingsUpdate {
   socialImageUrl?: string | null;
   fontEn?: string;
   fontAr?: string;
+  /** @nullable */
+  fontEnUrl?: string | null;
+  /** @nullable */
+  fontArUrl?: string | null;
   statEditions?: string;
   statEditionsLabelEn?: string;
   statEditionsLabelAr?: string;
