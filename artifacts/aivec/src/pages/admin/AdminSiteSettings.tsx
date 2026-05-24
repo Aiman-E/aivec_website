@@ -1,6 +1,6 @@
 import { useLanguage } from "@/lib/i18n";
 import { useGetSiteSettings, useUpdateSiteSettings, useListForms } from "@workspace/api-client-react";
-import { useForm } from "react-hook-form";
+import { useForm, useFieldArray, useFormContext } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
@@ -8,8 +8,10 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { useEffect } from "react";
+import { Plus, Trash2 } from "lucide-react";
 import { ImageUploadField } from "@/components/admin/ImageUploadField";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -23,22 +25,26 @@ const settingsSchema = z.object({
   conferenceDatesAr: z.string().optional(),
   venueNameEn: z.string().optional(),
   venueNameAr: z.string().optional(),
-  contactPhone: z.string().optional(),
-  contactWhatsapp: z.string().optional(),
+  contactPhones: z
+    .array(
+      z.object({
+        number: z.string().min(1, "Phone number is required"),
+        whatsapp: z.boolean(),
+      })
+    )
+    .default([]),
   contactEmails: z
-    .string()
-    .optional()
-    .refine(
-      (val) => {
-        if (!val || !val.trim()) return true;
-        return val
-          .split(",")
-          .map((e) => e.trim())
-          .filter(Boolean)
-          .every((e) => EMAIL_RE.test(e));
-      },
-      { message: "One or more emails are invalid" }
-    ),
+    .array(
+      z.object({
+        value: z
+          .string()
+          .min(1, "Email is required")
+          .refine((v) => EMAIL_RE.test(v), { message: "Invalid email" }),
+      })
+    )
+    .default([]),
+  heroMode: z.enum(["images", "video"]).default("images"),
+  heroVideoUrl: z.string().optional(),
   footerNoteEn: z.string().optional(),
   footerNoteAr: z.string().optional(),
   fontEn: z.string().optional(),
@@ -113,9 +119,10 @@ export function AdminSiteSettings() {
       conferenceDatesAr: "",
       venueNameEn: "",
       venueNameAr: "",
-      contactPhone: "",
-      contactWhatsapp: "",
-      contactEmails: "",
+      contactPhones: [],
+      contactEmails: [],
+      heroMode: "images",
+      heroVideoUrl: "",
       footerNoteEn: "",
       footerNoteAr: "",
       fontEn: "Fraunces",
@@ -183,9 +190,23 @@ export function AdminSiteSettings() {
         conferenceDatesAr: settings.conferenceDatesAr || "",
         venueNameEn: settings.venueNameEn || "",
         venueNameAr: settings.venueNameAr || "",
-        contactPhone: settings.contactPhone || "",
-        contactWhatsapp: settings.contactWhatsapp || "",
-        contactEmails: settings.contactEmails?.join(", ") || "",
+        contactPhones:
+          settings.contactPhones && settings.contactPhones.length > 0
+            ? settings.contactPhones.map((p) => ({
+                number: p.number ?? "",
+                whatsapp: !!p.whatsapp,
+              }))
+            : (() => {
+                const legacy: { number: string; whatsapp: boolean }[] = [];
+                const phone = settings.contactPhone?.trim();
+                const wa = settings.contactWhatsapp?.trim();
+                if (phone) legacy.push({ number: phone, whatsapp: !!wa && wa === phone });
+                if (wa && wa !== phone) legacy.push({ number: wa, whatsapp: true });
+                return legacy;
+              })(),
+        contactEmails: (settings.contactEmails ?? []).map((e) => ({ value: e })),
+        heroMode: (settings.heroMode === "video" ? "video" : "images") as "images" | "video",
+        heroVideoUrl: settings.heroVideoUrl ?? "",
         footerNoteEn: settings.footerNoteEn || "",
         footerNoteAr: settings.footerNoteAr || "",
         fontEn: settings.fontEn || "Fraunces",
@@ -218,10 +239,19 @@ export function AdminSiteSettings() {
   if (isLoading) return <div className="text-muted-foreground">{t("Loading...", "جاري التحميل...")}</div>;
 
   function onSubmit(data: SettingsFormValues) {
+    const phones = (data.contactPhones ?? [])
+      .map((p) => ({ number: p.number.trim(), whatsapp: !!p.whatsapp }))
+      .filter((p) => p.number.length > 0);
     const payload = {
       ...data,
       heroCtaFormSlug: data.heroCtaFormSlug?.trim() ? data.heroCtaFormSlug.trim() : null,
-      contactEmails: data.contactEmails ? data.contactEmails.split(",").map(e => e.trim()).filter(Boolean) : [],
+      contactPhones: phones,
+      contactPhone: phones[0]?.number ?? "",
+      contactWhatsapp: phones.find((p) => p.whatsapp)?.number ?? "",
+      contactEmails: (data.contactEmails ?? [])
+        .map((e) => e.value.trim())
+        .filter(Boolean),
+      heroVideoUrl: data.heroVideoUrl?.trim() ? data.heroVideoUrl.trim() : null,
     };
     
     updateSettings.mutate({ data: payload }, {
@@ -321,19 +351,51 @@ export function AdminSiteSettings() {
                 </div>
               </div>
 
-              <div className="space-y-4">
+              <div className="space-y-6">
                 <h3 className="font-semibold text-lg border-b pb-2">{t("Contact", "معلومات التواصل")}</h3>
-                <div className="grid md:grid-cols-2 gap-4">
-                  <FormField control={form.control} name="contactPhone" render={({ field }) => (
-                    <FormItem><FormLabel>Phone</FormLabel><FormControl><Input {...field} dir="ltr" /></FormControl><FormMessage /></FormItem>
+
+                <ContactPhonesField />
+                <ContactEmailsField />
+              </div>
+
+              <div className="space-y-4">
+                <h3 className="font-semibold text-lg border-b pb-2">{t("Hero Media", "وسائط الواجهة")}</h3>
+                <p className="text-sm text-muted-foreground">
+                  {t(
+                    "Choose between rotating images (managed under Hero Images) or a single background video.",
+                    "اختر بين صور متبدلة (تُدار من قسم صور الواجهة) أو فيديو خلفية واحد."
+                  )}
+                </p>
+                <FormField control={form.control} name="heroMode" render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t("Hero Mode", "نمط الواجهة")}</FormLabel>
+                    <Select value={field.value} onValueChange={field.onChange}>
+                      <FormControl>
+                        <SelectTrigger><SelectValue /></SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="images">{t("Rotating Images", "صور متبدلة")}</SelectItem>
+                        <SelectItem value="video">{t("Single Video", "فيديو واحد")}</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )} />
+                {form.watch("heroMode") === "video" && (
+                  <FormField control={form.control} name="heroVideoUrl" render={({ field }) => (
+                    <FormItem>
+                      <ImageUploadField
+                        value={field.value}
+                        onChange={field.onChange}
+                        label={t("Hero Video", "فيديو الواجهة")}
+                        hint={t("MP4 or WebM. Will autoplay muted as background.", "MP4 أو WebM. سيُشغَّل تلقائياً بدون صوت كخلفية.")}
+                        previewClassName="w-64 h-36"
+                        accept="video/mp4,video/webm"
+                      />
+                      <FormMessage />
+                    </FormItem>
                   )} />
-                  <FormField control={form.control} name="contactWhatsapp" render={({ field }) => (
-                    <FormItem><FormLabel>WhatsApp</FormLabel><FormControl><Input {...field} dir="ltr" /></FormControl><FormMessage /></FormItem>
-                  )} />
-                  <FormField control={form.control} name="contactEmails" render={({ field }) => (
-                    <FormItem className="md:col-span-2"><FormLabel>Emails (comma separated)</FormLabel><FormControl><Input {...field} dir="ltr" /></FormControl><FormMessage /></FormItem>
-                  )} />
-                </div>
+                )}
               </div>
 
               <div className="space-y-4">
@@ -487,6 +549,120 @@ export function AdminSiteSettings() {
           </Form>
         </CardContent>
       </Card>
+    </div>
+  );
+}
+
+function ContactPhonesField() {
+  const { control } = useFormContext<SettingsFormValues>();
+  const { fields, append, remove } = useFieldArray({ control, name: "contactPhones" });
+  return (
+    <div className="space-y-3">
+      <div className="flex items-center justify-between">
+        <FormLabel>Phone numbers</FormLabel>
+        <Button
+          type="button"
+          size="sm"
+          variant="outline"
+          onClick={() => append({ number: "", whatsapp: false })}
+        >
+          <Plus className="w-4 h-4 mr-1" /> Add phone
+        </Button>
+      </div>
+      {fields.length === 0 && (
+        <p className="text-xs text-muted-foreground">No phone numbers yet. Click "Add phone".</p>
+      )}
+      <div className="space-y-3">
+        {fields.map((f, index) => (
+          <div key={f.id} className="flex items-start gap-3 p-3 border rounded-md">
+            <div className="flex-1 grid gap-2">
+              <FormField
+                control={control}
+                name={`contactPhones.${index}.number` as const}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormControl>
+                      <Input {...field} dir="ltr" placeholder="+967 ..." />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={control}
+                name={`contactPhones.${index}.whatsapp` as const}
+                render={({ field }) => (
+                  <FormItem className="flex items-center gap-2 space-y-0">
+                    <FormControl>
+                      <Checkbox checked={field.value} onCheckedChange={(v) => field.onChange(!!v)} />
+                    </FormControl>
+                    <FormLabel className="text-sm font-normal">Show WhatsApp icon for this number</FormLabel>
+                  </FormItem>
+                )}
+              />
+            </div>
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              onClick={() => remove(index)}
+              aria-label="Remove phone"
+            >
+              <Trash2 className="w-4 h-4" />
+            </Button>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function ContactEmailsField() {
+  const { control } = useFormContext<SettingsFormValues>();
+  const { fields, append, remove } = useFieldArray({ control, name: "contactEmails" });
+  return (
+    <div className="space-y-3">
+      <div className="flex items-center justify-between">
+        <FormLabel>Emails</FormLabel>
+        <Button
+          type="button"
+          size="sm"
+          variant="outline"
+          onClick={() => append({ value: "" })}
+        >
+          <Plus className="w-4 h-4 mr-1" /> Add email
+        </Button>
+      </div>
+      {fields.length === 0 && (
+        <p className="text-xs text-muted-foreground">No emails yet. Click "Add email".</p>
+      )}
+      <div className="space-y-2">
+        {fields.map((f, index) => (
+          <div key={f.id} className="flex items-start gap-2">
+            <FormField
+              control={control}
+              name={`contactEmails.${index}.value` as const}
+              render={({ field }) => (
+                <FormItem className="flex-1">
+                  <FormControl>
+                    <Input {...field} dir="ltr" placeholder="name@example.com" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              onClick={() => remove(index)}
+              aria-label="Remove email"
+            >
+              <Trash2 className="w-4 h-4" />
+            </Button>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

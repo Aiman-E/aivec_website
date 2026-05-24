@@ -79,6 +79,19 @@ export interface UserRoleUpdate {
   role: UserRoleUpdateRole;
 }
 
+export interface ContactPhone {
+  number: string;
+  whatsapp: boolean;
+}
+
+export type SiteSettingsHeroMode = typeof SiteSettingsHeroMode[keyof typeof SiteSettingsHeroMode];
+
+
+export const SiteSettingsHeroMode = {
+  images: 'images',
+  video: 'video',
+} as const;
+
 export interface SiteSettings {
   id: number;
   siteTitleEn?: string;
@@ -95,7 +108,11 @@ export interface SiteSettings {
   venueDescAr?: string;
   contactPhone?: string;
   contactWhatsapp?: string;
+  contactPhones?: ContactPhone[];
   contactEmails?: string[];
+  heroMode?: SiteSettingsHeroMode;
+  /** @nullable */
+  heroVideoUrl?: string | null;
   seoTitleEn?: string;
   seoTitleAr?: string;
   seoDescEn?: string;
@@ -132,6 +149,14 @@ export interface SiteSettings {
   updatedAt?: string;
 }
 
+export type SiteSettingsUpdateHeroMode = typeof SiteSettingsUpdateHeroMode[keyof typeof SiteSettingsUpdateHeroMode];
+
+
+export const SiteSettingsUpdateHeroMode = {
+  images: 'images',
+  video: 'video',
+} as const;
+
 export interface SiteSettingsUpdate {
   siteTitleEn?: string;
   siteTitleAr?: string;
@@ -147,7 +172,11 @@ export interface SiteSettingsUpdate {
   venueDescAr?: string;
   contactPhone?: string;
   contactWhatsapp?: string;
+  contactPhones?: ContactPhone[];
   contactEmails?: string[];
+  heroMode?: SiteSettingsUpdateHeroMode;
+  /** @nullable */
+  heroVideoUrl?: string | null;
   seoTitleEn?: string;
   seoTitleAr?: string;
   seoDescEn?: string;

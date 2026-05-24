@@ -5,6 +5,8 @@
  * AIVEC Conference API
  * OpenAPI spec version: 0.1.0
  */
+import type { ContactPhone } from './contactPhone';
+import type { SiteSettingsUpdateHeroMode } from './siteSettingsUpdateHeroMode';
 
 export interface SiteSettingsUpdate {
   siteTitleEn?: string;
@@ -21,7 +23,11 @@ export interface SiteSettingsUpdate {
   venueDescAr?: string;
   contactPhone?: string;
   contactWhatsapp?: string;
+  contactPhones?: ContactPhone[];
   contactEmails?: string[];
+  heroMode?: SiteSettingsUpdateHeroMode;
+  /** @nullable */
+  heroVideoUrl?: string | null;
   seoTitleEn?: string;
   seoTitleAr?: string;
   seoDescEn?: string;

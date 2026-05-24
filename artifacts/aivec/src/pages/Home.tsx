@@ -38,6 +38,8 @@ export function Home() {
     settings?.heroCtaFormSlug?.trim() ||
     openForms?.[0]?.slug ||
     null;
+  const heroMode = settings?.heroMode === "video" ? "video" : "images";
+  const heroVideoUrl = settings?.heroVideoUrl ? resolveImageUrl(settings.heroVideoUrl) : "";
   const heroImages = (heroImagesData?.filter(h => h.active) ?? []).map(h => resolveImageUrl(h.url));
   const DEFAULT_HERO_SLIDES = [
     "/hero-anatomy.png",
@@ -99,27 +101,40 @@ export function Home() {
       
       {/* HERO SECTION - FULL-BLEED BACKGROUND SLIDESHOW */}
       <section id="home" className="relative min-h-[100dvh] pt-28 lg:pt-32 pb-16 overflow-hidden flex flex-col justify-center">
-        {/* Background slideshow */}
+        {/* Background slideshow or video */}
         <motion.div
           className="absolute inset-0 z-0"
           style={{ y: yHero, opacity: opacityHero }}
         >
-          <AnimatePresence>
-            <motion.div
-              key={slides[slideIndex]}
-              initial={{ opacity: 0, scale: 1.08 }}
-              animate={{ opacity: 1, scale: 1.0 }}
-              exit={{ opacity: 0 }}
-              transition={{ opacity: { duration: 1.6, ease: "easeInOut" }, scale: { duration: 6, ease: "linear" } }}
-              className="absolute inset-0"
-            >
-              <img
-                src={slides[slideIndex]}
-                alt=""
-                className="w-full h-full object-cover object-center"
-              />
-            </motion.div>
-          </AnimatePresence>
+          {heroMode === "video" && heroVideoUrl ? (
+            <video
+              key={heroVideoUrl}
+              src={heroVideoUrl}
+              autoPlay
+              muted
+              loop
+              playsInline
+              preload="auto"
+              className="w-full h-full object-cover object-center"
+            />
+          ) : (
+            <AnimatePresence>
+              <motion.div
+                key={slides[slideIndex]}
+                initial={{ opacity: 0, scale: 1.08 }}
+                animate={{ opacity: 1, scale: 1.0 }}
+                exit={{ opacity: 0 }}
+                transition={{ opacity: { duration: 1.6, ease: "easeInOut" }, scale: { duration: 6, ease: "linear" } }}
+                className="absolute inset-0"
+              >
+                <img
+                  src={slides[slideIndex]}
+                  alt=""
+                  className="w-full h-full object-cover object-center"
+                />
+              </motion.div>
+            </AnimatePresence>
+          )}
           {/* Editorial wash to keep typography legible */}
           <div className="absolute inset-0 bg-background/55 backdrop-blur-[2px]" />
           <div className="absolute inset-0 bg-gradient-to-b from-background/70 via-background/30 to-background" />
@@ -204,7 +219,7 @@ export function Home() {
         </div>
 
         {/* Slide indicator dots */}
-        {slides.length > 1 && (
+        {heroMode !== "video" && slides.length > 1 && (
           <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 flex gap-2">
             {slides.map((_, i) => (
               <button

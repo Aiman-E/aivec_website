@@ -903,6 +903,13 @@ components:
       properties:
         role: { type: string, enum: [user, admin] }
 
+    ContactPhone:
+      type: object
+      required: [number, whatsapp]
+      properties:
+        number: { type: string }
+        whatsapp: { type: boolean }
+
     SiteSettings:
       type: object
       required: [id, conferenceYear, conferenceNumber]
@@ -922,7 +929,10 @@ components:
         venueDescAr: { type: string }
         contactPhone: { type: string }
         contactWhatsapp: { type: string }
+        contactPhones: { type: array, items: { $ref: "#/components/schemas/ContactPhone" } }
         contactEmails: { type: array, items: { type: string } }
+        heroMode: { type: string, enum: [images, video] }
+        heroVideoUrl: { type: ["string", "null"] }
         seoTitleEn: { type: string }
         seoTitleAr: { type: string }
         seoDescEn: { type: string }
@@ -971,7 +981,10 @@ components:
         venueDescAr: { type: string }
         contactPhone: { type: string }
         contactWhatsapp: { type: string }
+        contactPhones: { type: array, items: { $ref: "#/components/schemas/ContactPhone" } }
         contactEmails: { type: array, items: { type: string } }
+        heroMode: { type: string, enum: [images, video] }
+        heroVideoUrl: { type: ["string", "null"] }
         seoTitleEn: { type: string }
         seoTitleAr: { type: string }
         seoDescEn: { type: string }

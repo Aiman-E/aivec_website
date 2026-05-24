@@ -63,9 +63,13 @@ export function ImageUploadField({
           className={`${previewClassName} shrink-0 bg-muted border border-border overflow-hidden flex items-center justify-center text-xs text-muted-foreground`}
         >
           {shownSrc ? (
-            <img src={shownSrc} alt="" className="w-full h-full object-contain" />
+            accept.startsWith("video/") ? (
+              <video src={shownSrc} className="w-full h-full object-contain" muted playsInline controls />
+            ) : (
+              <img src={shownSrc} alt="" className="w-full h-full object-contain" />
+            )
           ) : (
-            <span>No image</span>
+            <span>{accept.startsWith("video/") ? "No video" : "No image"}</span>
           )}
         </div>
         <div className="flex-1 space-y-2 min-w-0">

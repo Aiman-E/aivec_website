@@ -72,7 +72,13 @@ export const GetSiteSettingsResponse = zod.object({
   "venueDescAr": zod.string().optional(),
   "contactPhone": zod.string().optional(),
   "contactWhatsapp": zod.string().optional(),
+  "contactPhones": zod.array(zod.object({
+  "number": zod.string(),
+  "whatsapp": zod.boolean()
+})).optional(),
   "contactEmails": zod.array(zod.string()).optional(),
+  "heroMode": zod.enum(['images', 'video']).optional(),
+  "heroVideoUrl": zod.string().nullish(),
   "seoTitleEn": zod.string().optional(),
   "seoTitleAr": zod.string().optional(),
   "seoDescEn": zod.string().optional(),
@@ -121,7 +127,13 @@ export const UpdateSiteSettingsBody = zod.object({
   "venueDescAr": zod.string().optional(),
   "contactPhone": zod.string().optional(),
   "contactWhatsapp": zod.string().optional(),
+  "contactPhones": zod.array(zod.object({
+  "number": zod.string(),
+  "whatsapp": zod.boolean()
+})).optional(),
   "contactEmails": zod.array(zod.string()).optional(),
+  "heroMode": zod.enum(['images', 'video']).optional(),
+  "heroVideoUrl": zod.string().nullish(),
   "seoTitleEn": zod.string().optional(),
   "seoTitleAr": zod.string().optional(),
   "seoDescEn": zod.string().optional(),
@@ -169,7 +181,13 @@ export const UpdateSiteSettingsResponse = zod.object({
   "venueDescAr": zod.string().optional(),
   "contactPhone": zod.string().optional(),
   "contactWhatsapp": zod.string().optional(),
+  "contactPhones": zod.array(zod.object({
+  "number": zod.string(),
+  "whatsapp": zod.boolean()
+})).optional(),
   "contactEmails": zod.array(zod.string()).optional(),
+  "heroMode": zod.enum(['images', 'video']).optional(),
+  "heroVideoUrl": zod.string().nullish(),
   "seoTitleEn": zod.string().optional(),
   "seoTitleAr": zod.string().optional(),
   "seoDescEn": zod.string().optional(),

@@ -1,4 +1,6 @@
-import { pgTable, serial, text, integer, timestamp, jsonb } from "drizzle-orm/pg-core";
+import { pgTable, serial, text, integer, timestamp, jsonb, varchar } from "drizzle-orm/pg-core";
+
+export type ContactPhone = { number: string; whatsapp: boolean };
 
 export const siteSettingsTable = pgTable("site_settings", {
   id: serial("id").primaryKey(),
@@ -16,7 +18,10 @@ export const siteSettingsTable = pgTable("site_settings", {
   venueDescAr: text("venue_desc_ar").notNull().default(""),
   contactPhone: text("contact_phone").notNull().default(""),
   contactWhatsapp: text("contact_whatsapp").notNull().default(""),
+  contactPhones: jsonb("contact_phones").$type<ContactPhone[]>().notNull().default([]),
   contactEmails: jsonb("contact_emails").$type<string[]>().notNull().default([]),
+  heroMode: varchar("hero_mode", { length: 16 }).notNull().default("images"),
+  heroVideoUrl: text("hero_video_url"),
   seoTitleEn: text("seo_title_en").notNull().default(""),
   seoTitleAr: text("seo_title_ar").notNull().default(""),
   seoDescEn: text("seo_desc_en").notNull().default(""),
