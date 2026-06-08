@@ -4,8 +4,6 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { LanguageProvider } from "@/lib/i18n";
-import { ClerkProvider } from "@clerk/react";
-import { publishableKeyFromHost } from "@clerk/react/internal";
 import { FontLoader } from "@/components/FontLoader";
 import NotFound from "@/pages/not-found";
 
@@ -40,18 +38,6 @@ import { AdminUsers } from "@/pages/admin/AdminUsers";
 import { AdminAccounts } from "@/pages/admin/AdminAccounts";
 
 const queryClient = new QueryClient();
-
-// REQUIRED — copy verbatim. Resolves the key from window.location.hostname so the
-// same build serves multiple Clerk custom domains. Do not inline the env var.
-const PUBLISHABLE_KEY = publishableKeyFromHost(
-  typeof window !== "undefined" ? window.location.hostname : "",
-  import.meta.env.VITE_CLERK_PUBLISHABLE_KEY,
-);
-
-// REQUIRED — copy verbatim. Empty in dev (Clerk hits dev FAPI directly), auto-set
-// in prod. Do NOT gate on import.meta.env.PROD / NODE_ENV — the empty dev value
-// is intentional, and any branching breaks the prod proxy.
-const CLERK_PROXY_URL = import.meta.env.VITE_CLERK_PROXY_URL;
 
 function AdminRouter() {
   return (
@@ -139,41 +125,19 @@ function RootRouter() {
 }
 
 function App() {
-  if (!PUBLISHABLE_KEY) {
-    return <div>Missing Clerk Publishable Key</div>;
-  }
-
   return (
-    <ClerkProvider
-      publishableKey={PUBLISHABLE_KEY}
-      proxyUrl={CLERK_PROXY_URL}
-      appearance={{
-        variables: {
-          colorPrimary: "hsl(355 65% 25%)",
-        },
-        elements: {
-          socialButtons: { display: "none" },
-          socialButtonsBlockButton: { display: "none" },
-          socialButtonsIconButton: { display: "none" },
-          dividerRow: { display: "none" },
-          dividerText: { display: "none" },
-          dividerLine: { display: "none" },
-        },
-      }}
-    >
-      <QueryClientProvider client={queryClient}>
-        <TooltipProvider>
-          <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
-            <LanguageProvider>
-              <FontLoader />
-              <ScrollToTop />
-              <RootRouter />
-            </LanguageProvider>
-          </WouterRouter>
-          <Toaster />
-        </TooltipProvider>
-      </QueryClientProvider>
-    </ClerkProvider>
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
+          <LanguageProvider>
+            <FontLoader />
+            <ScrollToTop />
+            <RootRouter />
+          </LanguageProvider>
+        </WouterRouter>
+        <Toaster />
+      </TooltipProvider>
+    </QueryClientProvider>
   );
 }
 

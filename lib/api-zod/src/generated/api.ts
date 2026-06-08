@@ -9,7 +9,7 @@ import * as zod from 'zod';
 
 
 /**
- * @summary Request a presigned URL for file upload
+ * @summary Request an upload URL for file upload
  */
 
 
@@ -28,7 +28,7 @@ export const RequestUploadUrlBody = zod.object({
 
 
 export const RequestUploadUrlResponse = zod.object({
-  "uploadURL": zod.string().url(),
+  "uploadURL": zod.string().min(1),
   "objectPath": zod.string(),
   "metadata": zod.object({
   "name": zod.string().min(1),
@@ -1242,5 +1242,3 @@ export const GetAdminDashboardResponse = zod.object({
   "createdAt": zod.coerce.date()
 })).optional()
 })
-
-

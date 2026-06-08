@@ -27,7 +27,7 @@ paths:
     post:
       tags: [storage]
       operationId: requestUploadUrl
-      summary: Request a presigned URL for file upload
+      summary: Request an upload URL for file upload
       requestBody:
         required: true
         content:
@@ -909,7 +909,7 @@ components:
       type: object
       required: [uploadURL, objectPath]
       properties:
-        uploadURL: { type: string, format: uri }
+        uploadURL: { type: string, minLength: 1 }
         objectPath: { type: string }
         metadata:
           $ref: "#/components/schemas/UploadUrlRequest"

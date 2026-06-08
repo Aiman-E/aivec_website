@@ -77,12 +77,23 @@ export function getSessionCookieOptions() {
   };
 }
 
+export function getAdminSessionToken(req: Request): string {
+  const cookieToken = (req.cookies?.[ADMIN_SESSION_COOKIE] as string | undefined) ?? "";
+  if (cookieToken) return cookieToken;
+
+  const authorization = req.header("authorization") ?? "";
+  const bearerMatch = authorization.match(/^Bearer\s+(.+)$/i);
+  if (bearerMatch?.[1]) return bearerMatch[1].trim();
+
+  return req.header("x-admin-session-token")?.trim() ?? "";
+}
+
 export async function requireAdminSession(
   req: Request,
   res: Response,
   next: NextFunction,
 ): Promise<void> {
-  const token = (req.cookies?.[ADMIN_SESSION_COOKIE] as string | undefined) ?? "";
+  const token = getAdminSessionToken(req);
   if (!token) {
     res.status(401).json({ error: "Admin session required" });
     return;
@@ -101,7 +112,7 @@ export async function optionalAdminSession(
   _res: Response,
   next: NextFunction,
 ): Promise<void> {
-  const token = (req.cookies?.[ADMIN_SESSION_COOKIE] as string | undefined) ?? "";
+  const token = getAdminSessionToken(req);
   if (token) {
     const admin = await getAdminBySessionToken(token);
     if (admin) req.adminUser = admin;

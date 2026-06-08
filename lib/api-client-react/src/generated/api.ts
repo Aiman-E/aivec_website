@@ -92,7 +92,7 @@ export const getRequestUploadUrlUrl = () => {
 }
 
 /**
- * @summary Request a presigned URL for file upload
+ * @summary Request an upload URL for file upload
  */
 export const requestUploadUrl = async (uploadUrlRequest: UploadUrlRequest, options?: RequestInit): Promise<UploadUrlResponse> => {
 
@@ -141,7 +141,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type RequestUploadUrlMutationError = ErrorType<Error>
 
     /**
- * @summary Request a presigned URL for file upload
+ * @summary Request an upload URL for file upload
  */
 export const useRequestUploadUrl = <TError = ErrorType<Error>,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof requestUploadUrl>>, TError,{data: BodyType<UploadUrlRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
@@ -3627,7 +3627,6 @@ export function useGetAdminDashboard<TData = Awaited<ReturnType<typeof getAdminD
 
   return { ...query, queryKey: queryOptions.queryKey };
 }
-
 
 
 

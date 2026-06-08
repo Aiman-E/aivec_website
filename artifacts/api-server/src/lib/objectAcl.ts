@@ -1,6 +1,4 @@
-import { File } from "@google-cloud/storage";
-
-const ACL_POLICY_METADATA_KEY = "custom:aclPolicy";
+const ACL_POLICY_METADATA_KEY = "aclPolicy";
 
 // Can be flexibly defined according to the use case.
 //
@@ -15,7 +13,7 @@ export enum ObjectAccessGroupType {}
 export interface ObjectAccessGroup {
   type: ObjectAccessGroupType;
   // The logic id that identifies qualified group members. Format depends on the
-  // ObjectAccessGroupType — e.g. a user-list DB id, an email domain, a group id.
+  // ObjectAccessGroupType, e.g. a user-list DB id, an email domain, a group id.
   id: string;
 }
 
@@ -29,11 +27,17 @@ export interface ObjectAclRule {
   permission: ObjectPermission;
 }
 
-// Stored as object custom metadata under "custom:aclPolicy" (JSON string).
 export interface ObjectAclPolicy {
   owner: string;
   visibility: "public" | "private";
   aclRules?: Array<ObjectAclRule>;
+}
+
+interface ObjectFileWithAclMetadata {
+  name?: string;
+  getAclPolicy?: () => Promise<ObjectAclPolicy | null>;
+  setAclPolicy?: (aclPolicy: ObjectAclPolicy) => Promise<void>;
+  metadata?: Record<string, unknown>;
 }
 
 function isPermissionAllowed(
@@ -68,30 +72,31 @@ function createObjectAccessGroup(
 }
 
 export async function setObjectAclPolicy(
-  objectFile: File,
+  objectFile: ObjectFileWithAclMetadata,
   aclPolicy: ObjectAclPolicy,
 ): Promise<void> {
-  const [exists] = await objectFile.exists();
-  if (!exists) {
-    throw new Error(`Object not found: ${objectFile.name}`);
+  if (objectFile.setAclPolicy) {
+    await objectFile.setAclPolicy(aclPolicy);
+    return;
   }
 
-  await objectFile.setMetadata({
-    metadata: {
-      [ACL_POLICY_METADATA_KEY]: JSON.stringify(aclPolicy),
-    },
-  });
+  objectFile.metadata = {
+    ...(objectFile.metadata ?? {}),
+    [ACL_POLICY_METADATA_KEY]: aclPolicy,
+  };
 }
 
 export async function getObjectAclPolicy(
-  objectFile: File,
+  objectFile: ObjectFileWithAclMetadata,
 ): Promise<ObjectAclPolicy | null> {
-  const [metadata] = await objectFile.getMetadata();
-  const aclPolicy = metadata?.metadata?.[ACL_POLICY_METADATA_KEY];
-  if (!aclPolicy) {
-    return null;
+  if (objectFile.getAclPolicy) {
+    return objectFile.getAclPolicy();
   }
-  return JSON.parse(aclPolicy as string);
+
+  const aclPolicy = objectFile.metadata?.[ACL_POLICY_METADATA_KEY];
+  if (!aclPolicy) return null;
+  if (typeof aclPolicy === "string") return JSON.parse(aclPolicy) as ObjectAclPolicy;
+  return aclPolicy as ObjectAclPolicy;
 }
 
 export async function canAccessObject({
@@ -100,12 +105,12 @@ export async function canAccessObject({
   requestedPermission,
 }: {
   userId?: string;
-  objectFile: File;
+  objectFile: ObjectFileWithAclMetadata;
   requestedPermission: ObjectPermission;
 }): Promise<boolean> {
   const aclPolicy = await getObjectAclPolicy(objectFile);
   if (!aclPolicy) {
-    return false;
+    return true;
   }
 
   if (

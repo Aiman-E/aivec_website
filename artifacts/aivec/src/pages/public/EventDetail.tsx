@@ -1,14 +1,11 @@
 import { useLanguage, useNavigateToSection, useDateLocale } from "@/lib/i18n";
-import { useGetEvent, useRegisterForEvent, getGetEventQueryKey } from "@workspace/api-client-react";
+import { useGetEvent, getGetEventQueryKey } from "@workspace/api-client-react";
 import { useRoute } from "wouter";
 import { Skeleton } from "@/components/ui/skeleton";
 import { format } from "date-fns";
 import { Calendar, MapPin, ArrowRight, ArrowLeft, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useToast } from "@/hooks/use-toast";
-import { SignInButton, useUser } from "@clerk/react";
 import { resolveImageUrl } from "@/components/admin/ImageUploadField";
-import { FormRenderer } from "@/components/public/FormRenderer";
 
 export function EventDetail() {
   const { lang, t, tStatus } = useLanguage();
@@ -16,11 +13,8 @@ export function EventDetail() {
   const dateLocale = useDateLocale();
   const [, params] = useRoute("/:lang/events/:slug");
   const slug = params?.slug || "";
-  const { toast } = useToast();
-  const { isSignedIn } = useUser();
 
   const { data: eventData, isLoading } = useGetEvent(slug, { query: { enabled: !!slug, queryKey: getGetEventQueryKey(slug) } as never });
-  const registerForEvent = useRegisterForEvent();
 
   if (isLoading) {
     return (
@@ -59,30 +53,9 @@ export function EventDetail() {
     );
   }
 
-  const { event, fields } = eventData;
+  const { event } = eventData;
   const Arrow = lang === 'ar' ? ArrowRight : ArrowLeft;
   const isRegistrationOpen = event.status === 'open';
-
-  function onSubmit(answers: Record<string, unknown>) {
-    registerForEvent.mutate(
-      { id: event.id, data: { answers } } as never,
-      {
-        onSuccess: () => {
-          toast({
-            title: t("Registration successful", "تم التسجيل بنجاح"),
-            description: t("You have been registered for this event.", "لقد تم تسجيلك في هذه الفعالية."),
-          });
-        },
-        onError: () => {
-          toast({
-            variant: "destructive",
-            title: t("Registration failed", "فشل التسجيل"),
-            description: t("There was an error processing your registration. You might already be registered.", "حدث خطأ أثناء معالجة تسجيلك. قد تكون مسجلاً بالفعل."),
-          });
-        }
-      }
-    );
-  }
 
   return (
     <div className="flex flex-col min-h-screen bg-background text-foreground pb-32 pt-28">
@@ -187,28 +160,21 @@ export function EventDetail() {
                   </p>
                 </div>
               ) : (
-                <>
-                  {!isSignedIn ? (
-                    <div className="py-8">
-                      <p className="mb-8 text-muted-foreground leading-relaxed">
-                        {t("You must sign in or create an account to register for sessions.", "يجب تسجيل الدخول أو إنشاء حساب للتسجيل في الجلسات.")}
-                      </p>
-                      <SignInButton mode="modal">
-                        <Button size="lg" className="w-full rounded-none h-14 font-bold text-xs uppercase tracking-widest bg-primary text-primary-foreground hover:bg-primary/90">
-                          {t("Sign In to Register", "تسجيل الدخول للتسجيل")}
-                        </Button>
-                      </SignInButton>
-                    </div>
-                  ) : (
-                    <FormRenderer
-                      fields={fields}
-                      onSubmit={onSubmit}
-                      submitting={registerForEvent.isPending}
-                      submitLabel={t("Confirm Registration", "تأكيد التسجيل")}
-                      uploadBasePath="/api/storage/public"
-                    />
-                  )}
-                </>
+                <div className="py-8">
+                  <p className="mb-6 text-muted-foreground leading-relaxed">
+                    {t(
+                      "Online account registration is unavailable. Please contact the conference team to register for this session.",
+                      "التسجيل الإلكتروني بالحسابات غير متاح حالياً. يرجى التواصل مع فريق المؤتمر للتسجيل في هذه الجلسة.",
+                    )}
+                  </p>
+                  <Button
+                    size="lg"
+                    onClick={() => goToSection("#contact")}
+                    className="w-full rounded-none h-14 font-bold text-xs uppercase tracking-widest bg-primary text-primary-foreground hover:bg-primary/90"
+                  >
+                    {t("Contact the Team", "تواصل مع الفريق")}
+                  </Button>
+                </div>
               )}
             </div>
           </div>

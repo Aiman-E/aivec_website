@@ -1,7 +1,5 @@
 import { Link, useLocation } from "wouter";
 import { useLanguage } from "@/lib/i18n";
-import { Button } from "@/components/ui/button";
-import { SignInButton, UserButton, useUser } from "@clerk/react";
 import { Menu, X } from "lucide-react";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -10,7 +8,6 @@ import { resolveImageUrl } from "@/components/admin/ImageUploadField";
 
 export function Navbar() {
   const { lang, setLang, t } = useLanguage();
-  const { isSignedIn } = useUser();
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [location, setLocation] = useLocation();
@@ -154,23 +151,6 @@ export function Navbar() {
 
             <div className="flex items-center gap-4">
               <LangToggle />
-
-              {!isSignedIn ? (
-                <SignInButton mode="modal">
-                  <Button variant="default" size="sm" className="font-bold text-xs uppercase tracking-widest px-6 rounded-none bg-primary text-primary-foreground hover:bg-primary/90 border border-primary">
-                    {t("Sign In", "دخول")}
-                  </Button>
-                </SignInButton>
-              ) : (
-                <div className="flex items-center gap-4">
-                  <Link href={`/${lang}/me/registrations`}>
-                    <Button variant="outline" size="sm" className="font-bold text-xs uppercase tracking-widest rounded-none border-primary text-primary hover:bg-primary hover:text-primary-foreground">
-                      {t("Portal", "البوابة")}
-                    </Button>
-                  </Link>
-                  <UserButton appearance={{ elements: { avatarBox: "w-8 h-8 rounded-none border border-border" } }} />
-                </div>
-              )}
             </div>
           </div>
 
@@ -236,22 +216,6 @@ export function Navbar() {
                   {link.label}
                 </motion.button>
               ))}
-            </div>
-
-            <div className="mt-auto pt-10 flex flex-col gap-3">
-              {!isSignedIn ? (
-                <SignInButton mode="modal">
-                  <Button size="lg" className="w-full rounded-none text-sm tracking-widest uppercase font-bold" onClick={() => setMobileMenuOpen(false)}>
-                    {t("Sign In", "تسجيل الدخول")}
-                  </Button>
-                </SignInButton>
-              ) : (
-                <Link href={`/${lang}/me/registrations`} onClick={() => setMobileMenuOpen(false)}>
-                  <Button variant="outline" size="lg" className="w-full rounded-none text-sm tracking-widest uppercase font-bold border-primary text-primary">
-                    {t("Delegate Portal", "بوابة المشتركين")}
-                  </Button>
-                </Link>
-              )}
             </div>
           </motion.div>
         )}

@@ -5,6 +5,7 @@ import {
   ADMIN_SESSION_COOKIE,
   createSession,
   destroySession,
+  getAdminSessionToken,
   getSessionCookieOptions,
   requireAdminSession,
   verifyPassword,
@@ -53,7 +54,7 @@ router.post("/admin/auth/login", async (req, res): Promise<void> => {
 });
 
 router.post("/admin/auth/logout", async (req, res): Promise<void> => {
-  const token = (req.cookies?.[ADMIN_SESSION_COOKIE] as string | undefined) ?? "";
+  const token = getAdminSessionToken(req);
   if (token) await destroySession(token);
   res.clearCookie(ADMIN_SESSION_COOKIE, { path: "/" });
   res.json({ ok: true });

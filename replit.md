@@ -32,26 +32,38 @@ _Populate as you build — non-obvious choices a reader couldn't infer from the 
 
 _Describe the high-level user-facing capabilities of this app once they exist._
 
-## Data portability (running off Replit)
+## Data portability
 
-This project is **not locked to Replit**. Everything user-facing lives in services you control:
+This project is designed to run from the Dokploy deployment for `aivec.org`.
+Everything user-facing lives in services you control:
 
-- **User accounts** — Every user that signs in has their `clerkId`, email, first/last name, role, and join date written to the `users` table in your Postgres database (see `lib/db/src/schema/auth.ts` and `getOrCreateLocalUser` in `artifacts/api-server/src/lib/auth.ts`). Admin → Users has an **Export CSV** button to back this up at any time.
+- **Admin accounts** — Admin login uses the native `admin_users` and `admin_sessions` tables. No external auth provider is required for the admin panel.
 - **All content** (pages, events, news, blog, sponsors, contact submissions, scientific researches, site settings, admin accounts) — lives in the same Postgres DB. A `pg_dump` of `DATABASE_URL` is a full backup.
-- **Uploaded files** (hero images, sponsor logos, scientific paper PDFs) — live in the configured object storage bucket. On Replit this is App Storage; on another host, point `DEFAULT_OBJECT_STORAGE_BUCKET_ID` / `PRIVATE_OBJECT_DIR` / `PUBLIC_OBJECT_SEARCH_PATHS` at any S3-compatible bucket.
-- **Passwords** — Clerk handles password verification on its own servers. Your DB never sees plaintext passwords, and Clerk does not share password hashes. If you ever drop Clerk, users will need to set a new password with the replacement auth provider; their **identities (email, name, role) remain in your DB**.
+- **Uploaded files** (hero images, sponsor logos, form uploads) — live on the API container filesystem under `LOCAL_OBJECT_ROOT`, which should be mounted to persistent storage in Dokploy. For production this is `/app/uploads` in the container and `/srv/docker/dokploy/volumes/aivec/uploads` on the host.
+- **Public user accounts** — The previous external public user-auth flow is disabled. Public viewing, admin login, admin content management, and local uploads do not require public user-auth credentials.
 
-To run the app off Replit, point these env vars at your own infrastructure:
+Production API env:
 
-- `DATABASE_URL` — your Postgres
-- `VITE_CLERK_PUBLISHABLE_KEY` + Clerk secret key — your Clerk account (works on any host; not Replit-tied)
-- `DEFAULT_OBJECT_STORAGE_BUCKET_ID`, `PRIVATE_OBJECT_DIR`, `PUBLIC_OBJECT_SEARCH_PATHS` — your object storage
-- `AIVEC_ADMIN_EMAILS` — comma-separated emails auto-promoted to admin on first sign-in
+- `NODE_ENV=production`
+- `PORT=3000`
+- `DATABASE_URL` — your Postgres connection string
+- `LOCAL_OBJECT_ROOT=/app/uploads`
+- `ALLOWED_ORIGINS=https://aivec.org,http://aivec.org`
 - `ADMIN_INITIAL_USERNAME` / `ADMIN_INITIAL_PASSWORD` — initial admin-panel credentials (see Admin access)
+
+If the site is served from `www.aivec.org`, include those origins too:
+
+- `ALLOWED_ORIGINS=https://aivec.org,http://aivec.org,https://www.aivec.org,http://www.aivec.org`
+
+Production frontend env:
+
+- `NODE_ENV=production`
+- `PORT=3000`
+- `BASE_PATH=/`
 
 ## Admin access
 
-- Admin panel: `/<lang>/admin` (e.g. `/en/admin`) — separate from public Clerk login.
+- Admin panel: `/<lang>/admin` (e.g. `/en/admin`) — uses native admin login.
 - Default seeded login on first run: **username `admin` / password `admin`** (change immediately via Admin → Admin Accounts).
 - Override the initial seed via env: `ADMIN_INITIAL_USERNAME`, `ADMIN_INITIAL_PASSWORD`.
 - In production (`NODE_ENV=production`), the seed will refuse to run unless `ADMIN_INITIAL_PASSWORD` is at least 12 characters.

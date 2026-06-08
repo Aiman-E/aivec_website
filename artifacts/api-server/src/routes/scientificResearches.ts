@@ -39,12 +39,12 @@ router.get("/scientific-researches", requireAdminSession, async (_req, res): Pro
   res.json(rows);
 });
 
-// Requires a verified Clerk session. Uploader identity (email + clerk id) is taken
-// from the verified session, never trusted from the body, so callers cannot spoof
-// other users. Uploader display name + paper details come from the body.
+// Public paper submission used to require a public user-auth session. The
+// current deployment has no public user-auth provider, so requireAuth returns a
+// controlled 401 JSON response instead of depending on an external auth service.
 router.post("/scientific-researches", requireAuth, async (req: Request, res: Response): Promise<void> => {
   const user = req.localUser!;
-  const rateKey = `clerk:${user.clerkId}`;
+  const rateKey = `user:${user.id}`;
   if (!checkSubmitRate(rateKey)) {
     res.status(429).json({ error: "Too many submissions. Please try again shortly." });
     return;
