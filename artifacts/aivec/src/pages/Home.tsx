@@ -604,7 +604,7 @@ export function Home() {
             </div>
             
             <div className="relative min-h-[320px] sm:min-h-[420px] lg:min-h-full bg-muted border-b-2 lg:border-b-0 lg:border-l-2 border-foreground/15 order-1 lg:order-2 overflow-hidden">
-              <img src={settings?.venueImageUrl ? resolveImageUrl(settings.venueImageUrl) : "/aden-landscape.png"} alt={settings ? t(settings.venueNameEn, settings.venueNameAr) : "Aden Landscape"} className="absolute inset-0 w-full h-full object-cover grayscale contrast-110" />
+              <img src={settings?.venueImageUrl ? resolveImageUrl(settings.venueImageUrl) : "/aden-landscape.png"} alt={settings ? t(settings.venueNameEn, settings.venueNameAr) : "Aden Landscape"} className="absolute inset-0 w-full h-full object-cover" />
             </div>
             
           </div>
