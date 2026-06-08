@@ -16,6 +16,22 @@ import { ImageUploadField } from "@/components/admin/ImageUploadField";
 import { sanitizeFontName, sanitizeFontUrl, applyFontFaces, applyGoogleFontsLink } from "@/components/FontLoader";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const HOME_INTRO_VIDEO_MAX_BYTES = 5 * 1024 * 1024;
+const HOME_INTRO_VIDEO_EXTENSIONS = new Set(["mp4", "webm", "mkv", "mov", "m4v", "ogv"]);
+const HOME_INTRO_VIDEO_ACCEPT = [
+  "video/mp4",
+  "video/webm",
+  "video/x-matroska",
+  "video/quicktime",
+  "video/x-m4v",
+  "video/ogg",
+  ".mp4",
+  ".webm",
+  ".mkv",
+  ".mov",
+  ".m4v",
+  ".ogv",
+].join(",");
 
 const settingsSchema = z.object({
   siteTitleEn: z.string().optional(),
@@ -76,6 +92,7 @@ const settingsSchema = z.object({
   logoUrl: z.string().optional(),
   faviconUrl: z.string().optional(),
   socialImageUrl: z.string().optional(),
+  homeIntroVideoUrl: z.string().optional(),
   venueImageUrl: z.string().optional(),
   aboutImageUrl: z.string().optional(),
   quoteImageUrl: z.string().optional(),
@@ -162,6 +179,7 @@ export function AdminSiteSettings() {
       logoUrl: "",
       faviconUrl: "",
       socialImageUrl: "",
+      homeIntroVideoUrl: "",
       venueImageUrl: "",
       aboutImageUrl: "",
       quoteImageUrl: "",
@@ -265,6 +283,7 @@ export function AdminSiteSettings() {
         logoUrl: settings.logoUrl ?? "",
         faviconUrl: settings.faviconUrl ?? "",
         socialImageUrl: settings.socialImageUrl ?? "",
+        homeIntroVideoUrl: settings.homeIntroVideoUrl ?? "",
         venueImageUrl: settings.venueImageUrl ?? "",
         aboutImageUrl: settings.aboutImageUrl ?? "",
         quoteImageUrl: settings.quoteImageUrl ?? "",
@@ -290,6 +309,7 @@ export function AdminSiteSettings() {
       heroVideoUrl: data.heroVideoUrl?.trim() ? data.heroVideoUrl.trim() : null,
       fontEnUrl: data.fontEnUrl?.trim() ? data.fontEnUrl.trim() : null,
       fontArUrl: data.fontArUrl?.trim() ? data.fontArUrl.trim() : null,
+      homeIntroVideoUrl: data.homeIntroVideoUrl?.trim() ? data.homeIntroVideoUrl.trim() : null,
       venueImageUrl: data.venueImageUrl?.trim() ? data.venueImageUrl.trim() : null,
       aboutImageUrl: data.aboutImageUrl?.trim() ? data.aboutImageUrl.trim() : null,
       quoteImageUrl: data.quoteImageUrl?.trim() ? data.quoteImageUrl.trim() : null,
@@ -645,6 +665,34 @@ export function AdminSiteSettings() {
                         label={t("Social Share Image", "صورة المشاركة")}
                         hint={t("Recommended 1200×630 for Facebook/Twitter previews.", "يفضّل 1200×630 لمعاينات فيسبوك وتويتر.")}
                         previewClassName="w-32 h-20"
+                      />
+                      <FormMessage />
+                    </FormItem>
+                  )} />
+                  <FormField control={form.control} name="homeIntroVideoUrl" render={({ field }) => (
+                    <FormItem>
+                      <ImageUploadField
+                        value={field.value}
+                        onChange={field.onChange}
+                        label={t("Home Intro Video", "فيديو بداية الصفحة الرئيسية")}
+                        hint={t(
+                          "Shown above the homepage slideshow. MP4, WebM, MKV, MOV, M4V, or OGV, max 5 MB. Leave empty to hide.",
+                          "يظهر أعلى عرض صور الصفحة الرئيسية. MP4 أو WebM أو MKV أو MOV أو M4V أو OGV، بحد أقصى 5 ميغابايت. اتركه فارغًا لإخفائه."
+                        )}
+                        previewClassName="w-48 h-28"
+                        accept={HOME_INTRO_VIDEO_ACCEPT}
+                        maxSizeBytes={HOME_INTRO_VIDEO_MAX_BYTES}
+                        maxSizeLabel="5 MB"
+                        validateFile={(file) => {
+                          const extension = file.name.toLowerCase().split(".").pop() ?? "";
+                          if (file.type.toLowerCase().startsWith("video/") || HOME_INTRO_VIDEO_EXTENSIONS.has(extension)) {
+                            return null;
+                          }
+                          return t(
+                            "Please upload a valid video file.",
+                            "يرجى رفع ملف فيديو صالح."
+                          );
+                        }}
                       />
                       <FormMessage />
                     </FormItem>

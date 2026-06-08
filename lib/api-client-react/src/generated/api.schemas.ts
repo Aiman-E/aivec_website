@@ -126,6 +126,8 @@ export interface SiteSettings {
   /** @nullable */
   socialImageUrl?: string | null;
   /** @nullable */
+  homeIntroVideoUrl?: string | null;
+  /** @nullable */
   venueImageUrl?: string | null;
   /** @nullable */
   aboutImageUrl?: string | null;
@@ -202,6 +204,8 @@ export interface SiteSettingsUpdate {
   faviconUrl?: string | null;
   /** @nullable */
   socialImageUrl?: string | null;
+  /** @nullable */
+  homeIntroVideoUrl?: string | null;
   /** @nullable */
   venueImageUrl?: string | null;
   /** @nullable */
@@ -1033,4 +1037,3 @@ published?: boolean;
 export type ListBlogParams = {
 published?: boolean;
 };
-

@@ -41,6 +41,7 @@ export function Home() {
     null;
   const heroMode = settings?.heroMode === "video" ? "video" : "images";
   const heroVideoUrl = settings?.heroVideoUrl ? resolveImageUrl(settings.heroVideoUrl) : "";
+  const homeIntroVideoUrl = settings?.homeIntroVideoUrl ? resolveImageUrl(settings.homeIntroVideoUrl) : "";
   const heroImages = (heroImagesData?.filter(h => h.active) ?? []).map(h => resolveImageUrl(h.url));
   const DEFAULT_HERO_SLIDES = [
     "/hero-anatomy.png",
@@ -115,9 +116,24 @@ export function Home() {
 
   return (
     <div className="bg-background text-foreground selection:bg-primary selection:text-primary-foreground" ref={containerRef}>
+      {homeIntroVideoUrl && (
+        <section id="home" className="relative bg-black pt-28 lg:pt-32 border-b border-border overflow-hidden">
+          <video
+            key={homeIntroVideoUrl}
+            src={homeIntroVideoUrl}
+            className="block w-full max-h-[82vh] bg-black object-contain"
+            autoPlay
+            muted
+            loop
+            playsInline
+            controls
+            preload="metadata"
+          />
+        </section>
+      )}
       
       {/* HERO SECTION - FULL-BLEED BACKGROUND SLIDESHOW */}
-      <section id="home" className="relative min-h-[100dvh] pt-28 lg:pt-32 pb-16 overflow-hidden flex flex-col justify-center">
+      <section id={homeIntroVideoUrl ? undefined : "home"} className="relative min-h-[100dvh] pt-28 lg:pt-32 pb-16 overflow-hidden flex flex-col justify-center">
         {/* Background slideshow or video */}
         <motion.div
           className="absolute inset-0 z-0"

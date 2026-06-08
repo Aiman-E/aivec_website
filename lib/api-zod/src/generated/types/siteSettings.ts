@@ -42,6 +42,8 @@ export interface SiteSettings {
   /** @nullable */
   socialImageUrl?: string | null;
   /** @nullable */
+  homeIntroVideoUrl?: string | null;
+  /** @nullable */
   venueImageUrl?: string | null;
   /** @nullable */
   aboutImageUrl?: string | null;

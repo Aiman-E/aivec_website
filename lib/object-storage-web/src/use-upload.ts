@@ -20,6 +20,34 @@ interface UseUploadOptions {
   onError?: (error: Error) => void;
 }
 
+const MIME_BY_EXTENSION: Record<string, string> = {
+  jpg: "image/jpeg",
+  jpeg: "image/jpeg",
+  png: "image/png",
+  gif: "image/gif",
+  webp: "image/webp",
+  svg: "image/svg+xml",
+  ico: "image/x-icon",
+  mp4: "video/mp4",
+  webm: "video/webm",
+  mkv: "video/x-matroska",
+  mov: "video/quicktime",
+  m4v: "video/x-m4v",
+  ogv: "video/ogg",
+  pdf: "application/pdf",
+  woff2: "font/woff2",
+  woff: "font/woff",
+  ttf: "font/ttf",
+  otf: "font/otf",
+};
+
+function getFileContentType(file: { name?: string | null; type?: string | null }): string {
+  const declaredType = file.type?.trim();
+  if (declaredType && declaredType !== "application/octet-stream") return declaredType;
+  const extension = file.name?.toLowerCase().split(".").pop();
+  return (extension && MIME_BY_EXTENSION[extension]) || declaredType || "application/octet-stream";
+}
+
 /**
  * React hook for handling file uploads with backend-issued upload URLs.
  *
@@ -70,7 +98,7 @@ export function useUpload(options: UseUploadOptions = {}) {
         body: JSON.stringify({
           name: file.name,
           size: file.size,
-          contentType: file.type || "application/octet-stream",
+          contentType: getFileContentType(file),
         }),
       });
 
@@ -90,7 +118,7 @@ export function useUpload(options: UseUploadOptions = {}) {
         method: "PUT",
         body: file,
         headers: {
-          "Content-Type": file.type || "application/octet-stream",
+          "Content-Type": getFileContentType(file),
         },
       });
 
@@ -146,7 +174,7 @@ export function useUpload(options: UseUploadOptions = {}) {
         body: JSON.stringify({
           name: file.name,
           size: file.size,
-          contentType: file.type || "application/octet-stream",
+          contentType: getFileContentType(file),
         }),
       });
 
@@ -158,7 +186,7 @@ export function useUpload(options: UseUploadOptions = {}) {
       return {
         method: "PUT",
         url: data.uploadURL,
-        headers: { "Content-Type": file.type || "application/octet-stream" },
+        headers: { "Content-Type": getFileContentType(file) },
       };
     },
     []

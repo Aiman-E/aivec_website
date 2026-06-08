@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useUpload } from "@workspace/object-storage-web";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -19,6 +19,9 @@ interface ImageUploadFieldProps {
   hint?: string;
   previewClassName?: string;
   accept?: string;
+  maxSizeBytes?: number;
+  maxSizeLabel?: string;
+  validateFile?: (file: File) => string | null;
 }
 
 export function ImageUploadField({
@@ -28,10 +31,19 @@ export function ImageUploadField({
   hint,
   previewClassName = "w-32 h-20",
   accept = "image/*",
+  maxSizeBytes,
+  maxSizeLabel,
+  validateFile,
 }: ImageUploadFieldProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
   const [localPreview, setLocalPreview] = useState<string | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (localPreview) URL.revokeObjectURL(localPreview);
+    };
+  }, [localPreview]);
 
   const { uploadFile, isUploading, progress } = useUpload({
     onSuccess: (res) => {
@@ -49,6 +61,19 @@ export function ImageUploadField({
     const file = e.target.files?.[0];
     e.target.value = "";
     if (!file) return;
+    const validationError = validateFile?.(file);
+    if (validationError) {
+      toast({ variant: "destructive", title: "Upload failed", description: validationError });
+      return;
+    }
+    if (typeof maxSizeBytes === "number" && file.size > maxSizeBytes) {
+      toast({
+        variant: "destructive",
+        title: "Upload failed",
+        description: `File is too large. Maximum size is ${maxSizeLabel ?? `${maxSizeBytes} bytes`}.`,
+      });
+      return;
+    }
     setLocalPreview(URL.createObjectURL(file));
     await uploadFile(file);
   };
