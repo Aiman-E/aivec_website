@@ -126,7 +126,6 @@ export function Home() {
             muted
             loop
             playsInline
-            controls
             preload="metadata"
           />
         </section>
