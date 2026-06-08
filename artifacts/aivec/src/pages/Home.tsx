@@ -53,6 +53,21 @@ export function Home() {
   const slides = heroImages.length > 0 ? heroImages : DEFAULT_HERO_SLIDES;
   const [slideIndex, setSlideIndex] = useState(0);
   const [paperDialogOpen, setPaperDialogOpen] = useState(false);
+  const contactEmails =
+    settings?.contactEmails && settings.contactEmails.length > 0
+      ? settings.contactEmails
+      : ["alameriendo@gmail.com"];
+  const contactPhones =
+    settings?.contactPhones && settings.contactPhones.length > 0
+      ? settings.contactPhones
+      : (() => {
+          const legacy: { number: string; whatsapp: boolean }[] = [];
+          const phone = settings?.contactPhone?.trim();
+          const wa = settings?.contactWhatsapp?.trim();
+          if (phone) legacy.push({ number: phone, whatsapp: !!wa && wa === phone });
+          if (wa && wa !== phone) legacy.push({ number: wa, whatsapp: true });
+          return legacy.length > 0 ? legacy : [{ number: "+967 777 907 147", whatsapp: true }];
+        })();
 
   useEffect(() => {
     if (slides.length <= 1) return;
@@ -585,13 +600,50 @@ export function Home() {
                   <MapPin className="w-6 h-6 text-primary shrink-0 mt-1" />
                   <p className="text-foreground leading-relaxed">{settings ? t(settings.venueDescEn, settings.venueDescAr) : "Khormaksar, Aden, Yemen"}</p>
                 </div>
-                <div className="flex items-center gap-6">
+                <div className="flex items-start gap-6">
                   <Phone className="w-6 h-6 text-primary shrink-0" />
-                  <p className="font-mono text-foreground tracking-wide" dir="ltr">{settings?.contactPhone || "+967 777 907 147"}</p>
+                  <div className="space-y-2" dir="ltr">
+                    {contactPhones.map((phone, index) => {
+                      const normalizedPhone = phone.number.replace(/\s+/g, "");
+                      const whatsappDigits = phone.number.replace(/[^\d]/g, "");
+                      return (
+                        <div key={`${phone.number}-${index}`} className="flex items-center gap-3">
+                          <a
+                            href={`tel:${normalizedPhone}`}
+                            className="font-mono text-foreground tracking-wide hover:text-primary transition-colors"
+                          >
+                            {phone.number}
+                          </a>
+                          {phone.whatsapp && whatsappDigits && (
+                            <a
+                              href={`https://wa.me/${whatsappDigits}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              aria-label={`WhatsApp ${phone.number}`}
+                              className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-[#25D366] text-white hover:opacity-90 transition-opacity"
+                            >
+                              <WhatsAppGlyph className="w-4 h-4" />
+                            </a>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
                 </div>
-                <div className="flex items-center gap-6">
+                <div className="flex items-start gap-6">
                   <Mail className="w-6 h-6 text-primary shrink-0" />
-                  <p className="font-mono text-foreground tracking-wide">alameriendo@gmail.com</p>
+                  <div className="space-y-2">
+                    {contactEmails.map((email) => (
+                      <a
+                        key={email}
+                        href={`mailto:${email}`}
+                        className="block font-mono text-foreground tracking-wide hover:text-primary transition-colors"
+                        dir="ltr"
+                      >
+                        {email}
+                      </a>
+                    ))}
+                  </div>
                 </div>
               </div>
               
@@ -613,5 +665,13 @@ export function Home() {
 
       <PaperUploadDialog open={paperDialogOpen} onOpenChange={setPaperDialogOpen} />
     </div>
+  );
+}
+
+function WhatsAppGlyph({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} fill="currentColor" aria-hidden="true">
+      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.967-.94 1.164-.173.198-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479c0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347zM12.04 21.785h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.999-3.648-.235-.374a9.86 9.86 0 01-1.511-5.26c.002-5.45 4.436-9.884 9.889-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.886 9.884zm8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
+    </svg>
   );
 }

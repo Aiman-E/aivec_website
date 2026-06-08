@@ -749,9 +749,15 @@ function ContactPhonesField() {
                 render={({ field }) => (
                   <FormItem className="flex items-center gap-2 space-y-0">
                     <FormControl>
-                      <Checkbox checked={field.value} onCheckedChange={(v) => field.onChange(!!v)} />
+                      <Checkbox
+                        id={`contact-phone-whatsapp-${index}`}
+                        checked={field.value === true}
+                        onCheckedChange={(v) => field.onChange(v === true)}
+                      />
                     </FormControl>
-                    <FormLabel className="text-sm font-normal">Show WhatsApp icon for this number</FormLabel>
+                    <FormLabel htmlFor={`contact-phone-whatsapp-${index}`} className="text-sm font-normal cursor-pointer">
+                      Show WhatsApp icon for this number
+                    </FormLabel>
                   </FormItem>
                 )}
               />
