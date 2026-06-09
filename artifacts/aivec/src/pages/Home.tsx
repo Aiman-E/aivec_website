@@ -597,35 +597,35 @@ export function Home() {
       </section>
 
       {/* VENUE & CONTACT */}
-      <section id="venue" className="py-16 md:py-32 lg:py-40 bg-background relative border-t border-border">
-        <div className="container mx-auto px-6 md:px-12">
-          <div id="contact" className="grid lg:grid-cols-2 gap-0 border-2 border-foreground/15 shadow-2xl bg-card overflow-hidden">
+      <section id="venue" className="py-12 sm:py-16 md:py-32 lg:py-40 bg-background relative border-t border-border">
+        <div className="container mx-auto px-4 sm:px-6 md:px-12">
+          <div id="contact" className="grid lg:grid-cols-2 gap-0 border-2 border-foreground/15 shadow-2xl bg-card overflow-hidden min-w-0">
             
-            <div className="p-12 md:p-20 flex flex-col justify-center order-2 lg:order-1">
-              <h3 className="text-accent font-bold uppercase tracking-[0.2em] text-sm mb-8 flex items-center gap-4">
-                <span className="w-12 h-px bg-accent block"></span>
+            <div className="p-6 sm:p-8 md:p-12 lg:p-20 flex flex-col justify-center order-2 lg:order-1 min-w-0">
+              <h3 className="text-accent font-bold uppercase tracking-[0.16em] sm:tracking-[0.2em] text-xs sm:text-sm mb-6 sm:mb-8 flex flex-wrap items-center gap-3 sm:gap-4">
+                <span className="w-10 sm:w-12 h-px bg-accent block shrink-0"></span>
                 {t("Venue & Contact", "المكان والتواصل")}
               </h3>
-              <h2 className="text-4xl md:text-5xl font-serif font-bold mb-10 leading-tight">
+              <h2 className="text-3xl sm:text-4xl md:text-5xl font-serif font-bold mb-8 sm:mb-10 leading-tight break-words [overflow-wrap:anywhere]">
                 {settings ? t(settings.venueNameEn, settings.venueNameAr) : "Saba Grand Hall"}
               </h2>
               
-              <div className="space-y-8 mb-16 text-lg font-serif">
-                <div className="flex gap-6">
-                  <MapPin className="w-6 h-6 text-primary shrink-0 mt-1" />
-                  <p className="text-foreground leading-relaxed">{settings ? t(settings.venueDescEn, settings.venueDescAr) : "Khormaksar, Aden, Yemen"}</p>
+              <div className="space-y-6 sm:space-y-8 mb-10 sm:mb-16 text-base sm:text-lg font-serif min-w-0">
+                <div className="flex items-start gap-4 sm:gap-6 min-w-0">
+                  <MapPin className="w-5 h-5 sm:w-6 sm:h-6 text-primary shrink-0 mt-1" />
+                  <p className="text-foreground leading-relaxed min-w-0 break-words">{settings ? t(settings.venueDescEn, settings.venueDescAr) : "Khormaksar, Aden, Yemen"}</p>
                 </div>
-                <div className="flex items-start gap-6">
-                  <Phone className="w-6 h-6 text-primary shrink-0" />
-                  <div className="space-y-2" dir="ltr">
+                <div className="flex items-start gap-4 sm:gap-6 min-w-0">
+                  <Phone className="w-5 h-5 sm:w-6 sm:h-6 text-primary shrink-0" />
+                  <div className="space-y-2 min-w-0" dir="ltr">
                     {contactPhones.map((phone, index) => {
                       const normalizedPhone = phone.number.replace(/\s+/g, "");
                       const whatsappDigits = phone.number.replace(/[^\d]/g, "");
                       return (
-                        <div key={`${phone.number}-${index}`} className="flex items-center gap-3">
+                        <div key={`${phone.number}-${index}`} className="flex flex-wrap items-center gap-2 sm:gap-3 min-w-0">
                           <a
                             href={`tel:${normalizedPhone}`}
-                            className="font-mono text-foreground tracking-wide hover:text-primary transition-colors"
+                            className="font-mono text-sm sm:text-base md:text-lg text-foreground tracking-normal sm:tracking-wide hover:text-primary transition-colors break-all min-w-0"
                           >
                             {phone.number}
                           </a>
@@ -635,7 +635,7 @@ export function Home() {
                               target="_blank"
                               rel="noopener noreferrer"
                               aria-label={`WhatsApp ${phone.number}`}
-                              className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-[#25D366] text-white hover:opacity-90 transition-opacity"
+                              className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-[#25D366] text-white hover:opacity-90 transition-opacity shrink-0"
                             >
                               <WhatsAppGlyph className="w-4 h-4" />
                             </a>
@@ -645,14 +645,14 @@ export function Home() {
                     })}
                   </div>
                 </div>
-                <div className="flex items-start gap-6">
-                  <Mail className="w-6 h-6 text-primary shrink-0" />
-                  <div className="space-y-2">
+                <div className="flex items-start gap-4 sm:gap-6 min-w-0">
+                  <Mail className="w-5 h-5 sm:w-6 sm:h-6 text-primary shrink-0" />
+                  <div className="space-y-2 min-w-0 max-w-full">
                     {contactEmails.map((email) => (
                       <a
                         key={email}
                         href={`mailto:${email}`}
-                        className="block font-mono text-foreground tracking-wide hover:text-primary transition-colors"
+                        className="block max-w-full font-mono text-sm sm:text-base md:text-lg text-foreground tracking-normal sm:tracking-wide hover:text-primary transition-colors break-all"
                         dir="ltr"
                       >
                         {email}
@@ -663,7 +663,7 @@ export function Home() {
               </div>
               
               <div className="pt-10 border-t border-border/50">
-                <a href="#home" className="inline-flex items-center justify-center px-8 py-4 bg-foreground text-background font-bold text-xs uppercase tracking-widest hover:bg-primary hover:text-primary-foreground transition-colors">
+                <a href="#home" className="inline-flex w-full sm:w-auto items-center justify-center px-6 sm:px-8 py-4 bg-foreground text-background font-bold text-xs uppercase tracking-widest hover:bg-primary hover:text-primary-foreground transition-colors">
                   {t("Back to Top", "العودة للأعلى")}
                   <ArrowRight className={`w-4 h-4 ml-4 ${isRtl ? 'rotate-180 ml-0 mr-4' : ''}`} />
                 </a>
